@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11 -O2 -Wall -I.
 
 # HLS simulation target
 TARGET_HLS = test_hls
-SOURCES_HLS = test_hls.cpp minirocket_inference_hls.cpp
+SOURCES_HLS = test_hls.cpp minirocket_inference_hls.cpp minirocket_hls_testbench_loader.cpp
 
 all: $(TARGET_HLS)
 

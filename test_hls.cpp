@@ -5,236 +5,177 @@
 #include <iomanip>
 #include <algorithm>
 #include "minirocket_inference_hls.h"
+#include "minirocket_hls_testbench_loader.h"
 
-class HLSModelLoader {
-private:
-    std::vector<float> load_json_float_array(const std::string& filename, const std::string& key) {
-        // Simple JSON parser for arrays - assumes clean format
-        std::ifstream file(filename);
-        std::string line, content;
-        
-        while (std::getline(file, line)) {
-            content += line;
-        }
-        
-        // Find the key
-        size_t key_pos = content.find("\"" + key + "\"");
-        if (key_pos == std::string::npos) {
-            std::cerr << "Key " << key << " not found!" << std::endl;
-            return {};
-        }
-        
-        // Find array start
-        size_t array_start = content.find("[", key_pos);
-        size_t array_end = content.find("]", array_start);
-        
-        if (array_start == std::string::npos || array_end == std::string::npos) {
-            std::cerr << "Array for " << key << " not found!" << std::endl;
-            return {};
-        }
-        
-        std::string array_content = content.substr(array_start + 1, array_end - array_start - 1);
-        
-        std::vector<float> result;
-        size_t pos = 0;
-        
-        while (pos < array_content.length()) {
-            size_t comma_pos = array_content.find(",", pos);
-            if (comma_pos == std::string::npos) comma_pos = array_content.length();
-            
-            std::string value_str = array_content.substr(pos, comma_pos - pos);
-            
-            // Clean whitespace and brackets
-            value_str.erase(0, value_str.find_first_not_of(" \t\n\r\f\v"));
-            value_str.erase(value_str.find_last_not_of(" \t\n\r\f\v") + 1);
-            
-            if (!value_str.empty()) {
-                try {
-                    result.push_back(std::stof(value_str));
-                } catch (...) {
-                    // Skip invalid values
-                }
-            }
-            
-            pos = comma_pos + 1;
-        }
-        
-        return result;
+int main(int argc, char* argv[]) {
+    std::string model_file = "minirocket_model.json";
+    std::string test_file = "minirocket_model_test_data.json";
+    
+    // Allow command line arguments like C++ version
+    if (argc >= 3) {
+        model_file = argv[1];
+        test_file = argv[2];
     }
     
-    std::vector<int> load_json_int_array(const std::string& filename, const std::string& key) {
-        std::vector<float> float_vals = load_json_float_array(filename, key);
-        std::vector<int> result;
-        for (float val : float_vals) {
-            result.push_back(static_cast<int>(val));
-        }
-        return result;
-    }
-
-public:
-    bool load_model_for_hls(const std::string& filename, MiniRocketModelParams_HLS& params) {
-        std::cout << "Loading model parameters..." << std::endl;
-        
-        // Load dilations
-        auto dilations = load_json_int_array(filename, "dilations");
-        params.num_dilations = std::min(static_cast<int>(dilations.size()), MAX_DILATIONS);
-        for (int i = 0; i < params.num_dilations; i++) {
-            params.dilations[i] = dilations[i];
-        }
-        
-        // Load num_features_per_dilation
-        auto features_per_dil = load_json_int_array(filename, "num_features_per_dilation");
-        for (int i = 0; i < params.num_dilations; i++) {
-            params.num_features_per_dilation[i] = (i < features_per_dil.size()) ? features_per_dil[i] : NUM_KERNELS;
-        }
-        
-        // Load basic parameters
-        auto temp_vec = load_json_int_array(filename, "num_features");
-        params.num_features = temp_vec.empty() ? 420 : temp_vec[0];
-        
-        temp_vec = load_json_int_array(filename, "num_classes");
-        params.num_classes = temp_vec.empty() ? 4 : temp_vec[0];
-        
-        // Load biases
-        auto biases = load_json_float_array(filename, "biases");
-        int num_biases = std::min(static_cast<int>(biases.size()), MAX_FEATURES);
-        for (int i = 0; i < num_biases; i++) {
-            params.biases[i] = biases[i];
-        }
-        
-        // Load scaler parameters
-        auto scaler_mean = load_json_float_array(filename, "scaler_mean");
-        auto scaler_scale = load_json_float_array(filename, "scaler_scale");
-        
-        for (int i = 0; i < params.num_features && i < MAX_FEATURES; i++) {
-            params.scaler_mean[i] = (i < scaler_mean.size()) ? scaler_mean[i] : 0.0;
-            params.scaler_scale[i] = (i < scaler_scale.size()) ? scaler_scale[i] : 1.0;
-        }
-        
-        // Load intercept
-        auto intercept = load_json_float_array(filename, "classifier_intercept");
-        for (int i = 0; i < params.num_classes && i < MAX_CLASSES; i++) {
-            params.intercept[i] = (i < intercept.size()) ? intercept[i] : 0.0;
-        }
-        
-        // Load coefficients (this is a simplified approach)
-        auto coefficients = load_json_float_array(filename, "classifier_coef");
-        
-        // Coefficients are stored as [class0_features, class1_features, ...]
-        for (int class_idx = 0; class_idx < params.num_classes && class_idx < MAX_CLASSES; class_idx++) {
-            for (int feat_idx = 0; feat_idx < params.num_features && feat_idx < MAX_FEATURES; feat_idx++) {
-                int coef_idx = class_idx * params.num_features + feat_idx;
-                params.coefficients[class_idx][feat_idx] = 
-                    (coef_idx < coefficients.size()) ? coefficients[coef_idx] : 0.0;
-            }
-        }
-        
-        std::cout << "Model loaded: " << params.num_features << " features, " 
-                  << params.num_classes << " classes, " 
-                  << params.num_dilations << " dilations" << std::endl;
-        
-        return true;
-    }
-};
-
-void test_hls_implementation() {
-    std::cout << "Testing HLS implementation..." << std::endl;
+    std::cout << "HLS MiniRocket Test" << std::endl;
+    std::cout << "Model file: " << model_file << std::endl;
+    std::cout << "Test file: " << test_file << std::endl;
     
-    // Load model
-    HLSModelLoader loader;
-    MiniRocketModelParams_HLS params;
+    // Initialize loader
+    MiniRocketTestbenchLoader loader;
     
-    if (!loader.load_model_for_hls("minirocket_model.json", params)) {
+    // HLS arrays (heap allocated for testbench to avoid stack overflow)
+    data_t (*coefficients)[MAX_FEATURES] = new data_t[MAX_CLASSES][MAX_FEATURES];
+    data_t *intercept = new data_t[MAX_CLASSES];
+    data_t *scaler_mean = new data_t[MAX_FEATURES];
+    data_t *scaler_scale = new data_t[MAX_FEATURES];
+    int_t *dilations = new int_t[MAX_DILATIONS];
+    int_t *num_features_per_dilation = new int_t[MAX_DILATIONS];
+    data_t *biases = new data_t[MAX_FEATURES];
+    
+    int_t num_dilations, num_features, num_classes, time_series_length;
+    
+    // Load model into HLS arrays
+    if (!loader.load_model_to_hls_arrays(model_file, coefficients, intercept, 
+                                        scaler_mean, scaler_scale, dilations,
+                                        num_features_per_dilation, biases,
+                                        num_dilations, num_features, num_classes,
+                                        time_series_length)) {
         std::cerr << "Failed to load model!" << std::endl;
-        return;
+        return 1;
     }
     
-    // Create sample time series (sine wave)
-    data_t time_series[MAX_TIME_SERIES_LENGTH];
-    int_t time_series_length = 128;
-    
-    for (int i = 0; i < time_series_length; i++) {
-        time_series[i] = sin(2.0 * M_PI * i / 32.0) + 0.1 * ((i % 10) - 5) / 5.0;
+    // Load test data
+    std::vector<std::vector<float>> test_inputs, expected_outputs;
+    if (!loader.load_test_data(test_file, test_inputs, expected_outputs)) {
+        std::cerr << "Failed to load test data!" << std::endl;
+        return 1;
     }
     
-    std::cout << "Input time series (first 10 values): ";
-    for (int i = 0; i < 10; i++) {
-        std::cout << std::fixed << std::setprecision(3) << time_series[i] << " ";
-    }
-    std::cout << std::endl;
-    
-    // Test feature extraction
-    data_t features[MAX_FEATURES];
-    
-    std::cout << "Running feature extraction..." << std::endl;
-    minirocket_feature_extraction_hls(
-        time_series,
-        features,
-        params.dilations,
-        params.num_features_per_dilation,
-        params.biases,
-        time_series_length,
-        params.num_dilations,
-        params.num_features
-    );
-    
-    std::cout << "Feature extraction complete. First 10 features: ";
-    for (int i = 0; i < 10 && i < params.num_features; i++) {
-        std::cout << std::fixed << std::setprecision(4) << features[i] << " ";
-    }
-    std::cout << std::endl;
-    
-    // Test scaling
-    data_t scaled_features[MAX_FEATURES];
-    
-    std::cout << "Applying feature scaling..." << std::endl;
-    apply_scaler_hls(
-        features,
-        scaled_features,
-        params.scaler_mean,
-        params.scaler_scale,
-        params.num_features
-    );
-    
-    std::cout << "Scaling complete. First 10 scaled features: ";
-    for (int i = 0; i < 10 && i < params.num_features; i++) {
-        std::cout << std::fixed << std::setprecision(4) << scaled_features[i] << " ";
-    }
-    std::cout << std::endl;
-    
-    // Test classification
-    data_t predictions[MAX_CLASSES];
-    
-    std::cout << "Running classification..." << std::endl;
-    linear_classifier_predict_hls(
-        scaled_features,
-        predictions,
-        params.coefficients,
-        params.intercept,
-        params.num_features,
-        params.num_classes
-    );
-    
-    // Find predicted class
-    int predicted_class = 0;
-    data_t max_score = predictions[0];
-    
-    std::cout << "Classification scores: ";
-    for (int i = 0; i < params.num_classes; i++) {
-        std::cout << "Class" << i << "=" << std::fixed << std::setprecision(4) << predictions[i] << " ";
-        if (predictions[i] > max_score) {
-            max_score = predictions[i];
-            predicted_class = i;
+    // Convert y_test (single values) to expected class indices
+    std::vector<int> expected_classes;
+    for (const auto& output : expected_outputs) {
+        if (!output.empty()) {
+            expected_classes.push_back((int)output[0]);
         }
     }
-    std::cout << std::endl;
     
-    std::cout << "Predicted class: " << predicted_class 
-              << " (score: " << std::fixed << std::setprecision(4) << max_score << ")" << std::endl;
-    std::cout << "HLS implementation test complete!" << std::endl;
-}
-
-int main() {
-    test_hls_implementation();
-    return 0;
+    // Test on loaded data
+    int num_correct = 0;
+    int num_tests = std::min((int)test_inputs.size(), 100); // Test first 100 samples
+    
+    std::cout << "\nTesting HLS implementation with " << num_tests << " samples:" << std::endl;
+    
+    for (int test_idx = 0; test_idx < num_tests; test_idx++) {
+        // Progress indicator for every 10 tests
+        if (test_idx % 10 == 0) {
+            std::cout << "Processing tests " << test_idx + 1 << "-" << std::min(test_idx + 10, num_tests) << "..." << std::endl;
+        }
+        
+        // Copy input to HLS array (heap allocated to avoid stack overflow)
+        data_t *time_series = new data_t[MAX_TIME_SERIES_LENGTH];
+        int input_length = std::min((int)test_inputs[test_idx].size(), MAX_TIME_SERIES_LENGTH);
+        
+        for (int i = 0; i < input_length; i++) {
+            time_series[i] = test_inputs[test_idx][i];
+        }
+        
+        // Run HLS inference pipeline (heap allocated to avoid stack overflow)
+        data_t *features = new data_t[MAX_FEATURES];
+        data_t *scaled_features = new data_t[MAX_FEATURES];
+        data_t *predictions = new data_t[MAX_CLASSES];
+        
+        // Feature extraction
+        minirocket_feature_extraction_hls(
+            time_series,
+            features,
+            dilations,
+            num_features_per_dilation,
+            biases,
+            input_length,
+            num_dilations,
+            num_features
+        );
+        
+        // Scaling
+        apply_scaler_hls(
+            features,
+            scaled_features,
+            scaler_mean,
+            scaler_scale,
+            num_features
+        );
+        
+        // Classification
+        linear_classifier_predict_hls(
+            scaled_features,
+            predictions,
+            coefficients,
+            intercept,
+            num_features,
+            num_classes
+        );
+        
+        // Find predicted class
+        int predicted_class = 0;
+        data_t max_score = predictions[0];
+        for (int i = 1; i < num_classes; i++) {
+            if (predictions[i] > max_score) {
+                max_score = predictions[i];
+                predicted_class = i;
+            }
+        }
+        
+        // Get expected class directly from labels
+        int expected_class = (test_idx < expected_classes.size()) ? expected_classes[test_idx] : 0;
+        
+        bool correct = (predicted_class == expected_class);
+        if (correct) num_correct++;
+        
+        // Show running accuracy every 10 tests
+        if (test_idx % 10 == 9 || test_idx == num_tests - 1) {
+            float current_accuracy = (float)num_correct / (test_idx + 1) * 100.0f;
+            std::cout << "  Completed " << (test_idx + 1) << " tests - Accuracy: " 
+                     << std::fixed << std::setprecision(1) << current_accuracy 
+                     << "% (" << num_correct << "/" << (test_idx + 1) << " correct)" << std::endl;
+        }
+        
+        // Show prediction scores for first test only
+        if (test_idx == 0) {
+            std::cout << "Sample prediction scores - Test 1: ";
+            for (int i = 0; i < num_classes; i++) {
+                std::cout << "C" << i << "=" << std::fixed << std::setprecision(3) 
+                         << predictions[i] << " ";
+            }
+            std::cout << " → Predicted=" << predicted_class << ", Expected=" << expected_class << std::endl;
+        }
+        
+        // Cleanup
+        delete[] time_series;
+        delete[] features;
+        delete[] scaled_features;
+        delete[] predictions;
+    }
+    
+    float accuracy = (float)num_correct / num_tests * 100.0f;
+    std::cout << "\nResults: " << num_correct << "/" << num_tests 
+              << " correct (" << std::fixed << std::setprecision(1) 
+              << accuracy << "% accuracy)" << std::endl;
+    
+    // Cleanup main arrays
+    delete[] coefficients;
+    delete[] intercept;
+    delete[] scaler_mean;
+    delete[] scaler_scale;
+    delete[] dilations;
+    delete[] num_features_per_dilation;
+    delete[] biases;
+    
+    if (accuracy >= 90.0f) {
+        std::cout << "SUCCESS: HLS implementation achieves good accuracy!" << std::endl;
+        return 0;
+    } else {
+        std::cout << "WARNING: HLS accuracy below 90%" << std::endl;
+        return 1;
+    }
 }
