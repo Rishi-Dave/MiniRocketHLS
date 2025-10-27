@@ -222,7 +222,19 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     auto scaler_mean_vec = parse_float_array(content, "scaler_mean");
     auto scaler_scale_vec = parse_float_array(content, "scaler_scale");
     auto intercept_vec = parse_float_array(content, "classifier_intercept");
-    auto coef_2d = parse_2d_float_array(content, "classifier_coef");
+    
+    // Handle binary vs multi-class classification for coefficients
+    std::vector<std::vector<float>> coef_2d;
+    if (num_classes_out == 2) {
+        // Binary classification: classifier_coef is 1D array
+        auto coef_1d = parse_float_array(content, "classifier_coef");
+        coef_2d.resize(2);
+        coef_2d[0] = coef_1d;  // Use the 1D coefficients for class 0 decision function
+        coef_2d[1].resize(coef_1d.size(), 0.0f);  // Not used but keep for consistency
+    } else {
+        // Multi-class: classifier_coef is 2D array
+        coef_2d = parse_2d_float_array(content, "classifier_coef");
+    }
     
     // Copy to HLS arrays
     for (int i = 0; i < num_dilations_out; i++) {
@@ -236,8 +248,19 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
         scaler_scale[i] = scaler_scale_vec[i];
     }
     
+    // Handle intercept for binary vs multi-class
+    if (num_classes_out == 2 && intercept_vec.size() == 1) {
+        // Binary classification: single intercept
+        intercept[0] = intercept_vec[0];
+        intercept[1] = 0.0f;  // Not used
+    } else {
+        // Multi-class: one intercept per class
+        for (int i = 0; i < num_classes_out; i++) {
+            intercept[i] = intercept_vec[i];
+        }
+    }
+    
     for (int i = 0; i < num_classes_out; i++) {
-        intercept[i] = intercept_vec[i];
         for (int j = 0; j < num_features_out; j++) {
             coefficients[i][j] = coef_2d[i][j];
         }

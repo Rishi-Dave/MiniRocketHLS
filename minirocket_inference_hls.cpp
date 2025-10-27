@@ -157,20 +157,36 @@ void linear_classifier_predict_hls(
 ) {
     #pragma HLS INLINE off
     
-    CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
-        #pragma HLS PIPELINE off
-        #pragma HLS LOOP_TRIPCOUNT min=2 max=4
+    if (num_classes == 2) {
+        // Binary classification: use single decision function
+        data_t score = intercept[0];
         
-        data_t score = intercept[i];
-        
-        FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
+        BINARY_FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
             #pragma HLS PIPELINE II=1
             #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
             
-            score += coefficients[i][j] * scaled_features[j];
+            score += coefficients[0][j] * scaled_features[j];
         }
         
-        predictions[i] = score;
+        predictions[0] = (data_t)0.0 - score;  // Class 0 score
+        predictions[1] = score;   // Class 1 score
+    } else {
+        // Multi-class classification
+        CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
+            #pragma HLS PIPELINE off
+            #pragma HLS LOOP_TRIPCOUNT min=2 max=4
+            
+            data_t score = intercept[i];
+            
+            FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
+                #pragma HLS PIPELINE II=1
+                #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
+                
+                score += coefficients[i][j] * scaled_features[j];
+            }
+            
+            predictions[i] = score;
+        }
     }
 }
 

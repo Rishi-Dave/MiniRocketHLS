@@ -9,6 +9,8 @@ from sklearn.metrics import accuracy_score
 import argparse
 import os
 
+# sktime datasets import will be done locally in functions
+
 class MiniRocket:
     """MiniRocket implementation for time series classification"""
     
@@ -92,6 +94,9 @@ class MiniRocket:
         """Fit MiniRocket and transform the data"""
         n_samples, length = X.shape
         
+        # Store time series length
+        self.time_series_length = length
+        
         # Generate fixed components
         self.kernel_indices = self._get_kernel_combinations(length)
         self.dilations = self._get_dilations(length)
@@ -148,6 +153,49 @@ class MiniRocket:
                 
         return results
 
+def load_real_dataset(dataset_name='arrow_head'):
+    """Load real time series datasets from sktime"""
+    try:
+        print(f"Attempting to import sktime for dataset: {dataset_name}")
+        from sktime.datasets import load_arrow_head, load_gunpoint, load_italy_power_demand
+        print("sktime import successful")
+        
+        if dataset_name == 'arrow_head':
+            X, y = load_arrow_head()
+        elif dataset_name == 'gun_point':
+            X, y = load_gunpoint()
+        elif dataset_name == 'italy_power':
+            X, y = load_italy_power_demand()
+        else:
+            print(f"Unknown dataset {dataset_name}, using arrow_head")
+            X, y = load_arrow_head()
+        
+        # Convert from pandas to numpy
+        X_numpy = np.array([series.values for series in X.iloc[:, 0]])
+        
+        # Convert string labels to integers
+        unique_labels = sorted(set(y))
+        label_to_int = {label: i for i, label in enumerate(unique_labels)}
+        y_numpy = np.array([label_to_int[label] for label in y])
+        
+        print(f"Real dataset loaded: {dataset_name}")
+        print(f"  Shape: {X_numpy.shape}")
+        print(f"  Classes: {len(unique_labels)} ({unique_labels})")
+        print(f"  Class distribution: {np.bincount(y_numpy)}")
+        
+        return X_numpy.astype(np.float32), y_numpy
+        
+    except ImportError as e:
+        print(f"sktime import error: {e}")
+        print("falling back to synthetic data")
+        return generate_sample_data()
+    except Exception as e:
+        print(f"Error loading dataset {dataset_name}: {e}")
+        print("Falling back to synthetic data")
+        import traceback
+        traceback.print_exc()
+        return generate_sample_data()
+
 def generate_sample_data(n_samples=1000, length=128, n_classes=4):
     """Generate sample time series data for testing"""
     np.random.seed(42)
@@ -185,6 +233,7 @@ def save_model_parameters(minirocket, scaler, classifier, filename="minirocket_m
         "num_dilations": len(minirocket.dilations),
         "num_features": len(minirocket.biases),
         "num_classes": len(classifier.classes_),
+        "time_series_length": minirocket.time_series_length,
         "kernel_indices": minirocket.kernel_indices.tolist(),
         "dilations": minirocket.dilations.tolist(),
         "num_features_per_dilation": minirocket.num_features_per_dilation.tolist(),
@@ -204,14 +253,22 @@ def save_model_parameters(minirocket, scaler, classifier, filename="minirocket_m
 
 def main():
     parser = argparse.ArgumentParser(description='Train MiniRocket model')
-    parser.add_argument('--samples', type=int, default=1000, help='Number of samples')
-    parser.add_argument('--length', type=int, default=128, help='Time series length')
-    parser.add_argument('--classes', type=int, default=4, help='Number of classes')
+    parser.add_argument('--dataset', type=str, default='arrow_head', 
+                       choices=['arrow_head', 'gun_point', 'italy_power', 'synthetic'],
+                       help='Dataset to use (arrow_head, gun_point, italy_power, or synthetic)')
+    parser.add_argument('--samples', type=int, default=1000, help='Number of samples (for synthetic data)')
+    parser.add_argument('--length', type=int, default=128, help='Time series length (for synthetic data)')
+    parser.add_argument('--classes', type=int, default=4, help='Number of classes (for synthetic data)')
     parser.add_argument('--output', type=str, default='minirocket_model.json', help='Output file')
     args = parser.parse_args()
     
-    print("Generating sample data...")
-    X, y = generate_sample_data(args.samples, args.length, args.classes)
+    # Load data based on dataset choice
+    if args.dataset == 'synthetic':
+        print("Generating synthetic data...")
+        X, y = generate_sample_data(args.samples, args.length, args.classes)
+    else:
+        print(f"Loading real dataset: {args.dataset}")
+        X, y = load_real_dataset(args.dataset)
     
     print(f"Data shape: {X.shape}")
     print(f"Classes: {np.unique(y)}")
@@ -246,11 +303,16 @@ def main():
     # Save model
     model_data = save_model_parameters(minirocket, scaler, classifier, args.output)
     
-    # Save test data for C++ verification
+    # Save test data for C++ verification with dataset info
     test_data = {
+        "dataset_name": args.dataset,
         "X_test": X_test.tolist(),
         "y_test": y_test.tolist(),
-        "y_pred": y_pred.tolist()
+        "y_pred": y_pred.tolist(),
+        "test_accuracy": float(accuracy),
+        "num_samples": len(X_test),
+        "series_length": X_test.shape[1] if len(X_test.shape) > 1 else len(X_test[0]),
+        "num_classes": len(np.unique(y))
     }
     
     test_filename = args.output.replace('.json', '_test_data.json')
@@ -258,6 +320,7 @@ def main():
         json.dump(test_data, f, indent=2)
     
     print(f"Test data saved to {test_filename}")
+    print(f"Python baseline accuracy: {accuracy:.4f}")
     print("Training complete!")
 
 if __name__ == "__main__":
