@@ -114,19 +114,37 @@ tcl_template/                    # Main HLS project directory
 ## Running Your First Simulation
 
 ### Prerequisites
-1. **Xilinx Vitis HLS** installed and licensed
-2. **Environment Setup**: Source the Vitis HLS tools
-   ```bash
-   source /tools/Xilinx/Vitis_HLS/2023.1/settings64.sh
-   ```
+
+You have two options for running simulations:
+
+#### Option A: C++ Functional Simulation (Easiest - No special tools required)
+- **C++ Compiler** (g++, usually pre-installed on Linux/macOS)
+- **Basic development tools**
+
+#### Option B: Full HLS Simulation (Complete experience)
+- **Xilinx Vitis HLS** installed and licensed
+- **Environment Setup**: Source the Vitis HLS tools
 
 ### Step 1: Navigate to Project
 ```bash
 cd tcl_template/
 ```
 
-### Step 2: Run Simulation
+### Step 2: Choose Your Simulation Type
+
+#### Quick Start - Functional Simulation
 ```bash
+./build_cpp_sim.sh
+```
+This verifies the algorithm works correctly without requiring Xilinx tools.
+
+#### Full HLS Experience (if you have Xilinx tools)
+```bash
+# Setup environment (path varies by installation):
+source /tools/Xilinx/Vitis_HLS/*/settings64.sh
+# OR: source /opt/Xilinx/Vitis_HLS/*/settings64.sh
+# OR: source ~/Xilinx/Vitis_HLS/*/settings64.sh
+
 ./build_sim.sh
 ```
 

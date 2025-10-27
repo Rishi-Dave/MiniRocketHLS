@@ -12,20 +12,26 @@ Read the **[MiniRocket Pipeline Detailed Documentation](MINIROCKET_PIPELINE_DETA
 
 ### Running Your First Simulation
 
-1. **Setup Environment**
-   ```bash
-   source /tools/Xilinx/Vitis_HLS/2023.1/settings64.sh
-   ```
+You have two options depending on whether you have Xilinx HLS tools installed:
 
-2. **Navigate to Project**
-   ```bash
-   cd tcl_template/
-   ```
+#### Option 1: C++ Functional Simulation (No HLS tools required)
+```bash
+cd tcl_template/
+./build_cpp_sim.sh
+```
+This runs a functional simulation to verify algorithm correctness and accuracy.
 
-3. **Run Simulation**
-   ```bash
-   ./build_sim.sh
-   ```
+#### Option 2: Full HLS Simulation (Requires Xilinx Vitis HLS)
+```bash
+# First, setup Xilinx environment (path may vary):
+source /tools/Xilinx/Vitis_HLS/*/settings64.sh
+# OR: source /opt/Xilinx/Vitis_HLS/*/settings64.sh  
+# OR: source ~/Xilinx/Vitis_HLS/*/settings64.sh
+
+cd tcl_template/
+./build_sim.sh
+```
+This runs complete HLS synthesis, simulation, and hardware generation.
 
 ## Repository Structure
 
