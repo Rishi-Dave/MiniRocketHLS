@@ -71,7 +71,7 @@ set_part {xcvu9p-flga2104-2-i}
 create_clock -period 10 -name default
 
 # Run C simulation
-csim_design -compiler gcc
+csim_design
 
 # Run synthesis
 csynth_design

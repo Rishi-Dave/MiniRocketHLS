@@ -1,2 +1,61 @@
+# Python
 venv
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Claude Code
 .claude
+
+# HLS Build Directories (SAFE TO IGNORE - 8.8GB!)
+tcl_template/build_hls_sim/
+tcl_template/minirocket_hls_validate/
+tcl_template/build_cpp_sim/*.o
+tcl_template/build_cpp_sim/test_sim
+tcl_template/build_cpp_sim/src/test_sim
+tcl_template/build_dir/
+tcl_template/.Xil/
+
+# HLS Logs
+tcl_template/*.log
+tcl_template/vitis_hls.log
+tcl_template/vivado*.log
+*.jou
+
+# Waveform databases
+*.wdb
+*.wcfg
+
+# Simulation data files
+*.csv
+*.dat
+*.saif
+*.vcd
+
+# HLS intermediate files
+*.bc
+*.ll
+*.s
+.autopilot/
+.Xil/
+
+# Vitis/Vivado project files
+*.xpr
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.runs/
+
+# Build outputs
+*.xo
+*.xclbin
+*.ltx
+*.bit
+*.bin
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store

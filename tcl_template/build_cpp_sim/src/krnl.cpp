@@ -266,12 +266,32 @@ extern "C" void krnl_top(
         local_intercept[i] = intercept[i];
     }
     
-    COPY_COEF: for (int_t i = 0; i < num_classes; i++) {
-        for (int_t j = 0; j < num_features; j++) {
+    COPY_COEF_I: for (int_t i = 0; i < num_classes; i++) {
+        COPY_COEF_J: for (int_t j = 0; j < num_features; j++) {
             #pragma HLS PIPELINE II=1
-            local_coefficients[i][j] = coefficients[i * num_features + j];
+            // Note: coefficients is flattened from [MAX_CLASSES][MAX_FEATURES]
+            // so we need to use MAX_FEATURES as the stride, not num_features
+            local_coefficients[i][j] = coefficients[i * MAX_FEATURES + j];
         }
     }
+
+    // Debug: Check coefficient copying
+    #ifndef __SYNTHESIS__
+    static bool first_coef_debug = true;
+    if (first_coef_debug) {
+        first_coef_debug = false;
+        std::cout << "\nDEBUG COPY_COEF - Checking coefficient copy:" << std::endl;
+        std::cout << "  num_classes: " << num_classes << ", num_features: " << num_features << ", MAX_FEATURES: " << MAX_FEATURES << std::endl;
+        std::cout << "  First 3 from flattened coefficients array (using MAX_FEATURES stride):" << std::endl;
+        for (int i = 0; i < num_classes; i++) {
+            std::cout << "    Class " << i << " (indices " << (i * MAX_FEATURES) << "-" << (i * MAX_FEATURES + 2) << "): ";
+            for (int j = 0; j < 3; j++) {
+                std::cout << coefficients[i * MAX_FEATURES + j] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+    #endif
     
     // Feature extraction
     minirocket_feature_extraction_hls(
@@ -303,7 +323,31 @@ extern "C" void krnl_top(
         num_features,
         num_classes
     );
-    
+
+    // Debug output for first invocation only (using static variable)
+    #ifndef __SYNTHESIS__
+    static bool first_call = true;
+    if (first_call) {
+        first_call = false;
+        std::cout << "\nDEBUG krnl_top - First invocation:" << std::endl;
+        std::cout << "  First 5 features: ";
+        for (int i = 0; i < 5; i++) std::cout << local_features[i] << " ";
+        std::cout << std::endl;
+        std::cout << "  First 5 scaled features: ";
+        for (int i = 0; i < 5; i++) std::cout << local_scaled_features[i] << " ";
+        std::cout << std::endl;
+        std::cout << "  First 3 coefficients for each class:" << std::endl;
+        for (int i = 0; i < num_classes; i++) {
+            std::cout << "    Class " << i << ": ";
+            for (int j = 0; j < 3; j++) std::cout << local_coefficients[i][j] << " ";
+            std::cout << std::endl;
+        }
+        std::cout << "  Predictions: ";
+        for (int i = 0; i < num_classes; i++) std::cout << local_predictions[i] << " ";
+        std::cout << std::endl;
+    }
+    #endif
+
     // Copy output
     COPY_OUTPUT: for (int_t i = 0; i < num_classes; i++) {
         #pragma HLS PIPELINE II=1

@@ -97,39 +97,37 @@ int main(int argc, char* argv[]) {
         }
         
         // Run HLS inference pipeline (heap allocated to avoid stack overflow)
-        data_t *features = new data_t[MAX_FEATURES];
-        data_t *scaled_features = new data_t[MAX_FEATURES];
         data_t *predictions = new data_t[MAX_CLASSES];
-        
-        // Feature extraction
-        minirocket_feature_extraction_hls(
+
+        // Debug: Print first test parameters
+        if (test_idx == 0) {
+            std::cout << "\nDEBUG Test 0 parameters:" << std::endl;
+            std::cout << "  input_length: " << input_length << std::endl;
+            std::cout << "  num_features: " << num_features << std::endl;
+            std::cout << "  num_classes: " << num_classes << std::endl;
+            std::cout << "  num_dilations: " << num_dilations << std::endl;
+            std::cout << "  First 5 input values: ";
+            for (int i = 0; i < 5; i++) std::cout << time_series[i] << " ";
+            std::cout << std::endl;
+        }
+
+        // Call top-level kernel function (for RTL co-simulation)
+        // Note: coefficients needs to be passed as &coefficients[0][0] to properly
+        // treat the 2D array as a flattened 1D array
+        krnl_top(
             time_series,
-            features,
+            predictions,
+            &coefficients[0][0],  // Properly flatten 2D array
+            intercept,
+            scaler_mean,
+            scaler_scale,
             dilations,
             num_features_per_dilation,
             biases,
             input_length,
-            num_dilations,
-            num_features
-        );
-        
-        // Scaling
-        apply_scaler_hls(
-            features,
-            scaled_features,
-            scaler_mean,
-            scaler_scale,
-            num_features
-        );
-        
-        // Classification
-        linear_classifier_predict_hls(
-            scaled_features,
-            predictions,
-            coefficients,
-            intercept,
             num_features,
-            num_classes
+            num_classes,
+            num_dilations
         );
         
         // Find predicted class
@@ -168,8 +166,6 @@ int main(int argc, char* argv[]) {
         
         // Cleanup
         delete[] time_series;
-        delete[] features;
-        delete[] scaled_features;
         delete[] predictions;
     }
     
