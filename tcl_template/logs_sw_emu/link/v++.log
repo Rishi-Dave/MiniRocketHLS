@@ -1,0 +1,16 @@
+WARNING: [v++ 17-1682] Kernel 'krnl_top' has been packaged by Vivado HLS and may not work for a sw_emu target or a debug hw_emu target if an explicit include path for header files has not been specified by user in the original Vivado HLS project
+INFO: [v++ 60-1306] Additional information associated with this v++ link can be found at:
+	Reports: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/reports/link
+	Log files: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_sw_emu/link
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_sw_emu.xclbin.link_summary, at Wed Nov 12 14:08:29 2025
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/reports/link/v++_link_minirocket_sw_emu_guidance.html', at Wed Nov 12 14:08:29 2025
+INFO: [v++ 60-895]   Target platform: /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2023.2
+INFO: [v++ 60-629] Linking for software emulation target
+INFO: [v++ 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [v++ 60-645] kernel flags are ''
+ERROR: [v++ 17-1309] Gcc: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp:1:10: fatal error: krnl.hpp: No such file or directory
+ERROR: [v++ 60-398] gcc failed
+ERROR: [v++ 60-626] Kernel link failed to complete
+ERROR: [v++ 60-703] Failed to finish linking

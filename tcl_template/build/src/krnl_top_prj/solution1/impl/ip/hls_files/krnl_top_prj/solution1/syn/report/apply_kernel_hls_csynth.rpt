@@ -1,0 +1,278 @@
+
+
+================================================================
+== Vitis HLS Report for 'apply_kernel_hls'
+================================================================
+* Date:           Wed Nov 19 13:37:07 2025
+
+* Version:        2023.2 (Build 4023990 on Oct 11 2023)
+* Project:        krnl_top_prj
+* Solution:       solution1 (Vivado IP Flow Target)
+* Product family: virtexuplusHBM
+* Target device:  xcu280-fsvh2892-2L-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+---------+----------+------------+
+    |  Clock |  Target | Estimated| Uncertainty|
+    +--------+---------+----------+------------+
+    |ap_clk  |  3.33 ns|  2.342 ns|     0.90 ns|
+    +--------+---------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |        1|      543|  3.333 ns|  1.810 us|    1|  543|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        +------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+        |                                                |                                     |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+        |                    Instance                    |                Module               |   min   |   max   |    min   |    max   | min | max |   Type  |
+        +------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+        |grp_apply_kernel_hls_Pipeline_CONV_LOOP_fu_126  |apply_kernel_hls_Pipeline_CONV_LOOP  |       92|      540|  0.307 us|  1.800 us|   92|  540|       no|
+        +------------------------------------------------+-------------------------------------+---------+---------+----------+----------+-----+-----+---------+
+
+        * Loop: 
+        N/A
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+---------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT   | URAM|
++---------------------+---------+------+---------+---------+-----+
+|DSP                  |        -|     -|        -|        -|    -|
+|Expression           |        -|     -|        0|       80|    -|
+|FIFO                 |        -|     -|        -|        -|    -|
+|Instance             |        -|     4|     2260|     1437|    -|
+|Memory               |        0|     -|       12|       27|    -|
+|Multiplexer          |        -|     -|        -|       71|    -|
+|Register             |        -|     -|      143|        -|    -|
++---------------------+---------+------+---------+---------+-----+
+|Total                |        0|     4|     2415|     1615|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available SLR        |     1344|  3008|   869120|   434560|  320|
++---------------------+---------+------+---------+---------+-----+
+|Utilization SLR (%)  |        0|    ~0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available            |     4032|  9024|  2607360|  1303680|  960|
++---------------------+---------+------+---------+---------+-----+
+|Utilization (%)      |        0|    ~0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+
++ Detail: 
+    * Instance: 
+    +------------------------------------------------+-------------------------------------+---------+----+------+------+-----+
+    |                    Instance                    |                Module               | BRAM_18K| DSP|  FF  |  LUT | URAM|
+    +------------------------------------------------+-------------------------------------+---------+----+------+------+-----+
+    |grp_apply_kernel_hls_Pipeline_CONV_LOOP_fu_126  |apply_kernel_hls_Pipeline_CONV_LOOP  |        0|   4|  2260|  1437|    0|
+    +------------------------------------------------+-------------------------------------+---------+----+------+------+-----+
+    |Total                                           |                                     |        0|   4|  2260|  1437|    0|
+    +------------------------------------------------+-------------------------------------+---------+----+------+------+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    +--------------------+-----------------------------------------------+---------+---+----+-----+------+-----+------+-------------+
+    |       Memory       |                     Module                    | BRAM_18K| FF| LUT| URAM| Words| Bits| Banks| W*Bits*Banks|
+    +--------------------+-----------------------------------------------+---------+---+----+-----+------+-----+------+-------------+
+    |kernel_indices_0_U  |apply_kernel_hls_kernel_indices_0_ROM_AUTO_1R  |        0|  4|   9|    0|    84|    3|     1|          252|
+    |kernel_indices_1_U  |apply_kernel_hls_kernel_indices_1_ROM_AUTO_1R  |        0|  4|   9|    0|    84|    3|     1|          252|
+    |kernel_indices_2_U  |apply_kernel_hls_kernel_indices_2_ROM_AUTO_1R  |        0|  4|   9|    0|    84|    4|     1|          336|
+    +--------------------+-----------------------------------------------+---------+---+----+-----+------+-----+------+-------------+
+    |Total               |                                               |        0| 12|  27|    0|   252|   10|     3|          840|
+    +--------------------+-----------------------------------------------+---------+---+----+-----+------+-----+------+-------------+
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |          Variable Name          | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |sub_ln48_fu_174_p2               |         -|   0|  0|  39|          32|          32|
+    |ap_block_state4_on_subcall_done  |       and|   0|  0|   2|           1|           1|
+    |icmp_ln50_fu_180_p2              |      icmp|   0|  0|  39|          32|           1|
+    +---------------------------------+----------+----+---+----+------------+------------+
+    |Total                            |          |   0|  0|  80|          65|          34|
+    +---------------------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +------------------------------------------+----+-----------+-----+-----------+
+    |                   Name                   | LUT| Input Size| Bits| Total Bits|
+    +------------------------------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm                                 |  26|          5|    1|          5|
+    |ap_phi_mux_output_length_0_phi_fu_119_p4  |   9|          2|   32|         64|
+    |ap_return                                 |   9|          2|   32|         64|
+    |grp_fu_252_ce                             |   9|          2|    1|          2|
+    |grp_fu_256_ce                             |   9|          2|    1|          2|
+    |output_length_0_reg_115                   |   9|          2|   32|         64|
+    +------------------------------------------+----+-----------+-----+-----------+
+    |Total                                     |  71|         15|   99|        201|
+    +------------------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +-------------------------------------------------------------+----+----+-----+-----------+
+    |                             Name                            | FF | LUT| Bits| Const Bits|
+    +-------------------------------------------------------------+----+----+-----+-----------+
+    |ap_CS_fsm                                                    |   4|   0|    4|          0|
+    |ap_return_preg                                               |  32|   0|   32|          0|
+    |empty_reg_247                                                |  31|   0|   31|          0|
+    |grp_apply_kernel_hls_Pipeline_CONV_LOOP_fu_126_ap_start_reg  |   1|   0|    1|          0|
+    |icmp_ln50_reg_213                                            |   1|   0|    1|          0|
+    |kernel_indices_0_load_reg_232                                |   3|   0|    3|          0|
+    |kernel_indices_1_load_reg_237                                |   3|   0|    3|          0|
+    |kernel_indices_2_load_reg_242                                |   4|   0|    4|          0|
+    |output_length_0_reg_115                                      |  32|   0|   32|          0|
+    |sub_ln48_reg_207                                             |  32|   0|   32|          0|
+    +-------------------------------------------------------------+----+----+-----+-----------+
+    |Total                                                        | 143|   0|  143|          0|
+    +-------------------------------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-------------------------+-----+-----+------------+------------------------+--------------+
+|        RTL Ports        | Dir | Bits|  Protocol  |      Source Object     |    C Type    |
++-------------------------+-----+-----+------------+------------------------+--------------+
+|ap_clk                   |   in|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_rst                   |   in|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_start                 |   in|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_done                  |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_idle                  |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_ready                 |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|ap_return                |  out|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_767_p_din0        |  out|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_767_p_din1        |  out|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_767_p_opcode      |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_767_p_dout0       |   in|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_767_p_ce          |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_771_p_din0        |  out|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_771_p_din1        |  out|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_771_p_dout0       |   in|   32|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|grp_fu_771_p_ce          |  out|    1|  ap_ctrl_hs|        apply_kernel_hls|  return value|
+|time_series_0_address0   |  out|    6|   ap_memory|           time_series_0|         array|
+|time_series_0_ce0        |  out|    1|   ap_memory|           time_series_0|         array|
+|time_series_0_q0         |   in|   32|   ap_memory|           time_series_0|         array|
+|time_series_0_address1   |  out|    6|   ap_memory|           time_series_0|         array|
+|time_series_0_ce1        |  out|    1|   ap_memory|           time_series_0|         array|
+|time_series_0_q1         |   in|   32|   ap_memory|           time_series_0|         array|
+|time_series_0_address2   |  out|    6|   ap_memory|           time_series_0|         array|
+|time_series_0_ce2        |  out|    1|   ap_memory|           time_series_0|         array|
+|time_series_0_q2         |   in|   32|   ap_memory|           time_series_0|         array|
+|time_series_1_address0   |  out|    6|   ap_memory|           time_series_1|         array|
+|time_series_1_ce0        |  out|    1|   ap_memory|           time_series_1|         array|
+|time_series_1_q0         |   in|   32|   ap_memory|           time_series_1|         array|
+|time_series_1_address1   |  out|    6|   ap_memory|           time_series_1|         array|
+|time_series_1_ce1        |  out|    1|   ap_memory|           time_series_1|         array|
+|time_series_1_q1         |   in|   32|   ap_memory|           time_series_1|         array|
+|time_series_1_address2   |  out|    6|   ap_memory|           time_series_1|         array|
+|time_series_1_ce2        |  out|    1|   ap_memory|           time_series_1|         array|
+|time_series_1_q2         |   in|   32|   ap_memory|           time_series_1|         array|
+|time_series_2_address0   |  out|    6|   ap_memory|           time_series_2|         array|
+|time_series_2_ce0        |  out|    1|   ap_memory|           time_series_2|         array|
+|time_series_2_q0         |   in|   32|   ap_memory|           time_series_2|         array|
+|time_series_2_address1   |  out|    6|   ap_memory|           time_series_2|         array|
+|time_series_2_ce1        |  out|    1|   ap_memory|           time_series_2|         array|
+|time_series_2_q1         |   in|   32|   ap_memory|           time_series_2|         array|
+|time_series_2_address2   |  out|    6|   ap_memory|           time_series_2|         array|
+|time_series_2_ce2        |  out|    1|   ap_memory|           time_series_2|         array|
+|time_series_2_q2         |   in|   32|   ap_memory|           time_series_2|         array|
+|time_series_3_address0   |  out|    6|   ap_memory|           time_series_3|         array|
+|time_series_3_ce0        |  out|    1|   ap_memory|           time_series_3|         array|
+|time_series_3_q0         |   in|   32|   ap_memory|           time_series_3|         array|
+|time_series_3_address1   |  out|    6|   ap_memory|           time_series_3|         array|
+|time_series_3_ce1        |  out|    1|   ap_memory|           time_series_3|         array|
+|time_series_3_q1         |   in|   32|   ap_memory|           time_series_3|         array|
+|time_series_3_address2   |  out|    6|   ap_memory|           time_series_3|         array|
+|time_series_3_ce2        |  out|    1|   ap_memory|           time_series_3|         array|
+|time_series_3_q2         |   in|   32|   ap_memory|           time_series_3|         array|
+|time_series_4_address0   |  out|    6|   ap_memory|           time_series_4|         array|
+|time_series_4_ce0        |  out|    1|   ap_memory|           time_series_4|         array|
+|time_series_4_q0         |   in|   32|   ap_memory|           time_series_4|         array|
+|time_series_4_address1   |  out|    6|   ap_memory|           time_series_4|         array|
+|time_series_4_ce1        |  out|    1|   ap_memory|           time_series_4|         array|
+|time_series_4_q1         |   in|   32|   ap_memory|           time_series_4|         array|
+|time_series_4_address2   |  out|    6|   ap_memory|           time_series_4|         array|
+|time_series_4_ce2        |  out|    1|   ap_memory|           time_series_4|         array|
+|time_series_4_q2         |   in|   32|   ap_memory|           time_series_4|         array|
+|time_series_5_address0   |  out|    6|   ap_memory|           time_series_5|         array|
+|time_series_5_ce0        |  out|    1|   ap_memory|           time_series_5|         array|
+|time_series_5_q0         |   in|   32|   ap_memory|           time_series_5|         array|
+|time_series_5_address1   |  out|    6|   ap_memory|           time_series_5|         array|
+|time_series_5_ce1        |  out|    1|   ap_memory|           time_series_5|         array|
+|time_series_5_q1         |   in|   32|   ap_memory|           time_series_5|         array|
+|time_series_5_address2   |  out|    6|   ap_memory|           time_series_5|         array|
+|time_series_5_ce2        |  out|    1|   ap_memory|           time_series_5|         array|
+|time_series_5_q2         |   in|   32|   ap_memory|           time_series_5|         array|
+|time_series_6_address0   |  out|    6|   ap_memory|           time_series_6|         array|
+|time_series_6_ce0        |  out|    1|   ap_memory|           time_series_6|         array|
+|time_series_6_q0         |   in|   32|   ap_memory|           time_series_6|         array|
+|time_series_6_address1   |  out|    6|   ap_memory|           time_series_6|         array|
+|time_series_6_ce1        |  out|    1|   ap_memory|           time_series_6|         array|
+|time_series_6_q1         |   in|   32|   ap_memory|           time_series_6|         array|
+|time_series_6_address2   |  out|    6|   ap_memory|           time_series_6|         array|
+|time_series_6_ce2        |  out|    1|   ap_memory|           time_series_6|         array|
+|time_series_6_q2         |   in|   32|   ap_memory|           time_series_6|         array|
+|time_series_7_address0   |  out|    6|   ap_memory|           time_series_7|         array|
+|time_series_7_ce0        |  out|    1|   ap_memory|           time_series_7|         array|
+|time_series_7_q0         |   in|   32|   ap_memory|           time_series_7|         array|
+|time_series_7_address1   |  out|    6|   ap_memory|           time_series_7|         array|
+|time_series_7_ce1        |  out|    1|   ap_memory|           time_series_7|         array|
+|time_series_7_q1         |   in|   32|   ap_memory|           time_series_7|         array|
+|time_series_7_address2   |  out|    6|   ap_memory|           time_series_7|         array|
+|time_series_7_ce2        |  out|    1|   ap_memory|           time_series_7|         array|
+|time_series_7_q2         |   in|   32|   ap_memory|           time_series_7|         array|
+|convolutions_0_address0  |  out|    6|   ap_memory|          convolutions_0|         array|
+|convolutions_0_ce0       |  out|    1|   ap_memory|          convolutions_0|         array|
+|convolutions_0_we0       |  out|    1|   ap_memory|          convolutions_0|         array|
+|convolutions_0_d0        |  out|   32|   ap_memory|          convolutions_0|         array|
+|convolutions_1_address0  |  out|    6|   ap_memory|          convolutions_1|         array|
+|convolutions_1_ce0       |  out|    1|   ap_memory|          convolutions_1|         array|
+|convolutions_1_we0       |  out|    1|   ap_memory|          convolutions_1|         array|
+|convolutions_1_d0        |  out|   32|   ap_memory|          convolutions_1|         array|
+|convolutions_2_address0  |  out|    6|   ap_memory|          convolutions_2|         array|
+|convolutions_2_ce0       |  out|    1|   ap_memory|          convolutions_2|         array|
+|convolutions_2_we0       |  out|    1|   ap_memory|          convolutions_2|         array|
+|convolutions_2_d0        |  out|   32|   ap_memory|          convolutions_2|         array|
+|convolutions_3_address0  |  out|    6|   ap_memory|          convolutions_3|         array|
+|convolutions_3_ce0       |  out|    1|   ap_memory|          convolutions_3|         array|
+|convolutions_3_we0       |  out|    1|   ap_memory|          convolutions_3|         array|
+|convolutions_3_d0        |  out|   32|   ap_memory|          convolutions_3|         array|
+|convolutions_4_address0  |  out|    6|   ap_memory|          convolutions_4|         array|
+|convolutions_4_ce0       |  out|    1|   ap_memory|          convolutions_4|         array|
+|convolutions_4_we0       |  out|    1|   ap_memory|          convolutions_4|         array|
+|convolutions_4_d0        |  out|   32|   ap_memory|          convolutions_4|         array|
+|convolutions_5_address0  |  out|    6|   ap_memory|          convolutions_5|         array|
+|convolutions_5_ce0       |  out|    1|   ap_memory|          convolutions_5|         array|
+|convolutions_5_we0       |  out|    1|   ap_memory|          convolutions_5|         array|
+|convolutions_5_d0        |  out|   32|   ap_memory|          convolutions_5|         array|
+|convolutions_6_address0  |  out|    6|   ap_memory|          convolutions_6|         array|
+|convolutions_6_ce0       |  out|    1|   ap_memory|          convolutions_6|         array|
+|convolutions_6_we0       |  out|    1|   ap_memory|          convolutions_6|         array|
+|convolutions_6_d0        |  out|   32|   ap_memory|          convolutions_6|         array|
+|convolutions_7_address0  |  out|    6|   ap_memory|          convolutions_7|         array|
+|convolutions_7_ce0       |  out|    1|   ap_memory|          convolutions_7|         array|
+|convolutions_7_we0       |  out|    1|   ap_memory|          convolutions_7|         array|
+|convolutions_7_d0        |  out|   32|   ap_memory|          convolutions_7|         array|
+|kernel_idx_val           |   in|    7|     ap_none|          kernel_idx_val|        scalar|
+|dilation_val             |   in|   32|     ap_none|            dilation_val|        scalar|
+|time_series_length_val   |   in|   32|     ap_none|  time_series_length_val|        scalar|
++-------------------------+-----+-----+------------+------------------------+--------------+
+

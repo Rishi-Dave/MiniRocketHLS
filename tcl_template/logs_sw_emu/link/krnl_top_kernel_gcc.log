@@ -1,0 +1,4 @@
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp:1:10: fatal error: krnl.hpp: No such file or directory
+ #include "krnl.hpp"
+          ^~~~~~~~~~
+compilation terminated.

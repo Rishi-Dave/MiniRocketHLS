@@ -1,0 +1,439 @@
+
+
+================================================================
+== Synthesis Summary Report of 'krnl_top'
+================================================================
++ General Information: 
+    * Date:           Wed Nov 19 13:37:17 2025
+    * Version:        2023.2 (Build 4023990 on Oct 11 2023)
+    * Project:        krnl_top_prj
+    * Solution:       solution1 (Vivado IP Flow Target)
+    * Product family: virtexuplusHBM
+    * Target device:  xcu280-fsvh2892-2L-e
+    
+
++ Performance & Resource Estimates: 
+    
+    PS: '+' for module; 'o' for loop; '*' for dataflow
+    +----------------------------------------------------------------+--------+-------+---------+-----------+----------+---------+-------+----------+----------+----------+-------------+------------+-----+
+    |                             Modules                            |  Issue |       | Latency |  Latency  | Iteration|         |  Trip |          |          |          |             |            |     |
+    |                             & Loops                            |  Type  | Slack | (cycles)|    (ns)   |  Latency | Interval| Count | Pipelined|   BRAM   |    DSP   |      FF     |     LUT    | URAM|
+    +----------------------------------------------------------------+--------+-------+---------+-----------+----------+---------+-------+----------+----------+----------+-------------+------------+-----+
+    |+ krnl_top                                                      |  Timing|  -0.04|        -|          -|         -|        -|      -|        no|  220 (5%)|  14 (~0%)|  19651 (~0%)|  22183 (1%)|    -|
+    | + krnl_top_Pipeline_1                                          |       -|   0.67|      513|  1.710e+03|         -|      513|      -|        no|         -|         -|     11 (~0%)|    59 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|      511|  1.703e+03|         1|        1|    512|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_2                                          |       -|   0.17|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_3                                          |       -|   0.17|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_5                                          |       -|   0.80|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_6                                          |       -|   0.80|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_7                                          |       -|   0.80|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_8                                          |       -|   1.08|        9|     29.997|         -|        9|      -|        no|         -|         -|      5 (~0%)|    47 (~0%)|    -|
+    |  o Loop 1                                                      |       -|   2.43|        7|     23.331|         1|        1|      8|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_INPUT                                 |  Timing|  -0.00|        -|          -|         -|        -|      -|        no|         -|         -|     86 (~0%)|   126 (~0%)|    -|
+    |  o COPY_INPUT                                                  |       -|   2.43|        -|          -|         3|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_INTERCEPT                             |  Timing|  -0.00|        -|          -|         -|        -|      -|        no|         -|         -|    201 (~0%)|   162 (~0%)|    -|
+    |  o COPY_INTERCEPT                                              |       -|   2.43|        -|          -|         3|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_COEF_I_COPY_COEF_J                    |  Timing|  -0.00|    40112|  1.337e+05|         -|    40112|      -|        no|         -|   2 (~0%)|   5307 (~0%)|  3834 (~0%)|    -|
+    |  o COPY_COEF_I_COPY_COEF_J                                     |       -|   2.43|    40110|  1.337e+05|       112|        1|  40000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_DILATIONS                             |  Timing|  -0.00|        -|          -|         -|        -|      -|        no|         -|         -|     49 (~0%)|   100 (~0%)|    -|
+    |  o COPY_DILATIONS                                              |       -|   2.43|        -|          -|         3|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_BIASES                                |  Timing|  -0.00|        -|          -|         -|        -|      -|        no|         -|         -|    143 (~0%)|   129 (~0%)|    -|
+    |  o COPY_BIASES                                                 |       -|   2.43|        -|          -|         3|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | + minirocket_feature_extraction_hls                            |       -|   0.05|        -|          -|         -|        -|      -|        no|         -|   4 (~0%)|   3582 (~0%)|  3603 (~0%)|    -|
+    |  + minirocket_feature_extraction_hls_Pipeline_1                |       -|   0.67|      513|  1.710e+03|         -|      513|      -|        no|         -|         -|     11 (~0%)|    59 (~0%)|    -|
+    |   o Loop 1                                                     |       -|   2.43|      511|  1.703e+03|         1|        1|    512|       yes|         -|         -|            -|           -|    -|
+    |  o DILATION_LOOP                                               |       -|   2.43|        -|          -|         -|        -|      -|        no|         -|         -|            -|           -|    -|
+    |   o KERNEL_LOOP                                                |       -|   2.43|        -|          -|         -|        -|      -|        no|         -|         -|            -|           -|    -|
+    |    + apply_kernel_hls                                          |       -|   0.09|      543|  1.810e+03|         -|      543|      -|        no|         -|   4 (~0%)|   2415 (~0%)|  1615 (~0%)|    -|
+    |     + apply_kernel_hls_Pipeline_CONV_LOOP                      |       -|   0.09|      540|  1.800e+03|         -|      540|      -|        no|         -|   4 (~0%)|   2260 (~0%)|  1437 (~0%)|    -|
+    |      o CONV_LOOP                                               |       -|   2.43|      538|  1.793e+03|        28|        1|    512|       yes|         -|         -|            -|           -|    -|
+    |    + minirocket_feature_extraction_hls_Pipeline_PPV_LOOP       |       -|   0.05|        -|          -|         -|        -|      -|        no|         -|         -|    239 (~0%)|   400 (~0%)|    -|
+    |     o PPV_LOOP                                                 |       -|   2.43|        -|          -|         4|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | + apply_scaler_hls                                             |       -|   0.09|    10022|  3.340e+04|         -|    10022|      -|        no|         -|         -|    437 (~0%)|   237 (~0%)|    -|
+    |  o SCALE_LOOP                                                  |       -|   2.43|    10020|  3.340e+04|        22|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    | + linear_classifier_predict_hls                                |  Timing|  -0.04|   160046|  5.334e+05|         -|   160046|      -|        no|         -|         -|    660 (~0%)|  1361 (~0%)|    -|
+    |  + linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP  |  Timing|  -0.04|    40008|  1.333e+05|         -|    40008|      -|        no|         -|         -|    156 (~0%)|   212 (~0%)|    -|
+    |   o BINARY_FEATURE_LOOP                                        |      II|   2.43|    40006|  1.333e+05|        11|        4|  10000|       yes|         -|         -|            -|           -|    -|
+    |  o CLASS_LOOP                                                  |       -|   2.43|   160044|  5.334e+05|     40011|        -|      4|        no|         -|         -|            -|           -|    -|
+    |   + linear_classifier_predict_hls_Pipeline_FEATURE_LOOP        |  Timing|  -0.04|    40008|  1.333e+05|         -|    40008|      -|        no|         -|         -|    156 (~0%)|   232 (~0%)|    -|
+    |    o FEATURE_LOOP                                              |      II|   2.43|    40006|  1.333e+05|        11|        4|  10000|       yes|         -|         -|            -|           -|    -|
+    | + krnl_top_Pipeline_COPY_OUTPUT                                |  Timing|  -0.00|        -|          -|         -|        -|      -|        no|         -|         -|     66 (~0%)|   146 (~0%)|    -|
+    |  o COPY_OUTPUT                                                 |       -|   2.43|        -|          -|         2|        1|      -|       yes|         -|         -|            -|           -|    -|
+    | o Loop 1                                                       |       -|   2.43|    40011|  1.334e+05|     10003|        -|      4|        no|         -|         -|            -|           -|    -|
+    |  + krnl_top_Pipeline_4                                         |       -|   0.52|    10001|  3.333e+04|         -|    10001|      -|        no|         -|         -|     16 (~0%)|    69 (~0%)|    -|
+    |   o Loop 1                                                     |       -|   2.43|     9999|  3.333e+04|         1|        1|  10000|       yes|         -|         -|            -|           -|    -|
+    +----------------------------------------------------------------+--------+-------+---------+-----------+----------+---------+-------+----------+----------+----------+-------------+------------+-----+
+
+
+================================================================
+== HW Interfaces
+================================================================
+* M_AXI
++-------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+| Interface   | Data Width | Address Width | Latency | Offset | Register | Max Widen | Max Read     | Max Write    | Num Read    | Num Write   | Resource Estimate |
+|             | (SW->HW)   |               |         |        |          | Bitwidth  | Burst Length | Burst Length | Outstanding | Outstanding |                   |
++-------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+| m_axi_gmem0 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 256          | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem1 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 16           | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem2 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 256          | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem3 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 16           | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem4 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 256          | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem5 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 256          | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem6 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 16           | 16           | 16          | 16          | BRAM=2            |
+| m_axi_gmem7 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 16           | 16           | 16          | 16          |                   |
+| m_axi_gmem8 | 32 -> 32   | 64            | 64      | slave  | 0        | 512       | 256          | 16           | 16          | 16          | BRAM=2            |
++-------------+------------+---------------+---------+--------+----------+-----------+--------------+--------------+-------------+-------------+-------------------+
+
+* S_AXILITE Interfaces
++---------------+------------+---------------+--------+----------+
+| Interface     | Data Width | Address Width | Offset | Register |
++---------------+------------+---------------+--------+----------+
+| s_axi_control | 32         | 8             | 16     | 0        |
++---------------+------------+---------------+--------+----------+
+
+* S_AXILITE Registers
++---------------+-----------------------------+--------+-------+--------+------------------------------------------+----------------------------------------------------------------------+
+| Interface     | Register                    | Offset | Width | Access | Description                              | Bit Fields                                                           |
++---------------+-----------------------------+--------+-------+--------+------------------------------------------+----------------------------------------------------------------------+
+| s_axi_control | CTRL                        | 0x00   | 32    | RW     | Control signals                          | 0=AP_START 1=AP_DONE 2=AP_IDLE 3=AP_READY 7=AUTO_RESTART 9=INTERRUPT |
+| s_axi_control | GIER                        | 0x04   | 32    | RW     | Global Interrupt Enable Register         | 0=Enable                                                             |
+| s_axi_control | IP_IER                      | 0x08   | 32    | RW     | IP Interrupt Enable Register             | 0=CHAN0_INT_EN 1=CHAN1_INT_EN                                        |
+| s_axi_control | IP_ISR                      | 0x0c   | 32    | RW     | IP Interrupt Status Register             | 0=CHAN0_INT_ST 1=CHAN1_INT_ST                                        |
+| s_axi_control | time_series_input_1         | 0x10   | 32    | W      | Data signal of time_series_input         |                                                                      |
+| s_axi_control | time_series_input_2         | 0x14   | 32    | W      | Data signal of time_series_input         |                                                                      |
+| s_axi_control | prediction_output_1         | 0x1c   | 32    | W      | Data signal of prediction_output         |                                                                      |
+| s_axi_control | prediction_output_2         | 0x20   | 32    | W      | Data signal of prediction_output         |                                                                      |
+| s_axi_control | coefficients_1              | 0x28   | 32    | W      | Data signal of coefficients              |                                                                      |
+| s_axi_control | coefficients_2              | 0x2c   | 32    | W      | Data signal of coefficients              |                                                                      |
+| s_axi_control | intercept_1                 | 0x34   | 32    | W      | Data signal of intercept                 |                                                                      |
+| s_axi_control | intercept_2                 | 0x38   | 32    | W      | Data signal of intercept                 |                                                                      |
+| s_axi_control | scaler_mean_1               | 0x40   | 32    | W      | Data signal of scaler_mean               |                                                                      |
+| s_axi_control | scaler_mean_2               | 0x44   | 32    | W      | Data signal of scaler_mean               |                                                                      |
+| s_axi_control | scaler_scale_1              | 0x4c   | 32    | W      | Data signal of scaler_scale              |                                                                      |
+| s_axi_control | scaler_scale_2              | 0x50   | 32    | W      | Data signal of scaler_scale              |                                                                      |
+| s_axi_control | dilations_1                 | 0x58   | 32    | W      | Data signal of dilations                 |                                                                      |
+| s_axi_control | dilations_2                 | 0x5c   | 32    | W      | Data signal of dilations                 |                                                                      |
+| s_axi_control | num_features_per_dilation_1 | 0x64   | 32    | W      | Data signal of num_features_per_dilation |                                                                      |
+| s_axi_control | num_features_per_dilation_2 | 0x68   | 32    | W      | Data signal of num_features_per_dilation |                                                                      |
+| s_axi_control | biases_1                    | 0x70   | 32    | W      | Data signal of biases                    |                                                                      |
+| s_axi_control | biases_2                    | 0x74   | 32    | W      | Data signal of biases                    |                                                                      |
+| s_axi_control | time_series_length          | 0x7c   | 32    | W      | Data signal of time_series_length        |                                                                      |
+| s_axi_control | num_features                | 0x84   | 32    | W      | Data signal of num_features              |                                                                      |
+| s_axi_control | num_classes                 | 0x8c   | 32    | W      | Data signal of num_classes               |                                                                      |
+| s_axi_control | num_dilations               | 0x94   | 32    | W      | Data signal of num_dilations             |                                                                      |
++---------------+-----------------------------+--------+-------+--------+------------------------------------------+----------------------------------------------------------------------+
+
+* TOP LEVEL CONTROL
++-----------+------------+-----------+
+| Interface | Type       | Ports     |
++-----------+------------+-----------+
+| ap_clk    | clock      | ap_clk    |
+| ap_rst_n  | reset      | ap_rst_n  |
+| interrupt | interrupt  | interrupt |
+| ap_ctrl   | ap_ctrl_hs |           |
++-----------+------------+-----------+
+
+
+================================================================
+== SW I/O Information
+================================================================
+* Top Function Arguments
++---------------------------+-----------+------------------------+
+| Argument                  | Direction | Datatype               |
++---------------------------+-----------+------------------------+
+| time_series_input         | in        | ap_fixed_base<32, 16>* |
+| prediction_output         | out       | ap_fixed_base<32, 16>* |
+| coefficients              | in        | ap_fixed_base<32, 16>* |
+| intercept                 | in        | ap_fixed_base<32, 16>* |
+| scaler_mean               | in        | ap_fixed_base<32, 16>* |
+| scaler_scale              | in        | ap_fixed_base<32, 16>* |
+| dilations                 | in        | ap_int_base<32>*       |
+| num_features_per_dilation | unused    | ap_int_base<32>*       |
+| biases                    | in        | ap_fixed_base<32, 16>* |
+| time_series_length        | in        | ap_int_base<32>        |
+| num_features              | in        | ap_int_base<32>        |
+| num_classes               | in        | ap_int_base<32>        |
+| num_dilations             | in        | ap_int_base<32>        |
++---------------------------+-----------+------------------------+
+
+* SW-to-HW Mapping
++---------------------------+---------------+-----------+----------+-------------------------------------------------------+
+| Argument                  | HW Interface  | HW Type   | HW Usage | HW Info                                               |
++---------------------------+---------------+-----------+----------+-------------------------------------------------------+
+| time_series_input         | m_axi_gmem0   | interface |          |                                                       |
+| time_series_input         | s_axi_control | register  | offset   | name=time_series_input_1 offset=0x10 range=32         |
+| time_series_input         | s_axi_control | register  | offset   | name=time_series_input_2 offset=0x14 range=32         |
+| prediction_output         | m_axi_gmem1   | interface |          |                                                       |
+| prediction_output         | s_axi_control | register  | offset   | name=prediction_output_1 offset=0x1c range=32         |
+| prediction_output         | s_axi_control | register  | offset   | name=prediction_output_2 offset=0x20 range=32         |
+| coefficients              | m_axi_gmem2   | interface |          |                                                       |
+| coefficients              | s_axi_control | register  | offset   | name=coefficients_1 offset=0x28 range=32              |
+| coefficients              | s_axi_control | register  | offset   | name=coefficients_2 offset=0x2c range=32              |
+| intercept                 | m_axi_gmem3   | interface |          |                                                       |
+| intercept                 | s_axi_control | register  | offset   | name=intercept_1 offset=0x34 range=32                 |
+| intercept                 | s_axi_control | register  | offset   | name=intercept_2 offset=0x38 range=32                 |
+| scaler_mean               | m_axi_gmem4   | interface |          |                                                       |
+| scaler_mean               | s_axi_control | register  | offset   | name=scaler_mean_1 offset=0x40 range=32               |
+| scaler_mean               | s_axi_control | register  | offset   | name=scaler_mean_2 offset=0x44 range=32               |
+| scaler_scale              | m_axi_gmem5   | interface |          |                                                       |
+| scaler_scale              | s_axi_control | register  | offset   | name=scaler_scale_1 offset=0x4c range=32              |
+| scaler_scale              | s_axi_control | register  | offset   | name=scaler_scale_2 offset=0x50 range=32              |
+| dilations                 | m_axi_gmem6   | interface |          |                                                       |
+| dilations                 | s_axi_control | register  | offset   | name=dilations_1 offset=0x58 range=32                 |
+| dilations                 | s_axi_control | register  | offset   | name=dilations_2 offset=0x5c range=32                 |
+| num_features_per_dilation | m_axi_gmem7   | interface |          |                                                       |
+| num_features_per_dilation | s_axi_control | register  | offset   | name=num_features_per_dilation_1 offset=0x64 range=32 |
+| num_features_per_dilation | s_axi_control | register  | offset   | name=num_features_per_dilation_2 offset=0x68 range=32 |
+| biases                    | m_axi_gmem8   | interface |          |                                                       |
+| biases                    | s_axi_control | register  | offset   | name=biases_1 offset=0x70 range=32                    |
+| biases                    | s_axi_control | register  | offset   | name=biases_2 offset=0x74 range=32                    |
+| time_series_length        | s_axi_control | register  |          | name=time_series_length offset=0x7c range=32          |
+| num_features              | s_axi_control | register  |          | name=num_features offset=0x84 range=32                |
+| num_classes               | s_axi_control | register  |          | name=num_classes offset=0x8c range=32                 |
+| num_dilations             | s_axi_control | register  |          | name=num_dilations offset=0x94 range=32               |
++---------------------------+---------------+-----------+----------+-------------------------------------------------------+
+
+
+================================================================
+== M_AXI Burst Information
+================================================================
+ Note: All burst requests might be further partitioned into multiple requests during RTL generation based on max_read_burst_length or max_write_burst_length settings.
+
+* Inferred Burst Summary
++--------------+-----------+----------+-------+----------------+------------------------------------------------------------------------------+
+| HW Interface | Direction | Length   | Width | Loop           | Loop Location                                                                |
++--------------+-----------+----------+-------+----------------+------------------------------------------------------------------------------+
+| m_axi_gmem0  | read      | variable | 32    | COPY_INPUT     | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:247:14 |
+| m_axi_gmem1  | write     | variable | 32    | COPY_OUTPUT    | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:356:18 |
+| m_axi_gmem3  | read      | variable | 32    | COPY_INTERCEPT | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:265:21 |
+| m_axi_gmem4  | read      | variable | 32    | COPY_BIASES    | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |
+| m_axi_gmem5  | read      | variable | 32    | COPY_BIASES    | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |
+| m_axi_gmem6  | read      | variable | 32    | COPY_DILATIONS | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:252:21 |
+| m_axi_gmem8  | read      | variable | 32    | COPY_BIASES    | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |
++--------------+-----------+----------+-------+----------------+------------------------------------------------------------------------------+
+
+* All M_AXI Variable Accesses
++--------------+-------------------+------------------------------------------------------------------------------+-----------+--------------+----------+-------------------------+------------------------------------------------------------------------------+------------+---------------------------+
+| HW Interface | Variable          | Access Location                                                              | Direction | Burst Status | Length   | Loop                    | Loop Location                                                                | Resolution | Problem                   |
++--------------+-------------------+------------------------------------------------------------------------------+-----------+--------------+----------+-------------------------+------------------------------------------------------------------------------+------------+---------------------------+
+| m_axi_gmem0  | time_series_input | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:249:23 | read      | Inferred     | variable | COPY_INPUT              | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:247:14 |            |                           |
+| m_axi_gmem1  | prediction_output | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:358:23 | write     | Inferred     | variable | COPY_OUTPUT             | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:356:18 |            |                           |
+| m_axi_gmem2  | coefficients      | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:279:34 | read      | Fail         |          | COPY_COEF_I_COPY_COEF_J | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:272:30 | 214-229    | Could not analyze pattern |
+| m_axi_gmem3  | intercept         | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:267:21 | read      | Inferred     | variable | COPY_INTERCEPT          | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:265:21 |            |                           |
+| m_axi_gmem4  | scaler_mean       | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:261:30 | read      | Inferred     | variable | COPY_BIASES             | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |            |                           |
+| m_axi_gmem5  | scaler_scale      | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:262:31 | read      | Inferred     | variable | COPY_BIASES             | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |            |                           |
+| m_axi_gmem6  | dilations         | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:254:21 | read      | Inferred     | variable | COPY_DILATIONS          | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:252:21 |            |                           |
+| m_axi_gmem8  | biases            | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:260:18 | read      | Inferred     | variable | COPY_BIASES             | /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/src/krnl.cpp:258:18 |            |                           |
++--------------+-------------------+------------------------------------------------------------------------------+-----------+--------------+----------+-------------------------+------------------------------------------------------------------------------+------------+---------------------------+
+
+    * Resolution URL: docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=XXX-YYY.html (replace XXX-YYY with column value)
+
+================================================================
+== Bind Op Report
+================================================================
++----------------------------------------------------------------+-----+--------+------------------+------+---------+---------+
+| Name                                                           | DSP | Pragma | Variable         | Op   | Impl    | Latency |
++----------------------------------------------------------------+-----+--------+------------------+------+---------+---------+
+| + krnl_top                                                     | 14  |        |                  |      |         |         |
+|   add_ln231_fu_780_p2                                          |     |        | add_ln231        | add  | fabric  | 0       |
+|   mul_32s_32s_32_2_1_U284                                      | 3   |        | other            | mul  | auto    | 1       |
+|  + krnl_top_Pipeline_1                                         | 0   |        |                  |      |         |         |
+|    add_ln227_fu_210_p2                                         |     |        | add_ln227        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_2                                         | 0   |        |                  |      |         |         |
+|    add_ln228_fu_210_p2                                         |     |        | add_ln228        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_3                                         | 0   |        |                  |      |         |         |
+|    add_ln229_fu_210_p2                                         |     |        | add_ln229        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_4                                         | 0   |        |                  |      |         |         |
+|    add_ln231_fu_124_p2                                         |     |        | add_ln231        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_5                                         | 0   |        |                  |      |         |         |
+|    add_ln232_fu_57_p2                                          |     |        | add_ln232        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_6                                         | 0   |        |                  |      |         |         |
+|    add_ln233_fu_57_p2                                          |     |        | add_ln233        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_7                                         | 0   |        |                  |      |         |         |
+|    add_ln235_fu_57_p2                                          |     |        | add_ln235        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_8                                         | 0   |        |                  |      |         |         |
+|    add_ln236_fu_55_p2                                          |     |        | add_ln236        | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_INPUT                                | 0   |        |                  |      |         |         |
+|    add_ln22_fu_233_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_INTERCEPT                            | 0   |        |                  |      |         |         |
+|    add_ln22_fu_171_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_COEF_I_COPY_COEF_J                   | 2   |        |                  |      |         |         |
+|    idx_2_fu_195_p2                                             |     |        | idx_2            | add  | fabric  | 0       |
+|    mul_32s_15ns_32_2_1_U66                                     | 2   |        | mul_ln279        | mul  | auto    | 1       |
+|    add_ln279_fu_222_p2                                         |     |        | add_ln279        | add  | fabric  | 0       |
+|    add_ln279_1_fu_238_p2                                       |     |        | add_ln279_1      | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_DILATIONS                            | 0   |        |                  |      |         |         |
+|    add_ln22_fu_106_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_BIASES                               | 0   |        |                  |      |         |         |
+|    add_ln22_fu_180_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|  + minirocket_feature_extraction_hls                           | 4   |        |                  |      |         |         |
+|    add_ln22_fu_449_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|    add_ln100_fu_467_p2                                         |     |        | add_ln100        | add  | fabric  | 0       |
+|    sub_ln100_fu_489_p2                                         |     |        | sub_ln100        | sub  | fabric  | 0       |
+|    sub_ln100_1_fu_518_p2                                       |     |        | sub_ln100_1      | sub  | fabric  | 0       |
+|    kernel_idx_1_fu_532_p2                                      |     |        | kernel_idx_1     | add  | fabric  | 0       |
+|    add_ln22_3_fu_594_p2                                        |     |        | add_ln22_3       | add  | fabric  | 0       |
+|   + minirocket_feature_extraction_hls_Pipeline_1               | 0   |        |                  |      |         |         |
+|     add_ln90_fu_210_p2                                         |     |        | add_ln90         | add  | fabric  | 0       |
+|   + apply_kernel_hls                                           | 4   |        |                  |      |         |         |
+|     sub_ln48_fu_174_p2                                         |     |        | sub_ln48         | sub  | fabric  | 0       |
+|    + apply_kernel_hls_Pipeline_CONV_LOOP                       | 4   |        |                  |      |         |         |
+|      add_ln22_fu_594_p2                                        |     |        | add_ln22         | add  | fabric  | 0       |
+|      mul_3ns_32s_32_2_1_U92                                    |     |        | mul_ln64         | mul  | auto    | 1       |
+|      pos_fu_639_p2                                             |     |        | pos              | add  | fabric  | 0       |
+|      mul_3ns_32s_32_2_1_U93                                    |     |        | mul_ln64_1       | mul  | auto    | 1       |
+|      pos_1_fu_675_p2                                           |     |        | pos_1            | add  | fabric  | 0       |
+|      fadd_32ns_32ns_32_7_full_dsp_1_U89                        | 2   |        | value_2          | fadd | fulldsp | 6       |
+|      mul_4ns_32s_32_2_1_U94                                    |     |        | mul_ln64_2       | mul  | auto    | 1       |
+|      pos_2_fu_711_p2                                           |     |        | pos_2            | add  | fabric  | 0       |
+|      fadd_32ns_32ns_32_7_full_dsp_1_U90                        | 2   |        | value_4          | fadd | fulldsp | 6       |
+|   + minirocket_feature_extraction_hls_Pipeline_PPV_LOOP        | 0   |        |                  |      |         |         |
+|     add_ln22_fu_262_p2                                         |     |        | add_ln22         | add  | fabric  | 0       |
+|     positive_count_1_fu_412_p2                                 |     |        | positive_count_1 | add  | fabric  | 0       |
+|  + apply_scaler_hls                                            | 0   |        |                  |      |         |         |
+|    add_ln22_fu_362_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|  + linear_classifier_predict_hls                               | 0   |        |                  |      |         |         |
+|    add_ln22_fu_248_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
+|   + linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP | 0   |        |                  |      |         |         |
+|     add_ln22_fu_257_p2                                         |     |        | add_ln22         | add  | fabric  | 0       |
+|   + linear_classifier_predict_hls_Pipeline_FEATURE_LOOP        | 0   |        |                  |      |         |         |
+|     add_ln22_fu_322_p2                                         |     |        | add_ln22         | add  | fabric  | 0       |
+|  + krnl_top_Pipeline_COPY_OUTPUT                               | 0   |        |                  |      |         |         |
+|    add_ln22_fu_140_p2                                          |     |        | add_ln22         | add  | fabric  | 0       |
++----------------------------------------------------------------+-----+--------+------------------+------+---------+---------+
+
+
+================================================================
+== Storage Report
+================================================================
++--------------------------------------+--------------+-----------+------+------+--------+-------------------------+------+---------+------------------+
+| Name                                 | Usage        | Type      | BRAM | URAM | Pragma | Variable                | Impl | Latency | Bitwidth, Depth, |
+|                                      |              |           |      |      |        |                         |      |         | Banks            |
++--------------------------------------+--------------+-----------+------+------+--------+-------------------------+------+---------+------------------+
+| + krnl_top                           |              |           | 220  | 0    |        |                         |      |         |                  |
+|   control_s_axi_U                    | interface    | s_axilite |      |      |        |                         |      |         |                  |
+|   gmem0_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem1_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem2_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem3_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem4_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem5_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem6_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   gmem8_m_axi_U                      | interface    | m_axi     | 2    |      |        |                         |      |         |                  |
+|   local_time_series_U                | rom_np array |           |      |      |        | local_time_series       | auto | 1       | 32, 64, 1        |
+|   local_time_series_1_U              | rom_np array |           |      |      |        | local_time_series_1     | auto | 1       | 32, 64, 1        |
+|   fmul_32ns_32ns_32_4_max_dsp_1_U287 | rom_np array |           |      |      |        | local_time_series_2     | auto | 1       | 32, 64, 1        |
+|   local_time_series_3_U              | rom_np array |           |      |      |        | local_time_series_3     | auto | 1       | 32, 64, 1        |
+|   local_time_series_4_U              | rom_np array |           |      |      |        | local_time_series_4     | auto | 1       | 32, 64, 1        |
+|   local_time_series_5_U              | rom_np array |           |      |      |        | local_time_series_5     | auto | 1       | 32, 64, 1        |
+|   local_time_series_6_U              | rom_np array |           |      |      |        | local_time_series_6     | auto | 1       | 32, 64, 1        |
+|   local_time_series_7_U              | rom_np array |           |      |      |        | local_time_series_7     | auto | 1       | 32, 64, 1        |
+|   local_features_U                   | ram_1p array |           | 4    |      |        | local_features          | auto | 1       | 32, 1250, 1      |
+|   local_features_1_U                 | ram_1p array |           | 4    |      |        | local_features_1        | auto | 1       | 32, 1250, 1      |
+|   local_features_2_U                 | ram_1p array |           | 4    |      |        | local_features_2        | auto | 1       | 32, 1250, 1      |
+|   local_features_3_U                 | ram_1p array |           | 4    |      |        | local_features_3        | auto | 1       | 32, 1250, 1      |
+|   local_features_4_U                 | ram_1p array |           | 4    |      |        | local_features_4        | auto | 1       | 32, 1250, 1      |
+|   local_features_5_U                 | ram_1p array |           | 4    |      |        | local_features_5        | auto | 1       | 32, 1250, 1      |
+|   local_features_6_U                 | ram_1p array |           | 4    |      |        | local_features_6        | auto | 1       | 32, 1250, 1      |
+|   local_features_7_U                 | ram_1p array |           | 4    |      |        | local_features_7        | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_U            | ram_1p array |           | 4    |      |        | local_scaled_features   | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_1_U          | ram_1p array |           | 4    |      |        | local_scaled_features_1 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_2_U          | ram_1p array |           | 4    |      |        | local_scaled_features_2 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_3_U          | ram_1p array |           | 4    |      |        | local_scaled_features_3 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_4_U          | ram_1p array |           | 4    |      |        | local_scaled_features_4 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_5_U          | ram_1p array |           | 4    |      |        | local_scaled_features_5 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_6_U          | ram_1p array |           | 4    |      |        | local_scaled_features_6 | auto | 1       | 32, 1250, 1      |
+|   local_scaled_features_7_U          | ram_1p array |           | 4    |      |        | local_scaled_features_7 | auto | 1       | 32, 1250, 1      |
+|   local_coefficients_U               | ram_1p array |           | 20   |      |        | local_coefficients      | auto | 1       | 32, 10000, 1     |
+|   local_coefficients_1_U             | ram_1p array |           | 20   |      |        | local_coefficients_1    | auto | 1       | 32, 10000, 1     |
+|   local_coefficients_2_U             | ram_1p array |           | 20   |      |        | local_coefficients_2    | auto | 1       | 32, 10000, 1     |
+|   local_coefficients_3_U             | ram_1p array |           | 20   |      |        | local_coefficients_3    | auto | 1       | 32, 10000, 1     |
+|   local_scaler_mean_U                | ram_1p array |           | 20   |      |        | local_scaler_mean       | auto | 1       | 32, 10000, 1     |
+|   local_scaler_scale_U               | ram_1p array |           | 20   |      |        | local_scaler_scale      | auto | 1       | 32, 10000, 1     |
+|   local_biases_U                     | ram_1p array |           | 20   |      |        | local_biases            | auto | 1       | 32, 10000, 1     |
+|   local_dilations_U                  | ram_1p array |           |      |      |        | local_dilations         | auto | 1       | 32, 8, 1         |
+|  + minirocket_feature_extraction_hls |              |           | 0    | 0    |        |                         |      |         |                  |
+|    convolutions_U                    | ram_1p array |           |      |      |        | convolutions            | auto | 1       | 32, 64, 1        |
+|    convolutions_1_U                  | ram_1p array |           |      |      |        | convolutions_1          | auto | 1       | 32, 64, 1        |
+|    convolutions_2_U                  | ram_1p array |           |      |      |        | convolutions_2          | auto | 1       | 32, 64, 1        |
+|    convolutions_3_U                  | ram_1p array |           |      |      |        | convolutions_3          | auto | 1       | 32, 64, 1        |
+|    convolutions_4_U                  | ram_1p array |           |      |      |        | convolutions_4          | auto | 1       | 32, 64, 1        |
+|    convolutions_5_U                  | ram_1p array |           |      |      |        | convolutions_5          | auto | 1       | 32, 64, 1        |
+|    convolutions_6_U                  | ram_1p array |           |      |      |        | convolutions_6          | auto | 1       | 32, 64, 1        |
+|    convolutions_7_U                  | ram_1p array |           |      |      |        | convolutions_7          | auto | 1       | 32, 64, 1        |
+|   + apply_kernel_hls                 |              |           | 0    | 0    |        |                         |      |         |                  |
+|     kernel_indices_0_U               | rom_1p       |           |      |      |        | kernel_indices_0        | auto | 1       | 3, 84, 1         |
+|     kernel_indices_1_U               | rom_1p       |           |      |      |        | kernel_indices_1        | auto | 1       | 3, 84, 1         |
+|     kernel_indices_2_U               | rom_1p       |           |      |      |        | kernel_indices_2        | auto | 1       | 4, 84, 1         |
++--------------------------------------+--------------+-----------+------+------+--------+-------------------------+------+---------+------------------+
+
+
+================================================================
+== Pragma Report
+================================================================
+* Valid Pragma Syntax
++-----------------+------------------------------------------------------------------------------------+--------------------------------------------------------------------------+
+| Type            | Options                                                                            | Location                                                                 |
++-----------------+------------------------------------------------------------------------------------+--------------------------------------------------------------------------+
+| inline          | off                                                                                | ../../src/krnl.cpp:45 in apply_kernel_hls                                |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:56 in apply_kernel_hls                                |
+| loop_tripcount  | min=64 max=512                                                                     | ../../src/krnl.cpp:57 in apply_kernel_hls                                |
+| unroll          |                                                                                    | ../../src/krnl.cpp:62 in apply_kernel_hls                                |
+| inline          | off                                                                                | ../../src/krnl.cpp:87 in minirocket_feature_extraction_hls               |
+| array_partition | variable=convolutions type=cyclic factor=8                                         | ../../src/krnl.cpp:91 in minirocket_feature_extraction_hls, convolutions |
+| loop_tripcount  | min=1 max=8                                                                        | ../../src/krnl.cpp:96 in minirocket_feature_extraction_hls               |
+| loop_tripcount  | min=84 max=84                                                                      | ../../src/krnl.cpp:101 in minirocket_feature_extraction_hls              |
+| pipeline        | off                                                                                | ../../src/krnl.cpp:102 in minirocket_feature_extraction_hls              |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:116 in minirocket_feature_extraction_hls              |
+| inline          | off                                                                                | ../../src/krnl.cpp:140 in apply_scaler_hls                               |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:143 in apply_scaler_hls                               |
+| loop_tripcount  | min=100 max=10000                                                                  | ../../src/krnl.cpp:144 in apply_scaler_hls                               |
+| inline          | off                                                                                | ../../src/krnl.cpp:159 in linear_classifier_predict_hls                  |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:166 in linear_classifier_predict_hls                  |
+| loop_tripcount  | min=100 max=10000                                                                  | ../../src/krnl.cpp:167 in linear_classifier_predict_hls                  |
+| pipeline        | off                                                                                | ../../src/krnl.cpp:177 in linear_classifier_predict_hls                  |
+| loop_tripcount  | min=2 max=4                                                                        | ../../src/krnl.cpp:178 in linear_classifier_predict_hls                  |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:183 in linear_classifier_predict_hls                  |
+| loop_tripcount  | min=100 max=10000                                                                  | ../../src/krnl.cpp:184 in linear_classifier_predict_hls                  |
+| interface       | m_axi port=time_series_input bundle=gmem0 depth=512 max_read_burst_length=256      | ../../src/krnl.cpp:210 in krnl_top, time_series_input                    |
+| interface       | m_axi port=prediction_output bundle=gmem1 depth=4 max_write_burst_length=16        | ../../src/krnl.cpp:211 in krnl_top, prediction_output                    |
+| interface       | m_axi port=coefficients bundle=gmem2 depth=40000 max_read_burst_length=256         | ../../src/krnl.cpp:212 in krnl_top, coefficients                         |
+| interface       | m_axi port=intercept bundle=gmem3 depth=4 max_read_burst_length=16                 | ../../src/krnl.cpp:213 in krnl_top, intercept                            |
+| interface       | m_axi port=scaler_mean bundle=gmem4 depth=10000 max_read_burst_length=256          | ../../src/krnl.cpp:214 in krnl_top, scaler_mean                          |
+| interface       | m_axi port=scaler_scale bundle=gmem5 depth=10000 max_read_burst_length=256         | ../../src/krnl.cpp:215 in krnl_top, scaler_scale                         |
+| interface       | m_axi port=dilations bundle=gmem6 depth=8 max_read_burst_length=16                 | ../../src/krnl.cpp:216 in krnl_top, dilations                            |
+| interface       | m_axi port=num_features_per_dilation bundle=gmem7 depth=8 max_read_burst_length=16 | ../../src/krnl.cpp:217 in krnl_top, num_features_per_dilation            |
+| interface       | m_axi port=biases bundle=gmem8 depth=10000 max_read_burst_length=256               | ../../src/krnl.cpp:218 in krnl_top, biases                               |
+| interface       | s_axilite port=time_series_length bundle=control                                   | ../../src/krnl.cpp:220 in krnl_top, time_series_length                   |
+| interface       | s_axilite port=num_features bundle=control                                         | ../../src/krnl.cpp:221 in krnl_top, num_features                         |
+| interface       | s_axilite port=num_classes bundle=control                                          | ../../src/krnl.cpp:222 in krnl_top, num_classes                          |
+| interface       | s_axilite port=num_dilations bundle=control                                        | ../../src/krnl.cpp:223 in krnl_top, num_dilations                        |
+| interface       | s_axilite port=return bundle=control                                               | ../../src/krnl.cpp:224 in krnl_top, return                               |
+| array_partition | variable=local_time_series type=cyclic factor=8                                    | ../../src/krnl.cpp:239 in krnl_top, local_time_series                    |
+| array_partition | variable=local_features type=cyclic factor=8                                       | ../../src/krnl.cpp:240 in krnl_top, local_features                       |
+| array_partition | variable=local_scaled_features type=cyclic factor=8                                | ../../src/krnl.cpp:241 in krnl_top, local_scaled_features                |
+| array_partition | variable=local_predictions type=complete                                           | ../../src/krnl.cpp:242 in krnl_top, local_predictions                    |
+| array_partition | variable=local_coefficients type=block factor=4 dim=1                              | ../../src/krnl.cpp:243 in krnl_top, local_coefficients                   |
+| array_partition | variable=local_intercept type=complete                                             | ../../src/krnl.cpp:244 in krnl_top, local_intercept                      |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:248 in krnl_top                                       |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:253 in krnl_top                                       |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:259 in krnl_top                                       |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:266 in krnl_top                                       |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:273 in krnl_top                                       |
+| loop_tripcount  | min=400 max=40000                                                                  | ../../src/krnl.cpp:274 in krnl_top                                       |
+| pipeline        | II=1                                                                               | ../../src/krnl.cpp:357 in krnl_top                                       |
++-----------------+------------------------------------------------------------------------------------+--------------------------------------------------------------------------+
+
+* Inferred Pragmas
++--------------------------------+-----------------+----------------------------------------------+-------------------------------------+
+| Source Pragma                  | Inferred Pragma | Options                                      | Location                            |
++--------------------------------+-----------------+----------------------------------------------+-------------------------------------+
+| pipeline ../../src/krnl.cpp:56 | array_partition | dim=2 type=complete  variable=kernel_indices | variable kernel_indices in krnl_top |
++--------------------------------+-----------------+----------------------------------------------+-------------------------------------+
+
+

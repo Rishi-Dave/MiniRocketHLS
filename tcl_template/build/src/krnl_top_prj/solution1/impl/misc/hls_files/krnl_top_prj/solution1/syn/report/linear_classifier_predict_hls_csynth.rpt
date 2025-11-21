@@ -1,0 +1,237 @@
+
+
+================================================================
+== Vitis HLS Report for 'linear_classifier_predict_hls'
+================================================================
+* Date:           Wed Nov 19 13:37:10 2025
+
+* Version:        2023.2 (Build 4023990 on Oct 11 2023)
+* Project:        krnl_top_prj
+* Solution:       solution1 (Vivado IP Flow Target)
+* Product family: virtexuplusHBM
+* Target device:  xcu280-fsvh2892-2L-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+---------+----------+------------+
+    |  Clock |  Target | Estimated| Uncertainty|
+    +--------+---------+----------+------------+
+    |ap_clk  |  3.33 ns|  2.470 ns|     0.90 ns|
+    +--------+---------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+--------+---------+
+    |  Latency (cycles) |  Latency (absolute) |   Interval   | Pipeline|
+    |   min   |   max   |    min   |    max   | min |   max  |   Type  |
+    +---------+---------+----------+----------+-----+--------+---------+
+    |      410|   160046|  1.367 us|  0.533 ms|  410|  160046|       no|
+    +---------+---------+----------+----------+-----+--------+---------+
+
+    + Detail: 
+        * Instance: 
+        +-----------------------------------------------------------------------+------------------------------------------------------------+---------+---------+----------+----------+-----+-------+---------+
+        |                                                                       |                                                            |  Latency (cycles) |  Latency (absolute) |   Interval  | Pipeline|
+        |                                Instance                               |                           Module                           |   min   |   max   |    min   |    max   | min |  max  |   Type  |
+        +-----------------------------------------------------------------------+------------------------------------------------------------+---------+---------+----------+----------+-----+-------+---------+
+        |grp_linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP_fu_166  |linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP  |      408|    40008|  1.360 us|  0.133 ms|  408|  40008|       no|
+        |grp_linear_classifier_predict_hls_Pipeline_FEATURE_LOOP_fu_193         |linear_classifier_predict_hls_Pipeline_FEATURE_LOOP         |      408|    40008|  1.360 us|  0.133 ms|  408|  40008|       no|
+        +-----------------------------------------------------------------------+------------------------------------------------------------+---------+---------+----------+----------+-----+-------+---------+
+
+        * Loop: 
+        +--------------+---------+---------+-------------+-----------+-----------+-------+----------+
+        |              |  Latency (cycles) |  Iteration  |  Initiation Interval  |  Trip |          |
+        |   Loop Name  |   min   |   max   |   Latency   |  achieved |   target  | Count | Pipelined|
+        +--------------+---------+---------+-------------+-----------+-----------+-------+----------+
+        |- CLASS_LOOP  |      822|   160044|  411 ~ 40011|          -|          -|  2 ~ 4|        no|
+        +--------------+---------+---------+-------------+-----------+-----------+-------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+---------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT   | URAM|
++---------------------+---------+------+---------+---------+-----+
+|DSP                  |        -|     -|        -|        -|    -|
+|Expression           |        -|     -|        0|      149|    -|
+|FIFO                 |        -|     -|        -|        -|    -|
+|Instance             |        -|     0|      555|      802|    -|
+|Memory               |        -|     -|        -|        -|    -|
+|Multiplexer          |        -|     -|        -|      410|    -|
+|Register             |        -|     -|      105|        -|    -|
++---------------------+---------+------+---------+---------+-----+
+|Total                |        0|     0|      660|     1361|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available SLR        |     1344|  3008|   869120|   434560|  320|
++---------------------+---------+------+---------+---------+-----+
+|Utilization SLR (%)  |        0|     0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available            |     4032|  9024|  2607360|  1303680|  960|
++---------------------+---------+------+---------+---------+-----+
+|Utilization (%)      |        0|     0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+
++ Detail: 
+    * Instance: 
+    +-----------------------------------------------------------------------+------------------------------------------------------------+---------+----+-----+-----+-----+
+    |                                Instance                               |                           Module                           | BRAM_18K| DSP|  FF | LUT | URAM|
+    +-----------------------------------------------------------------------+------------------------------------------------------------+---------+----+-----+-----+-----+
+    |fadd_32ns_32ns_32_5_no_dsp_1_U251                                      |fadd_32ns_32ns_32_5_no_dsp_1                                |        0|   0|  243|  338|    0|
+    |grp_linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP_fu_166  |linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP  |        0|   0|  156|  212|    0|
+    |grp_linear_classifier_predict_hls_Pipeline_FEATURE_LOOP_fu_193         |linear_classifier_predict_hls_Pipeline_FEATURE_LOOP         |        0|   0|  156|  232|    0|
+    |sparsemux_9_2_32_1_1_U250                                              |sparsemux_9_2_32_1_1                                        |        0|   0|    0|   20|    0|
+    +-----------------------------------------------------------------------+------------------------------------------------------------+---------+----+-----+-----+-----+
+    |Total                                                                  |                                                            |        0|   0|  555|  802|    0|
+    +-----------------------------------------------------------------------+------------------------------------------------------------+---------+----+-----+-----+-----+
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +----------------------+----------+----+---+----+------------+------------+
+    |     Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +----------------------+----------+----+---+----+------------+------------+
+    |add_ln22_fu_248_p2    |         +|   0|  0|  38|          31|           1|
+    |icmp_ln161_fu_225_p2  |      icmp|   0|  0|  39|          32|           2|
+    |icmp_ln27_fu_243_p2   |      icmp|   0|  0|  39|          32|          32|
+    |xor_ln25_fu_299_p2    |       xor|   0|  0|  33|          32|          33|
+    +----------------------+----------+----+---+----+------------+------------+
+    |Total                 |          |   0|  0| 149|         127|          68|
+    +----------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------------+----+-----------+-----+-----------+
+    |            Name            | LUT| Input Size| Bits| Total Bits|
+    +----------------------------+----+-----------+-----+-----------+
+    |ap_NS_fsm                   |  37|          7|    1|          7|
+    |coefficients_0_address0     |  14|          3|   14|         42|
+    |coefficients_0_ce0          |  14|          3|    1|          3|
+    |grp_fu_383_ce               |  14|          3|    1|          3|
+    |grp_fu_383_p0               |  14|          3|   32|         96|
+    |grp_fu_383_p1               |  14|          3|   32|         96|
+    |grp_fu_387_ce               |  14|          3|    1|          3|
+    |grp_fu_387_p0               |  14|          3|   32|         96|
+    |grp_fu_387_p1               |  14|          3|   32|         96|
+    |i_fu_98                     |   9|          2|   31|         62|
+    |predictions_0               |  14|          3|   32|         96|
+    |predictions_1               |  14|          3|   32|         96|
+    |scaled_features_0_address0  |  14|          3|   11|         33|
+    |scaled_features_0_ce0       |  14|          3|    1|          3|
+    |scaled_features_1_address0  |  14|          3|   11|         33|
+    |scaled_features_1_ce0       |  14|          3|    1|          3|
+    |scaled_features_2_address0  |  14|          3|   11|         33|
+    |scaled_features_2_ce0       |  14|          3|    1|          3|
+    |scaled_features_3_address0  |  14|          3|   11|         33|
+    |scaled_features_3_ce0       |  14|          3|    1|          3|
+    |scaled_features_4_address0  |  14|          3|   11|         33|
+    |scaled_features_4_ce0       |  14|          3|    1|          3|
+    |scaled_features_5_address0  |  14|          3|   11|         33|
+    |scaled_features_5_ce0       |  14|          3|    1|          3|
+    |scaled_features_6_address0  |  14|          3|   11|         33|
+    |scaled_features_6_ce0       |  14|          3|    1|          3|
+    |scaled_features_7_address0  |  14|          3|   11|         33|
+    |scaled_features_7_ce0       |  14|          3|    1|          3|
+    +----------------------------+----+-----------+-----+-----------+
+    |Total                       | 410|         87|  337|        984|
+    +----------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +------------------------------------------------------------------------------------+----+----+-----+-----------+
+    |                                        Name                                        | FF | LUT| Bits| Const Bits|
+    +------------------------------------------------------------------------------------+----+----+-----+-----------+
+    |add_ln22_reg_368                                                                    |  31|   0|   31|          0|
+    |ap_CS_fsm                                                                           |   6|   0|    6|          0|
+    |grp_linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP_fu_166_ap_start_reg  |   1|   0|    1|          0|
+    |grp_linear_classifier_predict_hls_Pipeline_FEATURE_LOOP_fu_193_ap_start_reg         |   1|   0|    1|          0|
+    |i_fu_98                                                                             |  31|   0|   31|          0|
+    |icmp_ln161_reg_354                                                                  |   1|   0|    1|          0|
+    |score_reg_378                                                                       |  32|   0|   32|          0|
+    |trunc_ln176_reg_373                                                                 |   2|   0|    2|          0|
+    +------------------------------------------------------------------------------------+----+----+-----+-----------+
+    |Total                                                                               | 105|   0|  105|          0|
+    +------------------------------------------------------------------------------------+----+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++----------------------------+-----+-----+------------+-------------------------------+--------------+
+|          RTL Ports         | Dir | Bits|  Protocol  |         Source Object         |    C Type    |
++----------------------------+-----+-----+------------+-------------------------------+--------------+
+|ap_clk                      |   in|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|ap_rst                      |   in|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|ap_start                    |   in|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|ap_done                     |  out|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|ap_idle                     |  out|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|ap_ready                    |  out|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|grp_fu_1347_p_din0          |  out|   32|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|grp_fu_1347_p_din1          |  out|   32|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|grp_fu_1347_p_dout0         |   in|   32|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|grp_fu_1347_p_ce            |  out|    1|  ap_ctrl_hs|  linear_classifier_predict_hls|  return value|
+|scaled_features_0_address0  |  out|   11|   ap_memory|              scaled_features_0|         array|
+|scaled_features_0_ce0       |  out|    1|   ap_memory|              scaled_features_0|         array|
+|scaled_features_0_q0        |   in|   32|   ap_memory|              scaled_features_0|         array|
+|scaled_features_1_address0  |  out|   11|   ap_memory|              scaled_features_1|         array|
+|scaled_features_1_ce0       |  out|    1|   ap_memory|              scaled_features_1|         array|
+|scaled_features_1_q0        |   in|   32|   ap_memory|              scaled_features_1|         array|
+|scaled_features_2_address0  |  out|   11|   ap_memory|              scaled_features_2|         array|
+|scaled_features_2_ce0       |  out|    1|   ap_memory|              scaled_features_2|         array|
+|scaled_features_2_q0        |   in|   32|   ap_memory|              scaled_features_2|         array|
+|scaled_features_3_address0  |  out|   11|   ap_memory|              scaled_features_3|         array|
+|scaled_features_3_ce0       |  out|    1|   ap_memory|              scaled_features_3|         array|
+|scaled_features_3_q0        |   in|   32|   ap_memory|              scaled_features_3|         array|
+|scaled_features_4_address0  |  out|   11|   ap_memory|              scaled_features_4|         array|
+|scaled_features_4_ce0       |  out|    1|   ap_memory|              scaled_features_4|         array|
+|scaled_features_4_q0        |   in|   32|   ap_memory|              scaled_features_4|         array|
+|scaled_features_5_address0  |  out|   11|   ap_memory|              scaled_features_5|         array|
+|scaled_features_5_ce0       |  out|    1|   ap_memory|              scaled_features_5|         array|
+|scaled_features_5_q0        |   in|   32|   ap_memory|              scaled_features_5|         array|
+|scaled_features_6_address0  |  out|   11|   ap_memory|              scaled_features_6|         array|
+|scaled_features_6_ce0       |  out|    1|   ap_memory|              scaled_features_6|         array|
+|scaled_features_6_q0        |   in|   32|   ap_memory|              scaled_features_6|         array|
+|scaled_features_7_address0  |  out|   11|   ap_memory|              scaled_features_7|         array|
+|scaled_features_7_ce0       |  out|    1|   ap_memory|              scaled_features_7|         array|
+|scaled_features_7_q0        |   in|   32|   ap_memory|              scaled_features_7|         array|
+|predictions_0               |  out|   32|      ap_vld|                  predictions_0|       pointer|
+|predictions_0_ap_vld        |  out|    1|      ap_vld|                  predictions_0|       pointer|
+|predictions_1               |  out|   32|      ap_vld|                  predictions_1|       pointer|
+|predictions_1_ap_vld        |  out|    1|      ap_vld|                  predictions_1|       pointer|
+|predictions_2               |  out|   32|      ap_vld|                  predictions_2|       pointer|
+|predictions_2_ap_vld        |  out|    1|      ap_vld|                  predictions_2|       pointer|
+|predictions_3               |  out|   32|      ap_vld|                  predictions_3|       pointer|
+|predictions_3_ap_vld        |  out|    1|      ap_vld|                  predictions_3|       pointer|
+|coefficients_0_address0     |  out|   14|   ap_memory|                 coefficients_0|         array|
+|coefficients_0_ce0          |  out|    1|   ap_memory|                 coefficients_0|         array|
+|coefficients_0_q0           |   in|   32|   ap_memory|                 coefficients_0|         array|
+|coefficients_1_address0     |  out|   14|   ap_memory|                 coefficients_1|         array|
+|coefficients_1_ce0          |  out|    1|   ap_memory|                 coefficients_1|         array|
+|coefficients_1_q0           |   in|   32|   ap_memory|                 coefficients_1|         array|
+|coefficients_2_address0     |  out|   14|   ap_memory|                 coefficients_2|         array|
+|coefficients_2_ce0          |  out|    1|   ap_memory|                 coefficients_2|         array|
+|coefficients_2_q0           |   in|   32|   ap_memory|                 coefficients_2|         array|
+|coefficients_3_address0     |  out|   14|   ap_memory|                 coefficients_3|         array|
+|coefficients_3_ce0          |  out|    1|   ap_memory|                 coefficients_3|         array|
+|coefficients_3_q0           |   in|   32|   ap_memory|                 coefficients_3|         array|
+|intercept_0_val             |   in|   32|     ap_none|                intercept_0_val|        scalar|
+|intercept_1_val             |   in|   32|     ap_none|                intercept_1_val|        scalar|
+|intercept_2_val             |   in|   32|     ap_none|                intercept_2_val|        scalar|
+|intercept_3_val             |   in|   32|     ap_none|                intercept_3_val|        scalar|
+|num_features_val            |   in|   32|     ap_none|               num_features_val|        scalar|
+|num_classes_val             |   in|   32|     ap_none|                num_classes_val|        scalar|
++----------------------------+-----+-----+------------+-------------------------------+--------------+
+

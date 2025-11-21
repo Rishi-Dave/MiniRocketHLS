@@ -1,0 +1,97 @@
+INFO: [v++ 60-1306] Additional information associated with this v++ link can be found at:
+	Reports: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link
+	Log files: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/link
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_hw.xclbin.link_summary, at Mon Nov 17 18:26:15 2025
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link/v++_link_minirocket_hw_guidance.html', at Mon Nov 17 18:26:15 2025
+INFO: [v++ 60-895]   Target platform: /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2023.2
+INFO: [v++ 60-629] Linking for hardware target
+INFO: [v++ 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [v++ 60-1332] Run 'run_link' status: Not started
+INFO: [v++ 60-1443] [18:26:23] Run run_link: Step system_link: Started
+INFO: [v++ 60-1453] Command Line: system_link --xo /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo -keep --config /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/syslinkConfig.ini --xpfm /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm --target hw --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo
+INFO: [SYSTEM_LINK 82-53] Creating IP database /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-38] [18:26:26] build_xd_ip_db started: /home/Xilinx/Vitis/2023.2/bin/build_xd_ip_db -ip_search 0  -sds-pf /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/hw.hpfm -clkid 0 -ip /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/iprepo/xilinx_com_user_krnl_top_1_0,krnl_top -o /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-37] [18:26:34] build_xd_ip_db finished successfully
+Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 458.633 ; gain = 0.000 ; free physical = 557 ; free virtual = 109468
+INFO: [SYSTEM_LINK 82-51] Create system connectivity graph
+INFO: [SYSTEM_LINK 82-102] Applying explicit connections to the system connectivity graph: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [SYSTEM_LINK 82-38] [18:26:34] cfgen started: /home/Xilinx/Vitis/2023.2/bin/cfgen  -sp krnl_top_1.m_axi_gmem0:DDR[0] -sp krnl_top_1.m_axi_gmem1:DDR[0] -sp krnl_top_1.m_axi_gmem2:DDR[1] -sp krnl_top_1.m_axi_gmem3:DDR[1] -sp krnl_top_1.m_axi_gmem4:DDR[0] -sp krnl_top_1.m_axi_gmem5:DDR[1] -sp krnl_top_1.m_axi_gmem6:DDR[0] -sp krnl_top_1.m_axi_gmem8:DDR[1] -clock.freqHz 100000000:krnl_top_1 -dpa_mem_offload false -dmclkid 0 -r /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [CFGEN 83-0] Kernel Specs: 
+INFO: [CFGEN 83-0]   kernel: krnl_top, num: 1  {krnl_top_1}
+INFO: [CFGEN 83-0] Port Specs: 
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem0, sptag: DDR[0]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem1, sptag: DDR[0]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem2, sptag: DDR[1]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem3, sptag: DDR[1]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem4, sptag: DDR[0]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem5, sptag: DDR[1]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem6, sptag: DDR[0]
+INFO: [CFGEN 83-0]   kernel: krnl_top_1, k_port: m_axi_gmem8, sptag: DDR[1]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.time_series_input to DDR[0] for directive krnl_top_1.m_axi_gmem0:DDR[0]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.prediction_output to DDR[0] for directive krnl_top_1.m_axi_gmem1:DDR[0]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.coefficients to DDR[1] for directive krnl_top_1.m_axi_gmem2:DDR[1]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.intercept to DDR[1] for directive krnl_top_1.m_axi_gmem3:DDR[1]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.scaler_mean to DDR[0] for directive krnl_top_1.m_axi_gmem4:DDR[0]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.scaler_scale to DDR[1] for directive krnl_top_1.m_axi_gmem5:DDR[1]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.dilations to DDR[0] for directive krnl_top_1.m_axi_gmem6:DDR[0]
+INFO: [CFGEN 83-2228] Creating mapping for argument krnl_top_1.biases to DDR[1] for directive krnl_top_1.m_axi_gmem8:DDR[1]
+INFO: [CFGEN 83-2226] Inferring mapping for argument krnl_top_1.num_features_per_dilation to HBM[0]
+INFO: [SYSTEM_LINK 82-37] [18:26:45] cfgen finished successfully
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:11 . Memory (MB): peak = 458.633 ; gain = 0.000 ; free physical = 576 ; free virtual = 109456
+INFO: [SYSTEM_LINK 82-52] Create top-level block diagram
+INFO: [SYSTEM_LINK 82-38] [18:26:45] cf2bd started: /home/Xilinx/Vitis/2023.2/bin/cf2bd  --linux --trace_buffer 1024 --input_file /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/cfgraph/cfgen_cfgraph.xml --ip_db /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.cdb/xd_ip_db.xml --cf_name dr --working_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.xsd --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --target_bd ulp.bd
+INFO: [CF2BD 82-31] Launching cf2xd: cf2xd -linux -trace-buffer 1024 -i /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/cfgraph/cfgen_cfgraph.xml -r /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o dr.xml
+INFO: [CF2BD 82-28] cf2xd finished successfully
+INFO: [CF2BD 82-31] Launching cf_xsd: cf_xsd -disable-address-gen -bd ulp.bd -dn dr -dp /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link/_sysl/.xsd
+INFO: [CF2BD 82-28] cf_xsd finished successfully
+INFO: [SYSTEM_LINK 82-37] [18:26:51] cf2bd finished successfully
+Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 458.633 ; gain = 0.000 ; free physical = 637 ; free virtual = 109422
+INFO: [v++ 60-1441] [18:26:51] Run run_link: Step system_link: Completed
+Time (s): cpu = 00:00:27 ; elapsed = 00:00:28 . Memory (MB): peak = 478.340 ; gain = 0.000 ; free physical = 688 ; free virtual = 109482
+INFO: [v++ 60-1443] [18:26:51] Run run_link: Step cf2sw: Started
+INFO: [v++ 60-1453] Command Line: cf2sw -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/sdsl.dat -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw.rtd -nofilter /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw_full.rtd -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.1.xml
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link
+INFO: [v++ 60-1441] [18:26:58] Run run_link: Step cf2sw: Completed
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:07 . Memory (MB): peak = 478.340 ; gain = 0.000 ; free physical = 708 ; free virtual = 109546
+INFO: [v++ 60-1443] [18:26:58] Run run_link: Step rtd2_system_diagram: Started
+INFO: [v++ 60-1453] Command Line: rtd2SystemDiagram
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link
+INFO: [v++ 60-1441] [18:26:59] Run run_link: Step rtd2_system_diagram: Completed
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.44 . Memory (MB): peak = 478.340 ; gain = 0.000 ; free physical = 638 ; free virtual = 109523
+INFO: [v++ 60-1443] [18:26:59] Run run_link: Step vpl: Started
+INFO: [v++ 60-1453] Command Line: vpl -t hw -f xilinx_u280_gen3x16_xdma_1_202211_1 -s --remote_ip_cache /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/.ipcache --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --log_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/link --report_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link --config /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/vplConfig.ini -k /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link --no-info --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xo/ip_repo/xilinx_com_user_krnl_top_1_0 --messageDb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link/vpl.pb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/dr.bd.tcl
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link
+
+****** vpl v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: [VPL 60-839] Read in kernel information from file '/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/kernel_info.dat'.
+INFO: [VPL 74-78] Compiler Version string: 2023.2
+INFO: [VPL 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [VPL 60-1032] Extracting hardware platform to /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl/.local/hw_platform
+[18:27:48] Run vpl: Step create_project: Started
+Creating Vivado project.
+[18:28:00] Run vpl: Step create_project: Completed
+[18:28:00] Run vpl: Step create_bd: Started
+[18:28:54] Run vpl: Step create_bd: Failed
+[18:28:54] Run vpl: FINISHED. Run Status: create_bd ERROR
+
+===>The following messages were generated while  creating FPGA bitstream. Log file: /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl/runme.log :
+ERROR: [VPL 5-683] VLNV <xilinx.com:user:krnl_top:1.0> is not supported for the current part.
+ERROR: [VPL 60-773] In '/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl/runme.log', caught Tcl error:  ERROR: [Common 17-39] 'create_bd_cell' failed due to earlier errors.
+ERROR: [VPL 60-704] Integration error, Failed to update block diagram in project required for hardware synthesis.The project is 'prj'. The block diagram update script is '.local/dr.bd.tcl'. The block diagram update script was generated by system linker. An error stack with function names and arguments may be available in the 'vivado.log'.
+ERROR: [VPL 60-1328] Vpl run 'vpl' failed
+WARNING: [VPL 60-1142] Unable to read data from '/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl/output/generated_reports.log', generated reports will not be copied.
+ERROR: [VPL 60-806] Failed to finish platform linker
+INFO: [v++ 60-1442] [18:28:54] Run run_link: Step vpl: Failed
+Time (s): cpu = 00:00:10 ; elapsed = 00:01:55 . Memory (MB): peak = 478.340 ; gain = 0.000 ; free physical = 700 ; free virtual = 107098
+ERROR: [v++ 60-661] v++ link run 'run_link' failed
+ERROR: [v++ 60-626] Kernel link failed to complete
+ERROR: [v++ 60-703] Failed to finish linking
+INFO: [v++ 60-1653] Closing dispatch client.

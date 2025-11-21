@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <core name="" type="" target="">
+    <kernel name="krnl_top" language="c" vlnv="xilinx.com:hls:krnl_top:1.0" attributes="" hash="" preferredWorkGroupSizeMultiple="0" workGroupSize="1" debug="false" interrupt="true">
+      <port name="S_AXI_CONTROL" mode="slave" range="0x1000" dataWidth="64" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM0" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM1" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM2" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM3" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM4" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM5" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM6" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM7" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <port name="M_AXI_GMEM8" mode="master" range="0xFFFFFFFF" dataWidth="-1" portType="addressable" base="0x00000000"/>
+      <arg name="time_series_input" addressQualifier="1" id="0" port="M_AXI_GMEM0" size="0x4" offset="0x10" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="prediction_output" addressQualifier="1" id="1" port="M_AXI_GMEM1" size="0x4" offset="0x1C" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="coefficients" addressQualifier="1" id="2" port="M_AXI_GMEM2" size="0x4" offset="0x28" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="intercept" addressQualifier="1" id="3" port="M_AXI_GMEM3" size="0x4" offset="0x34" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="scaler_mean" addressQualifier="1" id="4" port="M_AXI_GMEM4" size="0x4" offset="0x40" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="scaler_scale" addressQualifier="1" id="5" port="M_AXI_GMEM5" size="0x4" offset="0x4C" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="dilations" addressQualifier="1" id="6" port="M_AXI_GMEM6" size="0x4" offset="0x58" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="num_features_per_dilation" addressQualifier="1" id="7" port="M_AXI_GMEM7" size="0x4" offset="0x64" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="biases" addressQualifier="1" id="8" port="M_AXI_GMEM8" size="0x4" offset="0x70" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="time_series_length" addressQualifier="0" id="9" port="S_AXI_CONTROL" size="0x4" offset="0x7C" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="num_features" addressQualifier="0" id="10" port="S_AXI_CONTROL" size="0x4" offset="0x84" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="num_classes" addressQualifier="0" id="11" port="S_AXI_CONTROL" size="0x4" offset="0x8C" hostOffset="0x0" hostSize="0x4" type=""/>
+      <arg name="num_dilations" addressQualifier="0" id="12" port="S_AXI_CONTROL" size="0x4" offset="0x94" hostOffset="0x0" hostSize="0x4" type=""/>
+      <compileWorkGroupSize x="1" y="1" z="1"/>
+    </kernel>
+  </core>
+</project>

@@ -1,0 +1,10 @@
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/installip.krnl_top.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/installip.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/csim.krnl_top.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/csim.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/cosim.krnl_top.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/synthesis.krnl_top.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/ip.krnl_top.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/ip.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/cosim.dir
+/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build/src/CMakeFiles/synthesis.dir

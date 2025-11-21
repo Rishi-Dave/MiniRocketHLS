@@ -1,0 +1,286 @@
+<ENTRY>
+{
+ "thisFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_sw_emu.xclbin.link_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Wed Nov 12 14:08:28 2025",
+ "timestampMillis": "1762985308928",
+ "buildStep": {
+  "cmdId": "39baecdf-1a91-448a-826c-6cfacdce3df7",
+  "name": "v++",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/link.steps.log",
+  "commandLine": "/home/Xilinx/Vitis/2023.2/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -t sw_emu --platform xilinx_u280_gen3x16_xdma_1_202211_1 --config minirocket.cfg --save-temps --temp_dir ./build_sw_emu --log_dir ./logs_sw_emu -l -o minirocket_sw_emu.xclbin minirocket_kernel.xo ",
+  "args": [
+   "-t",
+   "sw_emu",
+   "--platform",
+   "xilinx_u280_gen3x16_xdma_1_202211_1",
+   "--config",
+   "minirocket.cfg",
+   "--save-temps",
+   "--temp_dir",
+   "./build_sw_emu",
+   "--log_dir",
+   "./logs_sw_emu",
+   "-l",
+   "-o",
+   "minirocket_sw_emu.xclbin",
+   "minirocket_kernel.xo"
+  ],
+  "iniFiles": [
+   {
+    "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket.cfg",
+    "content": "[connectivity]\n# Map AXI masters to DDR banks for optimal memory bandwidth\n# Distribute large data transfers across multiple DDR banks to avoid contention\nsp=krnl_top_1.m_axi_gmem0:DDR[0]    # Time series input\nsp=krnl_top_1.m_axi_gmem1:DDR[0]    # Prediction output (small)\nsp=krnl_top_1.m_axi_gmem2:DDR[1]    # Coefficients (large)\nsp=krnl_top_1.m_axi_gmem3:DDR[1]    # Intercept (small)\nsp=krnl_top_1.m_axi_gmem4:DDR[2]    # Scaler mean (large)\nsp=krnl_top_1.m_axi_gmem5:DDR[2]    # Scaler scale (large)\nsp=krnl_top_1.m_axi_gmem6:DDR[0]    # Dilations (small)\nsp=krnl_top_1.m_axi_gmem8:DDR[3]    # Biases (large)\n\n[advanced]\n# Use performance-optimized implementation strategy\nprop=run.impl_1.strategy=Performance_ExplorePostRoutePhysOpt\n\n# Enable additional optimizations\nparam=compiler.acceleratorBinaryContent=bitstream\nparam=compiler.addOutputTypes=hw_export\n\n[vivado]\n# Vivado implementation directives for timing closure\nprop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=ExploreWithRemap\nprop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=ExtraPostPlacementOpt\nprop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\nprop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n\n[clock]\n# Kernel clock frequency (can adjust based on timing results)\nfreqHz=100000000:krnl_top_1\n"
+   }
+  ],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:28 2025",
+ "timestampMillis": "1762985308929",
+ "status": {
+  "cmdId": "39baecdf-1a91-448a-826c-6cfacdce3df7",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Wed Nov 12 14:08:36 2025",
+ "timestampMillis": "1762985316553",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_u280_gen3x16_xdma_1_202211_1.xpfm",
+  "hardwareDsa": "",
+  "platformDirectory": "/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_LINK",
+  "target": "TT_SW_EMU",
+  "binaryContainer": {
+   "base": {
+    "type": "BT_UKNOWN",
+    "name": "minirocket_sw_emu",
+    "file": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_sw_emu.xclbin",
+    "reports": [],
+    "uuid": ""
+   },
+   "kernels": []
+  },
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "krnl_top",
+     "file": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [
+     "krnl_top_1"
+    ],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "Vitis V++ Compiler Release 2023.2. SW Build 4026344 on 2023-10-11-15:42:10"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Nov 12 14:08:37 2025",
+ "timestampMillis": "1762985317016",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/systemDiagramModel.json",
+  "name": "",
+  "fileType": "JSON",
+  "reportType": "SYSTEM_DIAGRAM",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Nov 12 14:08:37 2025",
+ "timestampMillis": "1762985317024",
+ "buildStep": {
+  "cmdId": "eb218c9b-c53f-4c6e-80ab-b55185e62617",
+  "name": "regiongen",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/minirocket_sw_emu_regiongen.log",
+  "commandLine": "/home/Xilinx/Vitis/2023.2/bin/../runtime/bin/regiongen_new -v -m /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/minirocket_sw_emu.xml -r /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/minirocket_sw_emu.rtd -t alg -o xcl_top",
+  "args": [
+   "-v",
+   "-m",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/minirocket_sw_emu.xml",
+   "-r",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/minirocket_sw_emu.rtd",
+   "-t",
+   "alg",
+   "-o",
+   "xcl_top"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:37 2025",
+ "timestampMillis": "1762985317024",
+ "status": {
+  "cmdId": "eb218c9b-c53f-4c6e-80ab-b55185e62617",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:38 2025",
+ "timestampMillis": "1762985318902",
+ "status": {
+  "cmdId": "eb218c9b-c53f-4c6e-80ab-b55185e62617",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Wed Nov 12 14:08:38 2025",
+ "timestampMillis": "1762985318921",
+ "buildStep": {
+  "cmdId": "a47ed66d-4cc5-49a3-bccd-c1f9cc6b4752",
+  "name": "gcc",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/krnl_top/krnl_top_kernel_gcc.log",
+  "commandLine": "/home/Xilinx/Vivado/2023.2/tps/lnx64/gcc-8.3.0/bin/gcc -I . -I /home/Xilinx/Vitis_HLS/2023.2/bin/../include -I /home/Xilinx/Vitis_HLS/2023.2/bin/../lnx64/tools/auto_cc/include -I /home/Xilinx/Vitis_HLS/2023.2/bin/../common/technology/autopilot/opencl -I /home/Xilinx/Vitis/2023.2/bin/../common/technology/autopilot/opencl -I /home/Xilinx/Vitis/2023.2/bin/../data/emulation/include -I /usr/include/x86_64-linux-gnu -std=c++14 -fPIC -g -c -DHLS_STREAM_THREAD_SAFE -MD -MT obj/krnl.o -MP -MF obj/krnl.Cd /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp -o obj/krnl.o",
+  "args": [
+   "-I",
+   ".",
+   "-I",
+   "/home/Xilinx/Vitis_HLS/2023.2/bin/../include",
+   "-I",
+   "/home/Xilinx/Vitis_HLS/2023.2/bin/../lnx64/tools/auto_cc/include",
+   "-I",
+   "/home/Xilinx/Vitis_HLS/2023.2/bin/../common/technology/autopilot/opencl",
+   "-I",
+   "/home/Xilinx/Vitis/2023.2/bin/../common/technology/autopilot/opencl",
+   "-I",
+   "/home/Xilinx/Vitis/2023.2/bin/../data/emulation/include",
+   "-I",
+   "/usr/include/x86_64-linux-gnu",
+   "-std=c++14",
+   "-fPIC",
+   "-g",
+   "-c",
+   "-DHLS_STREAM_THREAD_SAFE",
+   "-MD",
+   "-MT",
+   "obj/krnl.o",
+   "-MP",
+   "-MF",
+   "obj/krnl.Cd",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp",
+   "-o",
+   "obj/krnl.o"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:38 2025",
+ "timestampMillis": "1762985318922",
+ "status": {
+  "cmdId": "a47ed66d-4cc5-49a3-bccd-c1f9cc6b4752",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:39 2025",
+ "timestampMillis": "1762985319489",
+ "status": {
+  "cmdId": "a47ed66d-4cc5-49a3-bccd-c1f9cc6b4752",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Nov 12 14:08:39 2025",
+ "timestampMillis": "1762985319502",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_sw_emu/optraceViewer.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "OPERATION_TRACE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Wed Nov 12 14:08:39 2025",
+ "timestampMillis": "1762985319503",
+ "status": {
+  "cmdId": "39baecdf-1a91-448a-826c-6cfacdce3df7",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Nov 12 14:08:39 2025",
+ "timestampMillis": "1762985319636",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/reports/link/v++_link_minirocket_sw_emu_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Wed Nov 12 14:08:39 2025",
+ "timestampMillis": "1762985319636",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_sw_emu/v++_link_minirocket_sw_emu_guidance.pb3",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>

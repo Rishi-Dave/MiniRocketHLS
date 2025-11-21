@@ -1,0 +1,486 @@
+<ENTRY>
+{
+ "thisFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_hw.xclbin.link_summary",
+ "connectId": "",
+ "serverToken": "",
+ "timestamp": "0"
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Mon Nov 17 18:26:14 2025",
+ "timestampMillis": "1763432774885",
+ "buildStep": {
+  "cmdId": "a998e666-9d8d-456e-8e32-b1afe737d929",
+  "name": "v++",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/link.steps.log",
+  "commandLine": "/home/Xilinx/Vitis/2023.2/bin/unwrapped/lnx64.o/v++  --vivado.prop \"run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --advanced.misc \"report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -t hw --platform xilinx_u280_gen3x16_xdma_1_202211_1 --config minirocket.cfg --save-temps --temp_dir ./build_fpga --log_dir ./logs_fpga -l -o minirocket_hw.xclbin minirocket_kernel.xo ",
+  "args": [
+   "-t",
+   "hw",
+   "--platform",
+   "xilinx_u280_gen3x16_xdma_1_202211_1",
+   "--config",
+   "minirocket.cfg",
+   "--save-temps",
+   "--temp_dir",
+   "./build_fpga",
+   "--log_dir",
+   "./logs_fpga",
+   "-l",
+   "-o",
+   "minirocket_hw.xclbin",
+   "minirocket_kernel.xo"
+  ],
+  "iniFiles": [
+   {
+    "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket.cfg",
+    "content": "[connectivity]\n# Map AXI masters to DDR banks for optimal memory bandwidth\n# Distribute large data transfers across multiple DDR banks to avoid contention\n# U280 has two DDR banks: bank0 and bank1\nsp=krnl_top_1.m_axi_gmem0:DDR[0]    # Time series input\nsp=krnl_top_1.m_axi_gmem1:DDR[0]    # Prediction output (small)\nsp=krnl_top_1.m_axi_gmem2:DDR[1]    # Coefficients (large)\nsp=krnl_top_1.m_axi_gmem3:DDR[1]    # Intercept (small)\nsp=krnl_top_1.m_axi_gmem4:DDR[0]    # Scaler mean (large) - changed from DDR[2]\nsp=krnl_top_1.m_axi_gmem5:DDR[1]    # Scaler scale (large) - changed from DDR[2]\nsp=krnl_top_1.m_axi_gmem6:DDR[0]    # Dilations (small)\nsp=krnl_top_1.m_axi_gmem8:DDR[1]    # Biases (large) - changed from DDR[3]\n\n[advanced]\n# Use performance-optimized implementation strategy\nprop=run.impl_1.strategy=Performance_ExplorePostRoutePhysOpt\n\n# Enable additional optimizations\nparam=compiler.acceleratorBinaryContent=bitstream\nparam=compiler.addOutputTypes=hw_export\n\n[vivado]\n# Vivado implementation directives for timing closure\nprop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=ExploreWithRemap\nprop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=ExtraPostPlacementOpt\nprop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\nprop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n\n[clock]\n# Kernel clock frequency (can adjust based on timing results)\nfreqHz=100000000:krnl_top_1\n"
+   }
+  ],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:14 2025",
+ "timestampMillis": "1763432774885",
+ "status": {
+  "cmdId": "a998e666-9d8d-456e-8e32-b1afe737d929",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_FlowMetaData",
+ "dateTimestamp": "Mon Nov 17 18:26:23 2025",
+ "timestampMillis": "1763432783181",
+ "buildSummary": {
+  "hardwarePlatform": "xilinx_u280_gen3x16_xdma_1_202211_1.xpfm",
+  "hardwareDsa": "",
+  "platformDirectory": "/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1",
+  "runtime": "OpenCL",
+  "systemConfig": "Linux",
+  "flow": "BF_LINK",
+  "target": "TT_HW",
+  "binaryContainer": {
+   "base": {
+    "type": "BT_UKNOWN",
+    "name": "minirocket_hw",
+    "file": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_hw.xclbin",
+    "reports": [],
+    "uuid": ""
+   },
+   "kernels": []
+  },
+  "kernels": [
+   {
+    "base": {
+     "type": "KERNEL",
+     "name": "krnl_top",
+     "file": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo",
+     "reports": [],
+     "uuid": ""
+    },
+    "sources": [
+     "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xo/krnl_top/krnl_top/cpu_sources/krnl.cpp"
+    ],
+    "psSources": [],
+    "cuNames": [
+     "krnl_top_1"
+    ],
+    "type": "HLS",
+    "frequency": 0,
+    "freqUnits": ""
+   }
+  ],
+  "toolVersion": "Vitis V++ Compiler Release 2023.2. SW Build 4026344 on 2023-10-11-15:42:10"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Mon Nov 17 18:26:23 2025",
+ "timestampMillis": "1763432783474",
+ "buildStep": {
+  "cmdId": "79157251-ba84-4547-a157-f6a1296cf620",
+  "name": "system_link",
+  "logFile": "",
+  "commandLine": "system_link --xo /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo -keep --config /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/syslinkConfig.ini --xpfm /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm --target hw --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link",
+  "args": [
+   "--xo",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/minirocket_kernel.xo",
+   "-keep",
+   "--config",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/syslinkConfig.ini",
+   "--xpfm",
+   "/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm",
+   "--target",
+   "hw",
+   "--output_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int",
+   "--temp_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/sys_link"
+  ],
+  "iniFiles": [
+   {
+    "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/syslinkConfig.ini",
+    "content": "sp=krnl_top_1.m_axi_gmem0:DDR[0]\nsp=krnl_top_1.m_axi_gmem1:DDR[0]\nsp=krnl_top_1.m_axi_gmem2:DDR[1]\nsp=krnl_top_1.m_axi_gmem3:DDR[1]\nsp=krnl_top_1.m_axi_gmem4:DDR[0]\nsp=krnl_top_1.m_axi_gmem5:DDR[1]\nsp=krnl_top_1.m_axi_gmem6:DDR[0]\nsp=krnl_top_1.m_axi_gmem8:DDR[1]\n\nclock.freqHz=100000000:krnl_top_1\n\n"
+   }
+  ],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:23 2025",
+ "timestampMillis": "1763432783475",
+ "status": {
+  "cmdId": "79157251-ba84-4547-a157-f6a1296cf620",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:51 2025",
+ "timestampMillis": "1763432811342",
+ "status": {
+  "cmdId": "79157251-ba84-4547-a157-f6a1296cf620",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Mon Nov 17 18:26:51 2025",
+ "timestampMillis": "1763432811346",
+ "buildStep": {
+  "cmdId": "f3a79eff-95c7-435b-a6a1-a29a82b7fc30",
+  "name": "cf2sw",
+  "logFile": "",
+  "commandLine": "cf2sw -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/sdsl.dat -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw.rtd -nofilter /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw_full.rtd -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.1.xml",
+  "args": [
+   "-sdsl",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/sdsl.dat",
+   "-rtd",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw.rtd",
+   "-nofilter",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/cf2sw_full.rtd",
+   "-xclbin",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.xml",
+   "-o",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xclbin_orig.1.xml"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:51 2025",
+ "timestampMillis": "1763432811347",
+ "status": {
+  "cmdId": "f3a79eff-95c7-435b-a6a1-a29a82b7fc30",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:58 2025",
+ "timestampMillis": "1763432818686",
+ "status": {
+  "cmdId": "f3a79eff-95c7-435b-a6a1-a29a82b7fc30",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Mon Nov 17 18:26:58 2025",
+ "timestampMillis": "1763432818689",
+ "buildStep": {
+  "cmdId": "a3b62237-8586-4f78-a222-2f735e41114c",
+  "name": "rtd2_system_diagram",
+  "logFile": "",
+  "commandLine": "rtd2SystemDiagram",
+  "args": [],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:58 2025",
+ "timestampMillis": "1763432818690",
+ "status": {
+  "cmdId": "a3b62237-8586-4f78-a222-2f735e41114c",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Mon Nov 17 18:26:59 2025",
+ "timestampMillis": "1763432819128",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/systemDiagramModel.json",
+  "name": "",
+  "fileType": "JSON",
+  "reportType": "SYSTEM_DIAGRAM",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:59 2025",
+ "timestampMillis": "1763432819129",
+ "status": {
+  "cmdId": "a3b62237-8586-4f78-a222-2f735e41114c",
+  "state": "CS_PASSED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Mon Nov 17 18:26:59 2025",
+ "timestampMillis": "1763432819131",
+ "buildStep": {
+  "cmdId": "fa80e7ec-d2b3-445c-ba0e-37c4a2928b6f",
+  "name": "vpl",
+  "logFile": "",
+  "commandLine": "vpl -t hw -f xilinx_u280_gen3x16_xdma_1_202211_1 -s --remote_ip_cache /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/.ipcache --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --log_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/link --report_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link --config /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/vplConfig.ini -k /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link --no-info --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xo/ip_repo/xilinx_com_user_krnl_top_1_0 --messageDb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link/vpl.pb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/dr.bd.tcl",
+  "args": [
+   "-t",
+   "hw",
+   "-f",
+   "xilinx_u280_gen3x16_xdma_1_202211_1",
+   "-s",
+   "--remote_ip_cache",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/.ipcache",
+   "--output_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int",
+   "--log_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/link",
+   "--report_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link",
+   "--config",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/vplConfig.ini",
+   "-k",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/kernel_info.dat",
+   "--webtalk_flag",
+   "Vitis",
+   "--temp_dir",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link",
+   "--no-info",
+   "--iprepo",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xo/ip_repo/xilinx_com_user_krnl_top_1_0",
+   "--messageDb",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link/vpl.pb",
+   "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/dr.bd.tcl"
+  ],
+  "iniFiles": [
+   {
+    "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/vplConfig.ini",
+    "content": "[advanced]\nmisc=report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\nmisc=report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\nparam=compiler.enablePerformanceTrace=1\nprop=run.impl_1.strategy=Performance_ExplorePostRoutePhysOpt\nparam=compiler.acceleratorBinaryContent=bitstream\nparam=compiler.addOutputTypes=hw_export\nparam=compiler.vppCurrentWorkingDir=/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template\nmisc=BinaryName=minirocket_hw\n\n[connectivity]\nnk=krnl_top:1:krnl_top_1\n\n[vivado]\nprop=run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\nprop=run.impl_1.STEPS.OPT_DESIGN.ARGS.DIRECTIVE=ExploreWithRemap\nprop=run.impl_1.STEPS.PLACE_DESIGN.ARGS.DIRECTIVE=ExtraPostPlacementOpt\nprop=run.impl_1.STEPS.PHYS_OPT_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\nprop=run.impl_1.STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE=AggressiveExplore\n\n"
+   }
+  ],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:26:59 2025",
+ "timestampMillis": "1763432819132",
+ "status": {
+  "cmdId": "fa80e7ec-d2b3-445c-ba0e-37c4a2928b6f",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_CmdStep",
+ "dateTimestamp": "Mon Nov 17 18:27:01 2025",
+ "timestampMillis": "1763432821391",
+ "buildStep": {
+  "cmdId": "513b3288-4f8d-4a3d-a303-21428e82b115",
+  "name": "vpl",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/link.steps.log",
+  "commandLine": "/home/Xilinx/Vitis/2023.2/bin/unwrapped/lnx64.o/vpl -t hw -f xilinx_u280_gen3x16_xdma_1_202211_1 -s --remote_ip_cache /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/.ipcache --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int --log_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/link --report_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link --config /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/vplConfig.ini -k /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link --no-info --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/xo/ip_repo/xilinx_com_user_krnl_top_1_0 --messageDb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link/vpl.pb /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/int/dr.bd.tcl ",
+  "args": [],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:27:01 2025",
+ "timestampMillis": "1763432821391",
+ "status": {
+  "cmdId": "513b3288-4f8d-4a3d-a303-21428e82b115",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_VivadoProject",
+ "dateTimestamp": "Mon Nov 17 18:27:06 2025",
+ "timestampMillis": "1763432826942",
+ "vivadoProject": {
+  "openDir": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl",
+  "openScript": "openprj.tcl",
+  "relativeProject": "prj/prj.xpr"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_SubCmdStep",
+ "dateTimestamp": "Mon Nov 17 18:27:06 2025",
+ "timestampMillis": "1763432826943",
+ "buildStep": {
+  "cmdId": "6294db4c-2e00-4e7f-9b3f-d6900e650de5",
+  "name": "vivado",
+  "logFile": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/vivado/vpl/vivado.log",
+  "commandLine": "vivado -log vivado.log -applog -m64 -messageDb vivado.pb -mode batch -source vpl.tcl -notrace",
+  "args": [
+   "-log",
+   "vivado.log",
+   "-applog",
+   " -m64",
+   "-messageDb",
+   "vivado.pb",
+   "-mode",
+   "batch",
+   "-source",
+   "vpl.tcl",
+   "-notrace"
+  ],
+  "iniFiles": [],
+  "cwd": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/link/run_link"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:27:06 2025",
+ "timestampMillis": "1763432826944",
+ "status": {
+  "cmdId": "6294db4c-2e00-4e7f-9b3f-d6900e650de5",
+  "state": "CS_RUNNING"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934299",
+ "status": {
+  "cmdId": "6294db4c-2e00-4e7f-9b3f-d6900e650de5",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934417",
+ "status": {
+  "cmdId": "513b3288-4f8d-4a3d-a303-21428e82b115",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934436",
+ "status": {
+  "cmdId": "fa80e7ec-d2b3-445c-ba0e-37c4a2928b6f",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934451",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/logs_fpga/optraceViewer.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "OPERATION_TRACE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Status",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934480",
+ "status": {
+  "cmdId": "a998e666-9d8d-456e-8e32-b1afe737d929",
+  "state": "CS_FAILED"
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934651",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/reports/link/v++_link_minirocket_hw_guidance.html",
+  "name": "",
+  "fileType": "HTML",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>
+<ENTRY>
+{
+ "type": "ET_Report",
+ "dateTimestamp": "Mon Nov 17 18:28:54 2025",
+ "timestampMillis": "1763432934652",
+ "report": {
+  "path": "/home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template/build_fpga/v++_link_minirocket_hw_guidance.pb3",
+  "name": "",
+  "fileType": "BINARY_PROTOBUF",
+  "reportType": "GLOBAL_RULECHECK_GUIDANCE",
+  "cmdId": ""
+ }
+}
+</ENTRY>

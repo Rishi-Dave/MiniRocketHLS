@@ -1,0 +1,168 @@
+
+
+================================================================
+== Vitis HLS Report for 'minirocket_feature_extraction_hls_Pipeline_1'
+================================================================
+* Date:           Wed Nov 19 13:37:05 2025
+
+* Version:        2023.2 (Build 4023990 on Oct 11 2023)
+* Project:        krnl_top_prj
+* Solution:       solution1 (Vivado IP Flow Target)
+* Product family: virtexuplusHBM
+* Target device:  xcu280-fsvh2892-2L-e
+
+
+================================================================
+== Performance Estimates
+================================================================
++ Timing: 
+    * Summary: 
+    +--------+---------+----------+------------+
+    |  Clock |  Target | Estimated| Uncertainty|
+    +--------+---------+----------+------------+
+    |ap_clk  |  3.33 ns|  1.757 ns|     0.90 ns|
+    +--------+---------+----------+------------+
+
++ Latency: 
+    * Summary: 
+    +---------+---------+----------+----------+-----+-----+---------+
+    |  Latency (cycles) |  Latency (absolute) |  Interval | Pipeline|
+    |   min   |   max   |    min   |    max   | min | max |   Type  |
+    +---------+---------+----------+----------+-----+-----+---------+
+    |      513|      513|  1.710 us|  1.710 us|  513|  513|       no|
+    +---------+---------+----------+----------+-----+-----+---------+
+
+    + Detail: 
+        * Instance: 
+        N/A
+
+        * Loop: 
+        +----------+---------+---------+----------+-----------+-----------+------+----------+
+        |          |  Latency (cycles) | Iteration|  Initiation Interval  | Trip |          |
+        | Loop Name|   min   |   max   |  Latency |  achieved |   target  | Count| Pipelined|
+        +----------+---------+---------+----------+-----------+-----------+------+----------+
+        |- Loop 1  |      511|      511|         1|          1|          1|   512|       yes|
+        +----------+---------+---------+----------+-----------+-----------+------+----------+
+
+
+
+================================================================
+== Utilization Estimates
+================================================================
+* Summary: 
++---------------------+---------+------+---------+---------+-----+
+|         Name        | BRAM_18K|  DSP |    FF   |   LUT   | URAM|
++---------------------+---------+------+---------+---------+-----+
+|DSP                  |        -|     -|        -|        -|    -|
+|Expression           |        -|     -|        0|       32|    -|
+|FIFO                 |        -|     -|        -|        -|    -|
+|Instance             |        -|     -|        -|        -|    -|
+|Memory               |        -|     -|        -|        -|    -|
+|Multiplexer          |        -|     -|        -|       27|    -|
+|Register             |        -|     -|       11|        -|    -|
++---------------------+---------+------+---------+---------+-----+
+|Total                |        0|     0|       11|       59|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available SLR        |     1344|  3008|   869120|   434560|  320|
++---------------------+---------+------+---------+---------+-----+
+|Utilization SLR (%)  |        0|     0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+|Available            |     4032|  9024|  2607360|  1303680|  960|
++---------------------+---------+------+---------+---------+-----+
+|Utilization (%)      |        0|     0|       ~0|       ~0|    0|
++---------------------+---------+------+---------+---------+-----+
+
++ Detail: 
+    * Instance: 
+    N/A
+
+    * DSP: 
+    N/A
+
+    * Memory: 
+    N/A
+
+    * FIFO: 
+    N/A
+
+    * Expression: 
+    +---------------------+----------+----+---+----+------------+------------+
+    |    Variable Name    | Operation| DSP| FF| LUT| Bitwidth P0| Bitwidth P1|
+    +---------------------+----------+----+---+----+------------+------------+
+    |add_ln90_fu_210_p2   |         +|   0|  0|  16|           9|           1|
+    |icmp_ln90_fu_216_p2  |      icmp|   0|  0|  16|           9|           2|
+    +---------------------+----------+----+---+----+------------+------------+
+    |Total                |          |   0|  0|  32|          18|           3|
+    +---------------------+----------+----+---+----+------------+------------+
+
+    * Multiplexer: 
+    +----------------------------------+----+-----------+-----+-----------+
+    |               Name               | LUT| Input Size| Bits| Total Bits|
+    +----------------------------------+----+-----------+-----+-----------+
+    |ap_done_int                       |   9|          2|    1|          2|
+    |ap_sig_allocacmp_indvars_iv_load  |   9|          2|    9|         18|
+    |indvars_iv_fu_60                  |   9|          2|    9|         18|
+    +----------------------------------+----+-----------+-----+-----------+
+    |Total                             |  27|          6|   19|         38|
+    +----------------------------------+----+-----------+-----+-----------+
+
+    * Register: 
+    +------------------+---+----+-----+-----------+
+    |       Name       | FF| LUT| Bits| Const Bits|
+    +------------------+---+----+-----+-----------+
+    |ap_CS_fsm         |  1|   0|    1|          0|
+    |ap_done_reg       |  1|   0|    1|          0|
+    |indvars_iv_fu_60  |  9|   0|    9|          0|
+    +------------------+---+----+-----+-----------+
+    |Total             | 11|   0|   11|          0|
+    +------------------+---+----+-----+-----------+
+
+
+
+================================================================
+== Interface
+================================================================
+* Summary: 
++-------------------------+-----+-----+------------+----------------------------------------------+--------------+
+|        RTL Ports        | Dir | Bits|  Protocol  |                 Source Object                |    C Type    |
++-------------------------+-----+-----+------------+----------------------------------------------+--------------+
+|ap_clk                   |   in|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|ap_rst                   |   in|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|ap_start                 |   in|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|ap_done                  |  out|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|ap_idle                  |  out|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|ap_ready                 |  out|    1|  ap_ctrl_hs|  minirocket_feature_extraction_hls_Pipeline_1|  return value|
+|convolutions_7_address0  |  out|    6|   ap_memory|                                convolutions_7|         array|
+|convolutions_7_ce0       |  out|    1|   ap_memory|                                convolutions_7|         array|
+|convolutions_7_we0       |  out|    1|   ap_memory|                                convolutions_7|         array|
+|convolutions_7_d0        |  out|   32|   ap_memory|                                convolutions_7|         array|
+|convolutions_6_address0  |  out|    6|   ap_memory|                                convolutions_6|         array|
+|convolutions_6_ce0       |  out|    1|   ap_memory|                                convolutions_6|         array|
+|convolutions_6_we0       |  out|    1|   ap_memory|                                convolutions_6|         array|
+|convolutions_6_d0        |  out|   32|   ap_memory|                                convolutions_6|         array|
+|convolutions_5_address0  |  out|    6|   ap_memory|                                convolutions_5|         array|
+|convolutions_5_ce0       |  out|    1|   ap_memory|                                convolutions_5|         array|
+|convolutions_5_we0       |  out|    1|   ap_memory|                                convolutions_5|         array|
+|convolutions_5_d0        |  out|   32|   ap_memory|                                convolutions_5|         array|
+|convolutions_4_address0  |  out|    6|   ap_memory|                                convolutions_4|         array|
+|convolutions_4_ce0       |  out|    1|   ap_memory|                                convolutions_4|         array|
+|convolutions_4_we0       |  out|    1|   ap_memory|                                convolutions_4|         array|
+|convolutions_4_d0        |  out|   32|   ap_memory|                                convolutions_4|         array|
+|convolutions_3_address0  |  out|    6|   ap_memory|                                convolutions_3|         array|
+|convolutions_3_ce0       |  out|    1|   ap_memory|                                convolutions_3|         array|
+|convolutions_3_we0       |  out|    1|   ap_memory|                                convolutions_3|         array|
+|convolutions_3_d0        |  out|   32|   ap_memory|                                convolutions_3|         array|
+|convolutions_2_address0  |  out|    6|   ap_memory|                                convolutions_2|         array|
+|convolutions_2_ce0       |  out|    1|   ap_memory|                                convolutions_2|         array|
+|convolutions_2_we0       |  out|    1|   ap_memory|                                convolutions_2|         array|
+|convolutions_2_d0        |  out|   32|   ap_memory|                                convolutions_2|         array|
+|convolutions_1_address0  |  out|    6|   ap_memory|                                convolutions_1|         array|
+|convolutions_1_ce0       |  out|    1|   ap_memory|                                convolutions_1|         array|
+|convolutions_1_we0       |  out|    1|   ap_memory|                                convolutions_1|         array|
+|convolutions_1_d0        |  out|   32|   ap_memory|                                convolutions_1|         array|
+|convolutions_address0    |  out|    6|   ap_memory|                                  convolutions|         array|
+|convolutions_ce0         |  out|    1|   ap_memory|                                  convolutions|         array|
+|convolutions_we0         |  out|    1|   ap_memory|                                  convolutions|         array|
+|convolutions_d0          |  out|   32|   ap_memory|                                  convolutions|         array|
++-------------------------+-----+-----+------------+----------------------------------------------+--------------+
+
