@@ -1,0 +1,47 @@
+╔══════════════════════════════════════════════════════════════╗
+║         MiniRocket FPGA Synthesis - Quick Checklist          ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ COMPLETED:
+  ☑ Step 1: Export HLS IP (export_ip.tcl)
+  ☑ Step 2: Package Vitis kernel (.xo file)
+  ☑ Step 3: Vitis configuration created (minirocket.cfg)
+  ☑ Step 4: Host application ready (host_app.cpp + Makefile)
+
+📋 NEXT STEPS - CHOOSE ONE:
+
+Option A: Software Emulation (FASTEST - 5-10 min)
+  □ Run: ./build_fpga.sh xilinx_u250_gen3x16_xdma_4_1_202210_1 sw_emu
+  □ Run: make
+  □ Run: export XCL_EMULATION_MODE=sw_emu
+  □ Run: emconfigutil --platform xilinx_u250_gen3x16_xdma_4_1_202210_1
+  □ Run: ./minirocket_host minirocket_sw_emu.xclbin
+
+Option B: Hardware Emulation (30-60 min)
+  □ Run: ./build_fpga.sh xilinx_u250_gen3x16_xdma_4_1_202210_1 hw_emu
+  □ Run: make
+  □ Run: export XCL_EMULATION_MODE=hw_emu
+  □ Run: emconfigutil --platform xilinx_u250_gen3x16_xdma_4_1_202210_1
+  □ Run: ./minirocket_host minirocket_hw_emu.xclbin
+
+Option C: Full FPGA Build (4-6 hours)
+  □ Run: ./build_fpga.sh
+  □ Wait 4-6 hours...
+  □ Run: make
+  □ Run: ./minirocket_host minirocket_hw.xclbin
+
+📚 Documentation:
+  - NEXT_STEPS.md - Detailed instructions
+  - FPGA_SYNTHESIS_GUIDE.md - Complete guide
+  - OPTIMIZATION_SUMMARY.md - Performance details
+
+🎯 Expected Performance:
+  - Latency: ~1.38 ms per inference
+  - Throughput: 725-989 inferences/sec
+  - Clock: 100 MHz (capable of 137 MHz)
+
+⚡ Quick Start (Recommended):
+  cd /home/rdave009/minirocket-hls/MiniRocketHLS/tcl_template
+  ./build_fpga.sh xilinx_u250_gen3x16_xdma_4_1_202210_1 sw_emu
+
+Good luck! 🚀

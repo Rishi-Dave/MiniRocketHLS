@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-set (PROJECT_NAME krnl)
+set (PROJECT_NAME krnl_top)
 project(${PROJECT_NAME})
 
 # Include custom Find<Module>.cmake scripts to enable searching for Vivado HLS

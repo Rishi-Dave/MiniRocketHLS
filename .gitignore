@@ -14,6 +14,13 @@ tcl_template/build_cpp_sim/*.o
 tcl_template/build_cpp_sim/test_sim
 tcl_template/build_cpp_sim/src/test_sim
 tcl_template/build_dir/
+tcl_template/build_dir.*/
+tcl_template/_x.*/
+tcl_template/_x/
+tcl_template/build_fpga/
+tcl_template/build_sw_emu/
+tcl_template/package.*/
+tcl_template/.run/
 tcl_template/.Xil/
 
 # HLS Logs
@@ -49,10 +56,17 @@ tcl_template/vivado*.log
 
 # Build outputs
 *.xo
-*.xclbin
 *.ltx
 *.bit
 *.bin
+
+# Host executable
+tcl_template/host
+
+# XRT logs
+emulation_debug.log
+xcd.log
+*.backup.log
 
 # Temporary files
 *~

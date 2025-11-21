@@ -194,14 +194,14 @@ int main(int argc, char** argv) {
     std::cout << std::endl;
 
     // Prepare model parameter arrays for device
-    std::vector<data_t, aligned_allocator<data_t>> coefficients(model_params.classifier_coef);
-    std::vector<data_t, aligned_allocator<data_t>> intercept(model_params.classifier_intercept);
-    std::vector<data_t, aligned_allocator<data_t>> scaler_mean(model_params.scaler_mean);
-    std::vector<data_t, aligned_allocator<data_t>> scaler_scale(model_params.scaler_scale);
-    std::vector<data_t, aligned_allocator<data_t>> biases(model_params.biases);
-    
-    std::vector<int_t, aligned_allocator<int_t>> dilations(model_params.dilations);
-    std::vector<int_t, aligned_allocator<int_t>> num_features_per_dilation(model_params.num_features_per_dilation);
+    std::vector<data_t, aligned_allocator<data_t>> coefficients(model_params.classifier_coef.begin(), model_params.classifier_coef.end());
+    std::vector<data_t, aligned_allocator<data_t>> intercept(model_params.classifier_intercept.begin(), model_params.classifier_intercept.end());
+    std::vector<data_t, aligned_allocator<data_t>> scaler_mean(model_params.scaler_mean.begin(), model_params.scaler_mean.end());
+    std::vector<data_t, aligned_allocator<data_t>> scaler_scale(model_params.scaler_scale.begin(), model_params.scaler_scale.end());
+    std::vector<data_t, aligned_allocator<data_t>> biases(model_params.biases.begin(), model_params.biases.end());
+
+    std::vector<int_t, aligned_allocator<int_t>> dilations(model_params.dilations.begin(), model_params.dilations.end());
+    std::vector<int_t, aligned_allocator<int_t>> num_features_per_dilation(model_params.num_features_per_dilation.begin(), model_params.num_features_per_dilation.end());
 
     /*====================================================Setting up kernel I/O===============================================================*/
 

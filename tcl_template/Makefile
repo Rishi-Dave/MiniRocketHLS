@@ -131,7 +131,7 @@ build: check-vitis check-device $(BINARY_CONTAINERS)
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
-BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/krnl.xo
+BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/krnl_top.xo
 
 $(BUILD_DIR)/krnl.xclbin: $(BINARY_CONTAINER_krnl_OBJS)
 	mkdir -p $(BUILD_DIR)
