@@ -1,0 +1,138 @@
+# MiniRocket FPGA Project - Git Ignore
+
+# ============================================
+# Build Artifacts & Binaries
+# ============================================
+
+# Compiled binaries
+*.o
+*.xo
+*.xclbin
+*.ltx
+host
+batch_benchmark
+ucr_benchmark
+ucr_benchmark_4cu
+minirocket_host
+
+# Build directories
+build/
+build_*/
+_x/
+_x.*/
+logs_*/
+.ipcache/
+.run/
+.Xil/
+
+# HLS validation directories (can be large)
+*_hls_validate/
+minirocket_hls_validate/
+
+# HLS-specific
+*.log
+*.jou
+*.str
+*.dir/
+*.pb
+*.pb3
+*_summary
+
+# ============================================
+# Large Data Files (Don't commit to repo)
+# ============================================
+
+# Trained models (can be regenerated)
+*_fpga_model.json
+*_fpga_test.json
+minirocket_model.json
+minirocket_model_test_data.json
+
+# UCR datasets (download separately)
+ucr_data/
+*.arff
+*.ts
+
+# ============================================
+# System & IDE Files
+# ============================================
+
+# OS-specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+.ipynb_checkpoints/
+
+# ============================================
+# Xilinx/Vitis Specific
+# ============================================
+
+# Vivado
+vivado*.log
+vivado*.jou
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+
+# Vitis
+*.compile_summary
+*.link_summary
+packaged_kernel*/
+tmp_kernel_pack*/
+_xocc*/
+
+# ============================================
+# Sensitive/Private Information
+# ============================================
+
+# System paths (contains machine-specific info)
+# Note: config.cfg is kept as it's needed for builds
+
+# Credentials & keys
+*.pem
+*.key
+credentials.json
+.env
+
+# ============================================
+# Keep These Files
+# ============================================
+
+# Essential source code
+!src/**/*.cpp
+!src/**/*.hpp
+!src/**/*.h
+
+# Essential scripts
+!*.py
+!*.sh
+
+# Configuration (needed for builds)
+!config.cfg
+!CMakeLists.txt
+!Makefile
+
+# Documentation
+!*.md
+!README.md
+!LICENSE
+
+# Example model (small reference)
+!example_model.json
