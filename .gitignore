@@ -102,6 +102,9 @@ _xocc*/
 # Sensitive/Private Information
 # ============================================
 
+# Temporary process files
+*.pid
+
 # System paths (contains machine-specific info)
 # Note: config.cfg is kept as it's needed for builds
 

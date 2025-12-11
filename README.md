@@ -134,17 +134,6 @@ For 4 compute units, modify `config.cfg` to set `nk=krnl_top:4` (see [FPGA_IMPLE
 
 ## Citation
 
-If you use this work in your research, please cite:
-
-```bibtex
-@inproceedings{minirocket-fpga-2025,
-  title={High-Performance FPGA Acceleration of MiniRocket for Time Series Classification},
-  author={[Your Name]},
-  booktitle={[Conference/Journal]},
-  year={2025}
-}
-```
-
 **Original MiniRocket Paper**:
 ```bibtex
 @inproceedings{dempster2021minirocket,
@@ -158,7 +147,7 @@ If you use this work in your research, please cite:
 
 ## License
 
-[Add your license here - e.g., MIT, Apache 2.0, etc.]
+MIT License
 
 ## Acknowledgments
 
@@ -166,12 +155,8 @@ If you use this work in your research, please cite:
 - UCR Time Series Classification Archive
 - Xilinx Vitis HLS and Runtime tools
 
-## Contact
-
-[Add your contact information or link to issues page]
-
 ---
 
-**Status**: Research implementation - Publication ready
+**Status**: Research implementation
 **Platform**: Xilinx Alveo U280
-**Last Updated**: November 2025
+**Last Updated**: December 2025
