@@ -38,6 +38,19 @@ minirocket_hls_validate/
 *.pb3
 *_summary
 
+# Vitis HLS project files (generated)
+tcl_template/minirocket_hls/
+tcl_template/export_ip.tcl
+tcl_template/vitis_hls.log
+
+# Temporary build files in tcl_template
+tcl_template/*.cpp
+tcl_template/*.h
+tcl_template/*.hpp
+tcl_template/include/
+tcl_template/minirocket_hls_testbench_loader.cpp
+tcl_template/minirocket_host.cpp
+
 # ============================================
 # Large Data Files (Don't commit to repo)
 # ============================================
@@ -47,6 +60,12 @@ minirocket_hls_validate/
 *_fpga_test.json
 minirocket_model.json
 minirocket_model_test_data.json
+minirocket_ucr_model.json
+minirocket_ucr_model_test_data.json
+
+# Compiled test executables
+test_hls
+test_cpp
 
 # UCR datasets (download separately)
 ucr_data/
@@ -115,6 +134,19 @@ credentials.json
 .env
 
 # ============================================
+# Debug & Investigation Files
+# ============================================
+
+# Keep build error reports for investigation
+!BUILD_ERROR_REPORT.txt
+!tcl_template/BUILD_NOTES.md
+!tcl_template/hw_build.log
+
+# Lifecycle fix scripts (workaround attempts)
+!tcl_template/fix_lifecycle.sh
+!tcl_template/monitor_and_fix_lifecycle.sh
+
+# ============================================
 # Keep These Files
 # ============================================
 
@@ -126,9 +158,11 @@ credentials.json
 # Essential scripts
 !*.py
 !*.sh
+!*.tcl
 
 # Configuration (needed for builds)
 !config.cfg
+!config_4cu.cfg
 !CMakeLists.txt
 !Makefile
 

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "krnl.hpp"
+#include "minirocket_inference_hls.h"
 
 // Testbench-only loader (NOT synthesizable - for simulation only)
 class MiniRocketTestbenchLoader {

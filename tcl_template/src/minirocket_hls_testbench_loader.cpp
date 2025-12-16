@@ -260,38 +260,12 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
         }
     }
     
-    // Debug: Check coef_2d dimensions
-    std::cout << "DEBUG: coef_2d size: " << coef_2d.size() << " rows" << std::endl;
-    for (int i = 0; i < coef_2d.size() && i < 4; i++) {
-        std::cout << "DEBUG: coef_2d[" << i << "] size: " << coef_2d[i].size() << " features" << std::endl;
-    }
-
     for (int i = 0; i < num_classes_out; i++) {
-        if (i >= coef_2d.size()) {
-            std::cerr << "ERROR: Not enough coefficient rows! Need " << num_classes_out
-                     << " but only have " << coef_2d.size() << std::endl;
-            break;
-        }
         for (int j = 0; j < num_features_out; j++) {
-            if (j >= coef_2d[i].size()) {
-                std::cerr << "ERROR: Not enough features in row " << i << "! Need "
-                         << num_features_out << " but only have " << coef_2d[i].size() << std::endl;
-                break;
-            }
             coefficients[i][j] = coef_2d[i][j];
         }
     }
-
-    // Debug: Print first few coefficients for each class
-    std::cout << "DEBUG: First 3 coefficients per class:" << std::endl;
-    for (int i = 0; i < num_classes_out; i++) {
-        std::cout << "  Class " << i << ": ";
-        for (int j = 0; j < 3 && j < num_features_out; j++) {
-            std::cout << coefficients[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-
+    
     std::cout << "Model loaded successfully into HLS arrays:" << std::endl;
     std::cout << "  Features: " << num_features_out << std::endl;
     std::cout << "  Classes: " << num_classes_out << std::endl;

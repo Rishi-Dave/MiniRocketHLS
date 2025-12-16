@@ -83,13 +83,13 @@ include ./opencl.mk
 CXXFLAGS += $(opencl_CXXFLAGS) -Wall -O0 -g -std=c++1y
 LDFLAGS += $(opencl_LDFLAGS)
 
-INCLUDES = ./include
+INCLUDES = ./src
 
 ########################## Checking if PLATFORM in whitelist #######################
 PLATFORM_BLOCKLIST += nodma 
 ############################## Setting up Host Variables ##############################
 #Include Required Host Source Files
-HOST_SRCS += ./minirocket_host.cpp 
+HOST_SRCS += ./src/minirocket_host.cpp ./src/minirocket_hls_testbench_loader.cpp
 # Host compiler global settings
 CXXFLAGS += -fmessage-length=0 -I$(INCLUDES)
 LDFLAGS += -lrt -lstdc++ 
