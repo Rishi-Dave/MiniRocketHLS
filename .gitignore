@@ -50,6 +50,7 @@ tcl_template/*.hpp
 tcl_template/include/
 tcl_template/minirocket_hls_testbench_loader.cpp
 tcl_template/minirocket_host.cpp
+tcl_template/_x*
 
 # ============================================
 # Large Data Files (Don't commit to repo)

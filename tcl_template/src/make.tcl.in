@@ -16,8 +16,10 @@ config_interface -m_axi_latency=64
 config_interface -m_axi_alignment_byte_size=64
 config_interface -m_axi_max_widen_bitwidth=512
 config_rtl -register_reset_num=3
+config_export -format xo
 
 add_files ${CMAKE_CURRENT_SOURCE_DIR}/krnl.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}"
+add_files ${CMAKE_CURRENT_SOURCE_DIR}/minirocket_inference_hls.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}"
 add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test_krnl.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}"
 
 
