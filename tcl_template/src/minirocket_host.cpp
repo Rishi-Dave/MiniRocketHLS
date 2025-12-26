@@ -64,12 +64,24 @@ private:
     struct CUBuffers {
         cl::Buffer input_buf;
         cl::Buffer output_buf;
-        cl::Buffer model_params_buf;
+        cl::Buffer coefficients_buf;
+        cl::Buffer intercept_buf;
+        cl::Buffer scaler_mean_buf;
+        cl::Buffer scaler_scale_buf;
+        cl::Buffer dilations_buf;
+        cl::Buffer num_features_per_dilation_buf;
+        cl::Buffer biases_buf;
     };
     std::vector<CUBuffers> cu_buffers;
 
     // Model parameters (shared across CUs)
-    std::vector<float> model_params_flat;
+    std::vector<float> coefficients_flat;
+    std::vector<float> intercept_vec;
+    std::vector<float> scaler_mean_vec;
+    std::vector<float> scaler_scale_vec;
+    std::vector<int> dilations_vec;
+    std::vector<int> num_features_per_dilation_vec;
+    std::vector<float> biases_vec;
 
 public:
     MiniRocketFPGA(const std::string& xclbin_path, int num_cus = 1)
@@ -147,25 +159,32 @@ public:
         num_dilations = num_dilations_out;
         time_series_length = time_series_length_out;
 
+        std::cout << "Model loaded successfully into HLS arrays:" << std::endl;
+        std::cout << "  Features: " << num_features << std::endl;
+        std::cout << "  Classes: " << num_classes << std::endl;
+        std::cout << "  Dilations: " << num_dilations << std::endl;
         std::cout << "Model loaded: " << num_features << " features, "
                   << num_classes << " classes, "
                   << num_dilations << " dilations" << std::endl;
 
-        // Flatten model parameters for device transfer
-        // Pack as: [dilations, num_features_per_dilation, biases, scaler_mean, scaler_scale, coefficients, intercept]
-        size_t model_size = num_dilations + num_dilations + num_features * 3 + num_classes * num_features + num_classes;
-        model_params_flat.resize(model_size);
+        // Separate model parameters into individual vectors
+        coefficients_flat.resize(num_classes * num_features);
+        intercept_vec.resize(num_classes);
+        scaler_mean_vec.resize(num_features);
+        scaler_scale_vec.resize(num_features);
+        dilations_vec.resize(num_dilations);
+        num_features_per_dilation_vec.resize(num_dilations);
+        biases_vec.resize(num_features);
 
-        int offset = 0;
-        for (int i = 0; i < num_dilations; i++) model_params_flat[offset++] = dilations[i];
-        for (int i = 0; i < num_dilations; i++) model_params_flat[offset++] = num_features_per_dilation[i];
-        for (int i = 0; i < num_features; i++) model_params_flat[offset++] = biases[i];
-        for (int i = 0; i < num_features; i++) model_params_flat[offset++] = scaler_mean[i];
-        for (int i = 0; i < num_features; i++) model_params_flat[offset++] = scaler_scale[i];
+        for (int i = 0; i < num_dilations; i++) dilations_vec[i] = dilations[i];
+        for (int i = 0; i < num_dilations; i++) num_features_per_dilation_vec[i] = num_features_per_dilation[i];
+        for (int i = 0; i < num_features; i++) biases_vec[i] = biases[i];
+        for (int i = 0; i < num_features; i++) scaler_mean_vec[i] = scaler_mean[i];
+        for (int i = 0; i < num_features; i++) scaler_scale_vec[i] = scaler_scale[i];
         for (int c = 0; c < num_classes; c++)
             for (int f = 0; f < num_features; f++)
-                model_params_flat[offset++] = coefficients[c][f];
-        for (int i = 0; i < num_classes; i++) model_params_flat[offset++] = intercept[i];
+                coefficients_flat[c * num_features + f] = coefficients[c][f];
+        for (int i = 0; i < num_classes; i++) intercept_vec[i] = intercept[i];
 
         // Create device buffers for each CU
         for (int cu = 0; cu < num_compute_units; cu++) {
@@ -173,9 +192,27 @@ public:
 
             bufs.input_buf = cl::Buffer(context, CL_MEM_READ_ONLY, MAX_TIME_SERIES_LENGTH * sizeof(float));
             bufs.output_buf = cl::Buffer(context, CL_MEM_WRITE_ONLY, MAX_CLASSES * sizeof(float));
-            bufs.model_params_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                                              model_params_flat.size() * sizeof(float),
-                                              model_params_flat.data());
+            bufs.coefficients_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                              coefficients_flat.size() * sizeof(float),
+                                              coefficients_flat.data());
+            bufs.intercept_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                           intercept_vec.size() * sizeof(float),
+                                           intercept_vec.data());
+            bufs.scaler_mean_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                             scaler_mean_vec.size() * sizeof(float),
+                                             scaler_mean_vec.data());
+            bufs.scaler_scale_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                              scaler_scale_vec.size() * sizeof(float),
+                                              scaler_scale_vec.data());
+            bufs.dilations_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                           dilations_vec.size() * sizeof(int),
+                                           dilations_vec.data());
+            bufs.num_features_per_dilation_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                                           num_features_per_dilation_vec.size() * sizeof(int),
+                                                           num_features_per_dilation_vec.data());
+            bufs.biases_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                        biases_vec.size() * sizeof(float),
+                                        biases_vec.data());
 
             cu_buffers.push_back(bufs);
         }
@@ -214,14 +251,20 @@ public:
                                MAX_TIME_SERIES_LENGTH * sizeof(float),
                                input_padded.data(), nullptr, &write_event);
 
-            // Set kernel arguments
-            kernels[cu_idx].setArg(0, cu_buffers[cu_idx].input_buf);
-            kernels[cu_idx].setArg(1, cu_buffers[cu_idx].output_buf);
-            kernels[cu_idx].setArg(2, cu_buffers[cu_idx].model_params_buf);
-            kernels[cu_idx].setArg(3, (int)inputs[batch_idx].size());
-            kernels[cu_idx].setArg(4, num_dilations);
-            kernels[cu_idx].setArg(5, num_features);
-            kernels[cu_idx].setArg(6, num_classes);
+            // Set kernel arguments (must match krnl_top signature)
+            kernels[cu_idx].setArg(0, cu_buffers[cu_idx].input_buf);               // time_series_input
+            kernels[cu_idx].setArg(1, cu_buffers[cu_idx].output_buf);              // prediction_output
+            kernels[cu_idx].setArg(2, cu_buffers[cu_idx].coefficients_buf);        // coefficients
+            kernels[cu_idx].setArg(3, cu_buffers[cu_idx].intercept_buf);           // intercept
+            kernels[cu_idx].setArg(4, cu_buffers[cu_idx].scaler_mean_buf);         // scaler_mean
+            kernels[cu_idx].setArg(5, cu_buffers[cu_idx].scaler_scale_buf);        // scaler_scale
+            kernels[cu_idx].setArg(6, cu_buffers[cu_idx].dilations_buf);           // dilations
+            kernels[cu_idx].setArg(7, cu_buffers[cu_idx].num_features_per_dilation_buf);  // num_features_per_dilation
+            kernels[cu_idx].setArg(8, cu_buffers[cu_idx].biases_buf);              // biases
+            kernels[cu_idx].setArg(9, (int)inputs[batch_idx].size());              // time_series_length
+            kernels[cu_idx].setArg(10, num_features);                              // num_features
+            kernels[cu_idx].setArg(11, num_classes);                               // num_classes
+            kernels[cu_idx].setArg(12, num_dilations);                             // num_dilations
 
             // Execute kernel
             cl::Event exec_event;

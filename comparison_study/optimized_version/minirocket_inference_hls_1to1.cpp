@@ -279,7 +279,7 @@ void linear_classifier_predict_hls(
 }
 
 // HLS-optimized top-level function for FPGA
-extern "C" void krnl_top(
+extern "C" void minirocket_inference_hls_top(
     data_t* time_series_input,      // Input time series
     data_t* prediction_output,      // Output predictions
     data_t* coefficients,           // Model coefficients (flattened)

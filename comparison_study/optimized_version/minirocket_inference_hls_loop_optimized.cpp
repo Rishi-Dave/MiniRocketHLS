@@ -35,10 +35,11 @@ const int_t kernel_indices[NUM_KERNELS][3] = {
 
 // Cumulative convolution approach matching sktime implementation
 // Uses weights alpha=-1 and gamma=+3
+// This builds the C_alpha and C_gamma arrays for a given dilation
 void compute_cumulative_convolution_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
-    data_t C[MAX_TIME_SERIES_LENGTH],
-    int_t kernel_idx,
+    data_t C_alpha[MAX_TIME_SERIES_LENGTH],
+    data_t C_gamma[9][MAX_TIME_SERIES_LENGTH],
     int_t dilation,
     int_t time_series_length,
     int_t padding
@@ -59,12 +60,6 @@ void compute_cumulative_convolution_hls(
     }
 
     // Initialize C_alpha with A
-    data_t C_alpha[MAX_TIME_SERIES_LENGTH];
-    data_t C_gamma[9][MAX_TIME_SERIES_LENGTH];
-
-    #pragma HLS ARRAY_PARTITION variable=C_alpha type=cyclic factor=8
-    #pragma HLS ARRAY_PARTITION variable=C_gamma type=complete dim=1
-
     INIT_C_ALPHA: for (int_t i = 0; i < time_series_length; i++) {
         #pragma HLS PIPELINE II=1
         C_alpha[i] = A[i];
@@ -117,17 +112,6 @@ void compute_cumulative_convolution_hls(
 
         start += dilation;
     }
-
-    // Get kernel indices
-    int_t index_0 = kernel_indices[kernel_idx][0];
-    int_t index_1 = kernel_indices[kernel_idx][1];
-    int_t index_2 = kernel_indices[kernel_idx][2];
-
-    // Compute final C = C_alpha + C_gamma[index_0] + C_gamma[index_1] + C_gamma[index_2]
-    COMPUTE_C: for (int_t i = 0; i < time_series_length; i++) {
-        #pragma HLS PIPELINE II=1
-        C[i] = C_alpha[i] + C_gamma[index_0][i] + C_gamma[index_1][i] + C_gamma[index_2][i];
-    }
 }
 
 // HLS-optimized MiniRocket feature extraction using cumulative convolution
@@ -143,8 +127,13 @@ void minirocket_feature_extraction_hls(
 ) {
     #pragma HLS INLINE off
 
-    // Local arrays for computations
+    // Local arrays for cumulative convolution results (shared across kernels)
+    data_t C_alpha[MAX_TIME_SERIES_LENGTH];
+    data_t C_gamma[9][MAX_TIME_SERIES_LENGTH];
     data_t C[MAX_TIME_SERIES_LENGTH];
+
+    #pragma HLS ARRAY_PARTITION variable=C_alpha type=cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=C_gamma type=complete dim=1
     #pragma HLS ARRAY_PARTITION variable=C type=cyclic factor=8
 
     int_t feature_idx = 0;
@@ -159,17 +148,29 @@ void minirocket_feature_extraction_hls(
         // Padding flag based on dilation index
         int_t _padding0 = dil_idx % 2;
 
+        // Compute cumulative convolution arrays once per dilation
+        // This produces C_alpha and C_gamma[0..8] that are reused for all 84 kernels
+        compute_cumulative_convolution_hls(
+            time_series, C_alpha, C_gamma, dilation,
+            time_series_length, padding
+        );
+
         KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
             #pragma HLS LOOP_TRIPCOUNT min=84 max=84
             #pragma HLS PIPELINE off
 
             if (feature_idx >= num_features) break;
 
-            // Compute cumulative convolution
-            compute_cumulative_convolution_hls(
-                time_series, C, kernel_idx, dilation,
-                time_series_length, padding
-            );
+            // Get kernel indices
+            int_t index_0 = kernel_indices[kernel_idx][0];
+            int_t index_1 = kernel_indices[kernel_idx][1];
+            int_t index_2 = kernel_indices[kernel_idx][2];
+
+            // Compute C = C_alpha + C_gamma[index_0] + C_gamma[index_1] + C_gamma[index_2]
+            COMPUTE_C: for (int_t i = 0; i < time_series_length; i++) {
+                #pragma HLS PIPELINE II=1
+                C[i] = C_alpha[i] + C_gamma[index_0][i] + C_gamma[index_1][i] + C_gamma[index_2][i];
+            }
 
             // Padding flag for this kernel
             int_t _padding1 = (_padding0 + kernel_idx) % 2;
@@ -279,7 +280,7 @@ void linear_classifier_predict_hls(
 }
 
 // HLS-optimized top-level function for FPGA
-extern "C" void krnl_top(
+extern "C" void minirocket_inference_hls_top(
     data_t* time_series_input,      // Input time series
     data_t* prediction_output,      // Output predictions
     data_t* coefficients,           // Model coefficients (flattened)

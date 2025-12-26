@@ -20,13 +20,13 @@ void krnl_top(
 ) {
     #pragma HLS INTERFACE m_axi port=time_series offset=slave bundle=gmem0
     #pragma HLS INTERFACE m_axi port=predictions offset=slave bundle=gmem1
-    #pragma HLS INTERFACE m_axi port=dilations offset=slave bundle=gmem2
-    #pragma HLS INTERFACE m_axi port=num_features_per_dilation offset=slave bundle=gmem2
-    #pragma HLS INTERFACE m_axi port=biases offset=slave bundle=gmem2
-    #pragma HLS INTERFACE m_axi port=scaler_mean offset=slave bundle=gmem2
-    #pragma HLS INTERFACE m_axi port=scaler_scale offset=slave bundle=gmem2
-    #pragma HLS INTERFACE m_axi port=coefficients offset=slave bundle=gmem3
+    #pragma HLS INTERFACE m_axi port=coefficients offset=slave bundle=gmem2
     #pragma HLS INTERFACE m_axi port=intercept offset=slave bundle=gmem3
+    #pragma HLS INTERFACE m_axi port=scaler_mean offset=slave bundle=gmem4
+    #pragma HLS INTERFACE m_axi port=scaler_scale offset=slave bundle=gmem5
+    #pragma HLS INTERFACE m_axi port=dilations offset=slave bundle=gmem6
+    #pragma HLS INTERFACE m_axi port=num_features_per_dilation offset=slave bundle=gmem7
+    #pragma HLS INTERFACE m_axi port=biases offset=slave bundle=gmem8
     #pragma HLS INTERFACE s_axilite port=time_series_length bundle=control
     #pragma HLS INTERFACE s_axilite port=num_dilations bundle=control
     #pragma HLS INTERFACE s_axilite port=num_features bundle=control

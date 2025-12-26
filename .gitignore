@@ -29,7 +29,7 @@ logs_*/
 *_hls_validate/
 minirocket_hls_validate/
 
-# HLS-specific
+# HLS-specific (ignore build logs)
 *.log
 *.jou
 *.str
@@ -37,6 +37,10 @@ minirocket_hls_validate/
 *.pb
 *.pb3
 *_summary
+
+# Specific build logs to ignore
+tcl_template/build_*.log
+tcl_template/hw_build_full.log
 
 # Vitis HLS project files (generated)
 tcl_template/minirocket_hls/
@@ -56,13 +60,21 @@ tcl_template/_x*
 # Large Data Files (Don't commit to repo)
 # ============================================
 
-# Trained models (can be regenerated)
+# Trained models (can be regenerated, but keep UCR benchmark models for validation)
 *_fpga_model.json
 *_fpga_test.json
 minirocket_model.json
 minirocket_model_test_data.json
 minirocket_ucr_model.json
 minirocket_ucr_model_test_data.json
+
+# Keep specific UCR benchmark models for reproducibility
+!tcl_template/minirocket_gunpoint_model.json
+!tcl_template/minirocket_gunpoint_model_test_data.json
+!tcl_template/minirocket_italypower_model.json
+!tcl_template/minirocket_italypower_model_test_data.json
+!tcl_template/minirocket_arrowhead_model.json
+!tcl_template/minirocket_arrowhead_model_test_data.json
 
 # Compiled test executables
 test_hls
@@ -138,14 +150,9 @@ credentials.json
 # Debug & Investigation Files
 # ============================================
 
-# Keep build error reports for investigation
-!BUILD_ERROR_REPORT.txt
-!tcl_template/BUILD_NOTES.md
-!tcl_template/hw_build.log
-
-# Lifecycle fix scripts (workaround attempts)
-!tcl_template/fix_lifecycle.sh
-!tcl_template/monitor_and_fix_lifecycle.sh
+# Backup files
+*.backup
+*.bak
 
 # ============================================
 # Keep These Files

@@ -1,4 +1,4 @@
-#include "minirocket_inference_hls.h"
+#include "krnl.hpp"
 #include <cstring>
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)
@@ -33,104 +33,47 @@ const int_t kernel_indices[NUM_KERNELS][3] = {
     {6, 7, 8}
 };
 
-// Cumulative convolution approach matching sktime implementation
-// Uses weights alpha=-1 and gamma=+3
-void compute_cumulative_convolution_hls(
+// HLS-optimized convolution with specific kernel and dilation
+void apply_kernel_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
-    data_t C[MAX_TIME_SERIES_LENGTH],
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
     int_t kernel_idx,
     int_t dilation,
     int_t time_series_length,
-    int_t padding
+    int_t* output_length
 ) {
     #pragma HLS INLINE off
-
-    data_t A[MAX_TIME_SERIES_LENGTH];  // A = -X
-    data_t G[MAX_TIME_SERIES_LENGTH];  // G = 3X
-
-    #pragma HLS ARRAY_PARTITION variable=A type=cyclic factor=8
-    #pragma HLS ARRAY_PARTITION variable=G type=cyclic factor=8
-
-    // Compute A = -X and G = 3X
-    COMPUTE_AG: for (int_t i = 0; i < time_series_length; i++) {
+    
+    const int_t kernel_length = KERNEL_SIZE;
+    *output_length = time_series_length - (kernel_length - 1) * dilation;
+    
+    if (*output_length <= 0) {
+        *output_length = 0;
+        return;
+    }
+    
+    CONV_LOOP: for (int_t j = 0; j < *output_length; j++) {
         #pragma HLS PIPELINE II=1
-        A[i] = (data_t)0.0 - time_series[i];  // -X
-        G[i] = time_series[i] + time_series[i] + time_series[i];  // 3X
-    }
+        #pragma HLS LOOP_TRIPCOUNT min=64 max=512
 
-    // Initialize C_alpha with A
-    data_t C_alpha[MAX_TIME_SERIES_LENGTH];
-    data_t C_gamma[9][MAX_TIME_SERIES_LENGTH];
-
-    #pragma HLS ARRAY_PARTITION variable=C_alpha type=cyclic factor=8
-    #pragma HLS ARRAY_PARTITION variable=C_gamma type=complete dim=1
-
-    INIT_C_ALPHA: for (int_t i = 0; i < time_series_length; i++) {
-        #pragma HLS PIPELINE II=1
-        C_alpha[i] = A[i];
-    }
-
-    // Initialize C_gamma - only middle position (4) has G, others are zero
-    INIT_C_GAMMA_OUTER: for (int_t g = 0; g < 9; g++) {
-        INIT_C_GAMMA_INNER: for (int_t i = 0; i < time_series_length; i++) {
-            #pragma HLS PIPELINE II=1
-            C_gamma[g][i] = (g == 4) ? G[i] : (data_t)0.0;
+        data_t value = 0.0;
+        
+        KERNEL_LOOP: for (int_t k = 0; k < 3; k++) {
+            #pragma HLS UNROLL
+            
+            int_t pos = j + kernel_indices[kernel_idx][k] * dilation;
+            if (pos < time_series_length) {
+                // Weights: -1, 0, 1 pattern
+                data_t weight = (k == 0) ? -1.0 : ((k == 2) ? 1.0 : 0.0);
+                value += time_series[pos] * weight;
+            }
         }
-    }
-
-    // Build cumulative arrays
-    int_t start = dilation;
-    int_t end = time_series_length - padding;
-
-    // First half (gamma_index 0 to 3)
-    BUILD_FIRST_HALF: for (int_t gamma_index = 0; gamma_index < 4; gamma_index++) {
-        #pragma HLS PIPELINE off
-
-        UPDATE_C_ALPHA_FIRST: for (int_t i = time_series_length - end; i < time_series_length; i++) {
-            #pragma HLS PIPELINE II=1
-            C_alpha[i] = C_alpha[i] + A[i - (time_series_length - end)];
-        }
-
-        UPDATE_C_GAMMA_FIRST: for (int_t i = time_series_length - end; i < time_series_length; i++) {
-            #pragma HLS PIPELINE II=1
-            C_gamma[gamma_index][i] = G[i - (time_series_length - end)];
-        }
-
-        end += dilation;
-    }
-
-    start = dilation;
-
-    // Second half (gamma_index 5 to 8)
-    BUILD_SECOND_HALF: for (int_t gamma_index = 5; gamma_index < 9; gamma_index++) {
-        #pragma HLS PIPELINE off
-
-        UPDATE_C_ALPHA_SECOND: for (int_t i = 0; i < time_series_length - start; i++) {
-            #pragma HLS PIPELINE II=1
-            C_alpha[i] = C_alpha[i] + A[i + start];
-        }
-
-        UPDATE_C_GAMMA_SECOND: for (int_t i = 0; i < time_series_length - start; i++) {
-            #pragma HLS PIPELINE II=1
-            C_gamma[gamma_index][i] = G[i + start];
-        }
-
-        start += dilation;
-    }
-
-    // Get kernel indices
-    int_t index_0 = kernel_indices[kernel_idx][0];
-    int_t index_1 = kernel_indices[kernel_idx][1];
-    int_t index_2 = kernel_indices[kernel_idx][2];
-
-    // Compute final C = C_alpha + C_gamma[index_0] + C_gamma[index_1] + C_gamma[index_2]
-    COMPUTE_C: for (int_t i = 0; i < time_series_length; i++) {
-        #pragma HLS PIPELINE II=1
-        C[i] = C_alpha[i] + C_gamma[index_0][i] + C_gamma[index_1][i] + C_gamma[index_2][i];
+        
+        convolutions[j] = value;
     }
 }
 
-// HLS-optimized MiniRocket feature extraction using cumulative convolution
+// HLS-optimized MiniRocket feature extraction
 void minirocket_feature_extraction_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
     data_t features[MAX_FEATURES],
@@ -142,76 +85,46 @@ void minirocket_feature_extraction_hls(
     int_t num_features
 ) {
     #pragma HLS INLINE off
-
+    
     // Local arrays for computations
-    data_t C[MAX_TIME_SERIES_LENGTH];
-    #pragma HLS ARRAY_PARTITION variable=C type=cyclic factor=8
-
+    data_t convolutions[MAX_TIME_SERIES_LENGTH];
+    #pragma HLS ARRAY_PARTITION variable=convolutions type=cyclic factor=8
+    
     int_t feature_idx = 0;
-
+    
     DILATION_LOOP: for (int_t dil_idx = 0; dil_idx < num_dilations; dil_idx++) {
         #pragma HLS LOOP_TRIPCOUNT min=1 max=8
-
+        
         int_t dilation = dilations[dil_idx];
-        int_t padding = ((9 - 1) * dilation) / 2;
-        int_t num_features_this_dilation = num_features_per_dilation[dil_idx];
-
-        // Padding flag based on dilation index
-        int_t _padding0 = dil_idx % 2;
-
+        
         KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
             #pragma HLS LOOP_TRIPCOUNT min=84 max=84
             #pragma HLS PIPELINE off
-
+            
             if (feature_idx >= num_features) break;
-
-            // Compute cumulative convolution
-            compute_cumulative_convolution_hls(
-                time_series, C, kernel_idx, dilation,
-                time_series_length, padding
-            );
-
-            // Padding flag for this kernel
-            int_t _padding1 = (_padding0 + kernel_idx) % 2;
-
-            // Compute PPV features for this kernel/dilation combination
-            FEATURE_LOOP: for (int_t feature_count = 0; feature_count < num_features_this_dilation; feature_count++) {
-                #pragma HLS PIPELINE off
-
-                if (feature_idx >= num_features) break;
-
-                data_t bias = biases[feature_idx];
-                int_t positive_count = 0;
-                int_t total_count = 0;
-
-                // Apply PPV with or without padding
-                if (_padding1 == 0) {
-                    // No padding - use entire convolution
-                    PPV_NO_PAD: for (int_t i = 0; i < time_series_length; i++) {
-                        #pragma HLS PIPELINE II=1
-                        if (C[i] > bias) {
-                            positive_count++;
-                        }
-                        total_count++;
-                    }
-                } else {
-                    // With padding - exclude padded regions
-                    PPV_WITH_PAD: for (int_t i = padding; i < time_series_length - padding; i++) {
-                        #pragma HLS PIPELINE II=1
-                        if (C[i] > bias) {
-                            positive_count++;
-                        }
-                        total_count++;
-                    }
+            
+            // Apply kernel convolution
+            int_t conv_length;
+            apply_kernel_hls(time_series, convolutions, kernel_idx, dilation, 
+                           time_series_length, &conv_length);
+            
+            // Calculate positive proportion of values (PPV)
+            data_t bias = biases[feature_idx];
+            int_t positive_count = 0;
+            
+            PPV_LOOP: for (int_t i = 0; i < conv_length; i++) {
+                #pragma HLS PIPELINE II=1
+                if (convolutions[i] > bias) {
+                    positive_count++;
                 }
-
-                // Compute PPV feature
-                data_t ppv = (total_count > 0) ?
-                    ((data_t)positive_count) / ((data_t)total_count) : (data_t)0.0;
-
-                features[feature_idx] = ppv;
-                feature_idx++;
             }
+            
+            // Compute PPV feature
+            data_t ppv = (conv_length > 0) ? 
+                ((data_t)positive_count) / ((data_t)conv_length) : (data_t)0.0;
+            
+            features[feature_idx] = ppv;
+            feature_idx++;
         }
     }
 }
@@ -278,7 +191,7 @@ void linear_classifier_predict_hls(
     }
 }
 
-// HLS-optimized top-level function for FPGA
+// Top-level kernel function that matches the interface in krnl.hpp
 extern "C" void krnl_top(
     data_t* time_series_input,      // Input time series
     data_t* prediction_output,      // Output predictions
@@ -294,15 +207,15 @@ extern "C" void krnl_top(
     int_t num_classes,
     int_t num_dilations
 ) {
-    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 depth=512
-    #pragma HLS INTERFACE m_axi port=prediction_output bundle=gmem1 depth=4
-    #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 depth=40000
-    #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 depth=4
-    #pragma HLS INTERFACE m_axi port=scaler_mean bundle=gmem4 depth=10000
-    #pragma HLS INTERFACE m_axi port=scaler_scale bundle=gmem5 depth=10000
-    #pragma HLS INTERFACE m_axi port=dilations bundle=gmem6 depth=8
-    #pragma HLS INTERFACE m_axi port=num_features_per_dilation bundle=gmem7 depth=8
-    #pragma HLS INTERFACE m_axi port=biases bundle=gmem8 depth=10000
+    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 depth=512 max_read_burst_length=256
+    #pragma HLS INTERFACE m_axi port=prediction_output bundle=gmem1 depth=4 max_write_burst_length=16
+    #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 depth=40000 max_read_burst_length=256
+    #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 depth=4 max_read_burst_length=16
+    #pragma HLS INTERFACE m_axi port=scaler_mean bundle=gmem4 depth=10000 max_read_burst_length=256
+    #pragma HLS INTERFACE m_axi port=scaler_scale bundle=gmem5 depth=10000 max_read_burst_length=256
+    #pragma HLS INTERFACE m_axi port=dilations bundle=gmem6 depth=8 max_read_burst_length=16
+    #pragma HLS INTERFACE m_axi port=num_features_per_dilation bundle=gmem7 depth=8 max_read_burst_length=16
+    #pragma HLS INTERFACE m_axi port=biases bundle=gmem8 depth=10000 max_read_burst_length=256
     
     #pragma HLS INTERFACE s_axilite port=time_series_length bundle=control
     #pragma HLS INTERFACE s_axilite port=num_features bundle=control
@@ -354,12 +267,35 @@ extern "C" void krnl_top(
         local_intercept[i] = intercept[i];
     }
     
-    COPY_COEF: for (int_t i = 0; i < num_classes; i++) {
-        for (int_t j = 0; j < num_features; j++) {
-            #pragma HLS PIPELINE II=1
-            local_coefficients[i][j] = coefficients[i * num_features + j];
+    // Flatten the nested loop to enable burst inference
+    // Single loop iterates through all coefficient elements
+    COPY_COEF_I_COPY_COEF_J: for (int_t idx = 0; idx < num_classes * num_features; idx++) {
+        #pragma HLS PIPELINE II=1
+        #pragma HLS LOOP_TRIPCOUNT min=400 max=40000
+        int_t i = idx / num_features;
+        int_t j = idx % num_features;
+        // Note: coefficients is flattened from [MAX_CLASSES][MAX_FEATURES]
+        // so we need to use MAX_FEATURES as the stride, not num_features
+        local_coefficients[i][j] = coefficients[i * MAX_FEATURES + j];
+    }
+
+    // Debug: Check coefficient copying
+    #ifndef __SYNTHESIS__
+    static bool first_coef_debug = true;
+    if (first_coef_debug) {
+        first_coef_debug = false;
+        std::cout << "\nDEBUG COPY_COEF - Checking coefficient copy:" << std::endl;
+        std::cout << "  num_classes: " << num_classes << ", num_features: " << num_features << ", MAX_FEATURES: " << MAX_FEATURES << std::endl;
+        std::cout << "  First 3 from flattened coefficients array (using MAX_FEATURES stride):" << std::endl;
+        for (int i = 0; i < num_classes; i++) {
+            std::cout << "    Class " << i << " (indices " << (i * MAX_FEATURES) << "-" << (i * MAX_FEATURES + 2) << "): ";
+            for (int j = 0; j < 3; j++) {
+                std::cout << coefficients[i * MAX_FEATURES + j] << " ";
+            }
+            std::cout << std::endl;
         }
     }
+    #endif
     
     // Feature extraction
     minirocket_feature_extraction_hls(
@@ -391,7 +327,31 @@ extern "C" void krnl_top(
         num_features,
         num_classes
     );
-    
+
+    // Debug output for first invocation only (using static variable)
+    #ifndef __SYNTHESIS__
+    static bool first_call = true;
+    if (first_call) {
+        first_call = false;
+        std::cout << "\nDEBUG krnl_top - First invocation:" << std::endl;
+        std::cout << "  First 5 features: ";
+        for (int i = 0; i < 5; i++) std::cout << local_features[i] << " ";
+        std::cout << std::endl;
+        std::cout << "  First 5 scaled features: ";
+        for (int i = 0; i < 5; i++) std::cout << local_scaled_features[i] << " ";
+        std::cout << std::endl;
+        std::cout << "  First 3 coefficients for each class:" << std::endl;
+        for (int i = 0; i < num_classes; i++) {
+            std::cout << "    Class " << i << ": ";
+            for (int j = 0; j < 3; j++) std::cout << local_coefficients[i][j] << " ";
+            std::cout << std::endl;
+        }
+        std::cout << "  Predictions: ";
+        for (int i = 0; i < num_classes; i++) std::cout << local_predictions[i] << " ";
+        std::cout << std::endl;
+    }
+    #endif
+
     // Copy output
     COPY_OUTPUT: for (int_t i = 0; i < num_classes; i++) {
         #pragma HLS PIPELINE II=1
