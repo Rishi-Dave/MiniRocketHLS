@@ -39,7 +39,7 @@ struct MiniRocketModelParams_HLS {
 };
 
 // HLS-optimized top-level function for FPGA
-extern "C" void minirocket_inference_hls_top(
+extern "C" void minirocket_inference(
     data_t* time_series_input,      // Input time series
     data_t* prediction_output,      // Output predictions
     data_t* coefficients,           // Model coefficients (flattened)

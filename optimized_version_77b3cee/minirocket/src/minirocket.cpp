@@ -1,4 +1,4 @@
-#include "krnl.hpp"
+#include "../include/minirocket.hpp"
 #include <cstring>
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)
@@ -54,8 +54,7 @@ void apply_kernel_hls(
     
     CONV_LOOP: for (int_t j = 0; j < *output_length; j++) {
         #pragma HLS PIPELINE II=1
-        #pragma HLS LOOP_TRIPCOUNT min=64 max=512
-
+        
         data_t value = 0.0;
         
         KERNEL_LOOP: for (int_t k = 0; k < 3; k++) {
@@ -191,8 +190,8 @@ void linear_classifier_predict_hls(
     }
 }
 
-// Top-level kernel function that matches the interface in krnl.hpp
-extern "C" void krnl_top(
+// HLS-optimized top-level function for FPGA
+extern "C" void minirocket_inference(
     data_t* time_series_input,      // Input time series
     data_t* prediction_output,      // Output predictions
     data_t* coefficients,           // Model coefficients (flattened)
@@ -207,15 +206,15 @@ extern "C" void krnl_top(
     int_t num_classes,
     int_t num_dilations
 ) {
-    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 depth=512 max_read_burst_length=256
-    #pragma HLS INTERFACE m_axi port=prediction_output bundle=gmem1 depth=4 max_write_burst_length=16
-    #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 depth=40000 max_read_burst_length=256
-    #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 depth=4 max_read_burst_length=16
-    #pragma HLS INTERFACE m_axi port=scaler_mean bundle=gmem4 depth=10000 max_read_burst_length=256
-    #pragma HLS INTERFACE m_axi port=scaler_scale bundle=gmem5 depth=10000 max_read_burst_length=256
-    #pragma HLS INTERFACE m_axi port=dilations bundle=gmem6 depth=8 max_read_burst_length=16
-    #pragma HLS INTERFACE m_axi port=num_features_per_dilation bundle=gmem7 depth=8 max_read_burst_length=16
-    #pragma HLS INTERFACE m_axi port=biases bundle=gmem8 depth=10000 max_read_burst_length=256
+    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 depth=512
+    #pragma HLS INTERFACE m_axi port=prediction_output bundle=gmem1 depth=4
+    #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 depth=40000
+    #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 depth=4
+    #pragma HLS INTERFACE m_axi port=scaler_mean bundle=gmem4 depth=10000
+    #pragma HLS INTERFACE m_axi port=scaler_scale bundle=gmem5 depth=10000
+    #pragma HLS INTERFACE m_axi port=dilations bundle=gmem6 depth=8
+    #pragma HLS INTERFACE m_axi port=num_features_per_dilation bundle=gmem7 depth=8
+    #pragma HLS INTERFACE m_axi port=biases bundle=gmem8 depth=10000
     
     #pragma HLS INTERFACE s_axilite port=time_series_length bundle=control
     #pragma HLS INTERFACE s_axilite port=num_features bundle=control
@@ -267,35 +266,12 @@ extern "C" void krnl_top(
         local_intercept[i] = intercept[i];
     }
     
-    // Flatten the nested loop to enable burst inference
-    // Single loop iterates through all coefficient elements
-    COPY_COEF_I_COPY_COEF_J: for (int_t idx = 0; idx < num_classes * num_features; idx++) {
-        #pragma HLS PIPELINE II=1
-        #pragma HLS LOOP_TRIPCOUNT min=400 max=40000
-        int_t i = idx / num_features;
-        int_t j = idx % num_features;
-        // Note: coefficients is flattened from [MAX_CLASSES][MAX_FEATURES]
-        // so we need to use MAX_FEATURES as the stride, not num_features
-        local_coefficients[i][j] = coefficients[i * MAX_FEATURES + j];
-    }
-
-    // Debug: Check coefficient copying
-    #ifndef __SYNTHESIS__
-    static bool first_coef_debug = true;
-    if (first_coef_debug) {
-        first_coef_debug = false;
-        std::cout << "\nDEBUG COPY_COEF - Checking coefficient copy:" << std::endl;
-        std::cout << "  num_classes: " << num_classes << ", num_features: " << num_features << ", MAX_FEATURES: " << MAX_FEATURES << std::endl;
-        std::cout << "  First 3 from flattened coefficients array (using MAX_FEATURES stride):" << std::endl;
-        for (int i = 0; i < num_classes; i++) {
-            std::cout << "    Class " << i << " (indices " << (i * MAX_FEATURES) << "-" << (i * MAX_FEATURES + 2) << "): ";
-            for (int j = 0; j < 3; j++) {
-                std::cout << coefficients[i * MAX_FEATURES + j] << " ";
-            }
-            std::cout << std::endl;
+    COPY_COEF: for (int_t i = 0; i < num_classes; i++) {
+        for (int_t j = 0; j < num_features; j++) {
+            #pragma HLS PIPELINE II=1
+            local_coefficients[i][j] = coefficients[i * num_features + j];
         }
     }
-    #endif
     
     // Feature extraction
     minirocket_feature_extraction_hls(
@@ -327,31 +303,7 @@ extern "C" void krnl_top(
         num_features,
         num_classes
     );
-
-    // Debug output for first invocation only (using static variable)
-    #ifndef __SYNTHESIS__
-    static bool first_call = true;
-    if (first_call) {
-        first_call = false;
-        std::cout << "\nDEBUG krnl_top - First invocation:" << std::endl;
-        std::cout << "  First 5 features: ";
-        for (int i = 0; i < 5; i++) std::cout << local_features[i] << " ";
-        std::cout << std::endl;
-        std::cout << "  First 5 scaled features: ";
-        for (int i = 0; i < 5; i++) std::cout << local_scaled_features[i] << " ";
-        std::cout << std::endl;
-        std::cout << "  First 3 coefficients for each class:" << std::endl;
-        for (int i = 0; i < num_classes; i++) {
-            std::cout << "    Class " << i << ": ";
-            for (int j = 0; j < 3; j++) std::cout << local_coefficients[i][j] << " ";
-            std::cout << std::endl;
-        }
-        std::cout << "  Predictions: ";
-        for (int i = 0; i < num_classes; i++) std::cout << local_predictions[i] << " ";
-        std::cout << std::endl;
-    }
-    #endif
-
+    
     // Copy output
     COPY_OUTPUT: for (int_t i = 0; i < num_classes; i++) {
         #pragma HLS PIPELINE II=1
