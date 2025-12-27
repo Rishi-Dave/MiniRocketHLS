@@ -17,14 +17,21 @@ This repository implements the **MiniRocket time series classification algorithm
 
 Both implementations achieve **100% accuracy** on UCR benchmark datasets, validating that the optimizations maintain algorithmic correctness while delivering massive speedup.
 
-### Key Results
+### Key Results (Validated on UCR Datasets)
 
 | Metric | 1:1 Reference | Optimized | Improvement |
 |--------|---------------|-----------|-------------|
-| **Throughput** | 45 inf/sec | 3,468 inf/sec | **77x faster** |
-| **Accuracy** | 100% | 100% | **Identical** |
-| **Clock Freq** | 242 MHz | 404 MHz | 1.67x |
+| **Throughput (GunPoint)** | 45.8 inf/sec | 3,468 inf/sec | **75.7x faster** |
+| **Throughput (ItalyPower)** | 250 inf/sec | 19,267 inf/sec | **77.1x faster** |
+| **Accuracy** | 98.33% / 97.26% | 98.33% / 97.26% | **Identical** |
+| **Clock Freq** | 300 MHz | 404 MHz | 1.35x |
 | **Active CUs** | 1 | 4 | 4x parallelism |
+
+**1-CU Reference Build** (Branch: `1cu-reference-build`):
+- GunPoint: 45.8 inf/sec, 98.33% accuracy (59/60 correct)
+- ItalyPowerDemand: 250 inf/sec, 97.26% accuracy (320/329 correct)
+- Build Time: ~2 hours @ 300 MHz target frequency
+- HBM Banks Used: 9 (HBM[0-8])
 
 ### MiniRocket Algorithm
 
