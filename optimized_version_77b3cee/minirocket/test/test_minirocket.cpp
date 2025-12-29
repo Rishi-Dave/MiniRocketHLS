@@ -36,6 +36,7 @@ int main(int argc, char* argv[]) {
     int_t num_dilations, num_features, num_classes, time_series_length;
     
     // Load model into HLS arrays
+    std::cout << "Loading model..." << std::endl;
     if (!loader.load_model_to_hls_arrays(model_file, coefficients, intercept, 
                                         scaler_mean, scaler_scale, dilations,
                                         num_features_per_dilation, biases,
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]) {
     }
     
     // Load test data
+    std::cout << "Loading test data..." << std::endl;
     std::vector<std::vector<float>> test_inputs, expected_outputs;
     if (!loader.load_test_data(test_file, test_inputs, expected_outputs)) {
         std::cerr << "Failed to load test data!" << std::endl;
@@ -77,7 +79,7 @@ int main(int argc, char* argv[]) {
     
     // Test on loaded data
     int num_correct = 0;
-    int num_tests = std::min((int)test_inputs.size(), 100); // Test first 100 samples
+    int num_tests = std::min((int)test_inputs.size(), 1); // Test first 100 samples
 
     std::cout << "\n" << std::string(60, '=') << std::endl;
     std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;

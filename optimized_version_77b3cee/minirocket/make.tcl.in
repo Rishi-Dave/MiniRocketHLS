@@ -31,7 +31,7 @@ set command [lindex $argv 2]
 if {$command == "synthesis"} {
    csynth_design
 } elseif {$command == "csim"} {
-   csim_design 
+   csim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model_test_data.json"
 } elseif {$command == "cosim"} {
    cosim_design
 } elseif {$command == "ip"} {

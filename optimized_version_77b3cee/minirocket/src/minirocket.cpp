@@ -56,14 +56,17 @@ void apply_kernel_hls(
         #pragma HLS PIPELINE II=1
         
         data_t value = 0.0;
-        
+        convolutions[j] = 0.0;
         KERNEL_LOOP: for (int_t k = 0; k < 3; k++) {
             #pragma HLS UNROLL
             
             int_t pos = j + kernel_indices[kernel_idx][k] * dilation;
             if (pos < time_series_length) {
                 // Weights: -1, 0, 1 pattern
-                data_t weight = (k == 0) ? -1.0 : ((k == 2) ? 1.0 : 0.0);
+                //data_t weight = (k == 0) ? -1.0 : ((k == 2) ? 1.0 : 0.0);
+                
+                data_t weight = (k == 0) ? -1.0 : 2.0;
+
                 value += time_series[pos] * weight;
             }
         }
@@ -119,8 +122,7 @@ void minirocket_feature_extraction_hls(
             }
             
             // Compute PPV feature
-            data_t ppv = (conv_length > 0) ? 
-                ((data_t)positive_count) / ((data_t)conv_length) : (data_t)0.0;
+            data_t ppv = (data_t)positive_count / (data_t)conv_length;
             
             features[feature_idx] = ppv;
             feature_idx++;

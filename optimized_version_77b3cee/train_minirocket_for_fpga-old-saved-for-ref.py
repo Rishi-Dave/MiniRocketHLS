@@ -163,12 +163,12 @@ def train_minirocket_model(dataset_name, target_features=420):
     # Prepare model for export
     # Reshape coefficients to match FPGA format [num_classes][MAX_FEATURES]
     coef = classifier.coef_
-    if coef.ndim == 1:
-        coef = coef.reshape(1, -1)
+    # if coef.ndim == 1:
+    #     coef = coef.reshape(1, -1)
 
-    # Pad to MAX_FEATURES
-    coef_padded = np.zeros((num_classes, MAX_FEATURES), dtype=np.float32)
-    coef_padded[:coef.shape[0], :coef.shape[1]] = coef
+    # # Pad to MAX_FEATURES
+    # coef_padded = np.zeros((num_classes, MAX_FEATURES), dtype=np.float32)
+    # coef_padded[:coef.shape[0], :coef.shape[1]] = coef
 
     intercept = classifier.intercept_
     if not hasattr(intercept, '__len__'):
@@ -200,7 +200,7 @@ def train_minirocket_model(dataset_name, target_features=420):
         "biases": biases_padded.tolist(),
         "scaler_mean": scaler_mean_padded.tolist(),
         "scaler_scale": scaler_scale_padded.tolist(),
-        "classifier_coef": coef_padded.flatten().tolist(),
+        "classifier_coef": coef.tolist(),
         "classifier_intercept": list(intercept),
         "class_map": {str(k): v for k, v in class_map.items()},
     }

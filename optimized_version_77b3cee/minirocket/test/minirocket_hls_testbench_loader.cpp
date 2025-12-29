@@ -201,6 +201,8 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     int_t& num_classes_out,
     int_t& time_series_length_out
 ) {
+
+    std::cout << "Reading model file: " << model_filename << std::endl;
     std::string content = read_file(model_filename);
     if (content.empty()) return false;
     
@@ -209,6 +211,12 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     num_features_out = parse_int_value(content, "num_features");
     num_classes_out = parse_int_value(content, "num_classes");
     time_series_length_out = parse_int_value(content, "time_series_length");
+
+    std::cout << "Parsed model parameters:" << std::endl;
+    std::cout << "  num_dilations: " << num_dilations_out << std::endl;
+    std::cout << "  num_features: " << num_features_out << std::endl;
+    std::cout << "  num_classes: " << num_classes_out << std::endl;
+    std::cout << "  time_series_length: " << time_series_length_out << std::endl;
     
     if (num_dilations_out > MAX_DILATIONS || num_features_out > MAX_FEATURES || num_classes_out > MAX_CLASSES) {
         std::cerr << "Error: Model parameters exceed HLS limits" << std::endl;
@@ -223,19 +231,32 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     auto scaler_scale_vec = parse_float_array(content, "scaler_scale");
     auto intercept_vec = parse_float_array(content, "classifier_intercept");
     
+    std::cout << "Parsed model arrays." << std::endl;
+    std::cout << "  dilations size: " << dilations_vec.size() << std::endl;
+    std::cout << "  num_features_per_dilation size: " << num_features_per_dilation_vec.size() << std::endl;
+    std::cout << "  biases size: " << biases_vec.size() << std::endl;
+    std::cout << "  scaler_mean size: " << scaler_mean_vec.size() << std::endl;
+    std::cout << "  scaler_scale size: " << scaler_scale_vec.size() << std::endl;
+    std::cout << "  intercept size: " << intercept_vec.size() << std::endl;
+
     // Handle binary vs multi-class classification for coefficients
     std::vector<std::vector<float>> coef_2d;
     if (num_classes_out == 2) {
         // Binary classification: classifier_coef is 1D array
+        std::cout << "Parsing binary classifier coefficients..." << std::endl;
         auto coef_1d = parse_float_array(content, "classifier_coef");
         coef_2d.resize(2);
         coef_2d[0] = coef_1d;  // Use the 1D coefficients for class 0 decision function
         coef_2d[1].resize(coef_1d.size(), 0.0f);  // Not used but keep for consistency
     } else {
         // Multi-class: classifier_coef is 2D array
+        std::cout << "Parsing multi-class classifier coefficients..." << std::endl;
         coef_2d = parse_2d_float_array(content, "classifier_coef");
     }
     
+    std::cout << "Parsed classifier coefficients." << std::endl;
+    std::cout << "  Coefficients size: " << coef_2d.size() << " x " << (coef_2d.empty() ? 0 : coef_2d[0].size()) << std::endl;
+
     // Copy to HLS arrays
     for (int i = 0; i < num_dilations_out; i++) {
         dilations[i] = dilations_vec[i];
