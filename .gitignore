@@ -178,6 +178,7 @@ credentials.json
 !*.md
 !README.md
 !LICENSE
+!../1to1_vs_optimized_comparison.md
 
 # Example model (small reference)
 !example_model.json

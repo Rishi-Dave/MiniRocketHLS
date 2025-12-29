@@ -111,7 +111,7 @@ MiniRocketHLS/
   - Ridge classifier prediction
 
 **Mathematical Fidelity**:
-- Exact α=-1, γ=+3 weights as per paper
+- Exact α=-1, γ=+2 weights as per paper
 - Preserves cumulative sum computation C[i] = C[i-1] + value
 - Bit-exact float arithmetic matching Python implementation
 
