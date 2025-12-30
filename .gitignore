@@ -9,7 +9,6 @@
 *.xo
 *.xclbin
 *.ltx
-host
 batch_benchmark
 ucr_benchmark
 ucr_benchmark_4cu
@@ -55,6 +54,9 @@ tcl_template/include/
 tcl_template/minirocket_hls_testbench_loader.cpp
 tcl_template/minirocket_host.cpp
 tcl_template/_x*
+
+# Temporary build files in optimized_version_*/
+optimized_version_*/package.*
 
 # ============================================
 # Large Data Files (Don't commit to repo)

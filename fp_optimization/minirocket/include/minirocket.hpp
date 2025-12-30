@@ -19,8 +19,15 @@ typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 #define MAX_DILATIONS 8
 #define MAX_CLASSES 4
 
-// Fixed kernel indices (84 combinations of 3 indices from 0-8)
-extern const int_t kernel_indices[NUM_KERNELS][3];
+typedef union {
+    data_t fp_num;
+    uint32_t raw_bits;
+    struct {
+        uint32_t mant : 23;
+        uint32_t bexp : 8;
+        uint32_t sign : 1;
+    };
+} float_num_t;
 
 // HLS-optimized structure for model parameters (arrays instead of vectors)
 struct MiniRocketModelParams_HLS {
