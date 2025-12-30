@@ -39,22 +39,22 @@ minirocket_hls_validate/
 *_summary
 
 # Specific build logs to ignore
-tcl_template/build_*.log
-tcl_template/hw_build_full.log
+reference_1to1/build_*.log
+reference_1to1/hw_build_full.log
 
 # Vitis HLS project files (generated)
-tcl_template/minirocket_hls/
-tcl_template/export_ip.tcl
-tcl_template/vitis_hls.log
+reference_1to1/minirocket_hls/
+reference_1to1/export_ip.tcl
+reference_1to1/vitis_hls.log
 
-# Temporary build files in tcl_template
-tcl_template/*.cpp
-tcl_template/*.h
-tcl_template/*.hpp
-tcl_template/include/
-tcl_template/minirocket_hls_testbench_loader.cpp
-tcl_template/minirocket_host.cpp
-tcl_template/_x*
+# Temporary build files in reference_1to1
+reference_1to1/*.cpp
+reference_1to1/*.h
+reference_1to1/*.hpp
+reference_1to1/include/
+reference_1to1/minirocket_hls_testbench_loader.cpp
+reference_1to1/minirocket_host.cpp
+reference_1to1/_x*
 
 # ============================================
 # Large Data Files (Don't commit to repo)
@@ -178,6 +178,7 @@ credentials.json
 !*.md
 !README.md
 !LICENSE
+!../1to1_vs_optimized_comparison.md
 
 # Example model (small reference)
 !example_model.json

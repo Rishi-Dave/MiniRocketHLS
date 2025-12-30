@@ -324,8 +324,8 @@ int main(int argc, char* argv[]) {
     std::string test_path = argv[3];
 
     try {
-        // Detect number of compute units from xclbin (default to 1)
-        int num_cus = 1;  // Can be detected from xclbin or passed as argument
+        // Single compute unit for 1:1 paper-faithful reference
+        int num_cus = 1;  // 1 CU configured in config.cfg
 
         // Initialize FPGA
         MiniRocketFPGA fpga(xclbin_path, num_cus);

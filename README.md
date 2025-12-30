@@ -17,14 +17,21 @@ This repository implements the **MiniRocket time series classification algorithm
 
 Both implementations achieve **100% accuracy** on UCR benchmark datasets, validating that the optimizations maintain algorithmic correctness while delivering massive speedup.
 
-### Key Results
+### Key Results (Validated on UCR Datasets)
 
 | Metric | 1:1 Reference | Optimized | Improvement |
 |--------|---------------|-----------|-------------|
-| **Throughput** | 45 inf/sec | 3,468 inf/sec | **77x faster** |
-| **Accuracy** | 100% | 100% | **Identical** |
-| **Clock Freq** | 242 MHz | 404 MHz | 1.67x |
+| **Throughput (GunPoint)** | 45.8 inf/sec | 3,468 inf/sec | **75.7x faster** |
+| **Throughput (ItalyPower)** | 250 inf/sec | 19,267 inf/sec | **77.1x faster** |
+| **Accuracy** | 98.33% / 97.26% | 98.33% / 97.26% | **Identical** |
+| **Clock Freq** | 300 MHz | 404 MHz | 1.35x |
 | **Active CUs** | 1 | 4 | 4x parallelism |
+
+**1-CU Reference Build** (Branch: `1cu-reference-build`):
+- GunPoint: 45.8 inf/sec, 98.33% accuracy (59/60 correct)
+- ItalyPowerDemand: 250 inf/sec, 97.26% accuracy (320/329 correct)
+- Build Time: ~2 hours @ 300 MHz target frequency
+- HBM Banks Used: 9 (HBM[0-8])
 
 ### MiniRocket Algorithm
 
@@ -42,37 +49,43 @@ Both implementations achieve **100% accuracy** on UCR benchmark datasets, valida
 
 ```
 MiniRocketHLS/
-├── tcl_template/                       # Main FPGA implementation
-│   ├── src/
-│   │   ├── minirocket_inference_hls.cpp  # Core HLS kernel (1:1 reference)
-│   │   ├── minirocket_inference_hls.h    # HLS headers
-│   │   ├── minirocket_host.cpp           # OpenCL host application
-│   │   ├── krnl.cpp                      # Deprecated wrapper (not used)
-│   │   ├── krnl.hpp                      # Kernel interface definitions
-│   │   ├── minirocket_hls_testbench_loader.* # Model/data loader
-│   │   └── test_hls.cpp                  # C++ testbench
-│   ├── build/                          # HLS synthesis scripts
-│   │   └── src/make.tcl                # HLS build configuration
-│   ├── config.cfg                      # Vitis v++ configuration (4 CUs)
-│   ├── Makefile                        # Build system
-│   ├── minirocket_ucr_model.json       # Trained model parameters
-│   └── minirocket_ucr_model_test_data.json  # Test dataset
-├── comparison_study/                   # Performance comparison artifacts
-├── optimized_version_77b3cee/          # Archived optimized implementation
-├── docs/
-│   ├── README.md                       # This file
+├── README.md                           # This file
+├── docs/                               # Documentation
 │   ├── ALGORITHM.md                    # Algorithm explanation & optimizations
 │   ├── FPGA_IMPLEMENTATION.md          # Implementation details
-│   └── RESULTS.md                      # Benchmark results & analysis
-└── .gitignore                          # Build artifacts
+│   ├── RESULTS.md                      # Benchmark results & analysis
+│   ├── 1to1_vs_optimized_comparison.md # Performance comparison (1:1 vs optimized)
+│   ├── DOCUMENTATION_INDEX.md          # Documentation navigation
+│   ├── DOCUMENTATION_SUMMARY.md        # Quick reference guide
+│   └── FILE_STRUCTURE.md               # Detailed file structure
+├── reference_1to1/                     # 1:1 paper-faithful implementation
+│   ├── src/
+│   │   ├── minirocket_inference_hls.cpp  # Core HLS kernel (paper-faithful)
+│   │   ├── minirocket_inference_hls.h    # HLS headers
+│   │   ├── minirocket_host.cpp           # OpenCL host application
+│   │   ├── krnl.cpp                      # Kernel wrapper
+│   │   ├── krnl.hpp                      # Kernel interface definitions
+│   │   ├── minirocket_hls_testbench_loader.* # Model/data loader
+│   │   └── test_hls.cpp                  # C++ testbench (no FPGA needed)
+│   ├── build/                          # HLS synthesis scripts
+│   │   └── src/make.tcl                # HLS build configuration
+│   ├── config.cfg                      # Vitis v++ configuration (2 CUs)
+│   ├── Makefile                        # Build system (7658 lines)
+│   ├── minirocket_ucr_model.json       # Trained model parameters
+│   └── ucr_benchmark_results.md        # UCR dataset validation results
+└── optimized_version/                  # Optimized implementation archive
+    ├── src/                            # Source code (-1,0,+1 weights)
+    ├── docs/                           # Results and documentation
+    └── benchmarks/                     # Performance data
 
 ```
 
-**Important Files**:
-- [minirocket_inference_hls.cpp](tcl_template/src/minirocket_inference_hls.cpp) - Main HLS kernel
-- [minirocket_host.cpp](tcl_template/src/minirocket_host.cpp) - Host application
-- [config.cfg](tcl_template/config.cfg) - Configure number of compute units
-- [1to1_vs_optimized_comparison.md](../1to1_vs_optimized_comparison.md) - Detailed performance comparison
+**Quick Links**:
+- **Implementation**: [reference_1to1/src/minirocket_inference_hls.cpp](reference_1to1/src/minirocket_inference_hls.cpp)
+- **Host Code**: [reference_1to1/src/minirocket_host.cpp](reference_1to1/src/minirocket_host.cpp)
+- **Build Config**: [reference_1to1/config.cfg](reference_1to1/config.cfg)
+- **Performance Comparison**: [docs/1to1_vs_optimized_comparison.md](docs/1to1_vs_optimized_comparison.md)
+- **Algorithm Details**: [docs/ALGORITHM.md](docs/ALGORITHM.md)
 
 ---
 
@@ -95,7 +108,7 @@ MiniRocketHLS/
 ```bash
 # 1. Clone repository
 git clone <repository-url>
-cd MiniRocketHLS/tcl_template
+cd MiniRocketHLS/reference_1to1
 
 # 2. Source Xilinx tools
 source /opt/xilinx/Vitis/2023.2/settings64.sh
@@ -108,19 +121,19 @@ pip3 install numpy scikit-learn sktime
 ### Build FPGA Bitstream
 
 ```bash
-cd tcl_template
+cd reference_1to1
 
-# Option 1: Use pre-trained UCR model (fastest)
+# Build hardware bitstream with pre-trained UCR model
 make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
 
 # Build time: ~7 hours (hardware synthesis)
 ```
 
 The build process:
-1. Synthesizes HLS kernel from C++ to RTL
-2. Links 4 compute units (configurable in config.cfg)
-3. Runs place & route for U280 FPGA
-4. Generates bitstream: `build_dir.hw.*/krnl.xclbin`
+1. Synthesizes HLS kernel from C++ to RTL (paper-faithful implementation)
+2. Links 2 compute units (configurable in config.cfg)
+3. Runs place & route for U280 FPGA (242 MHz achieved clock)
+4. Generates bitstream: `build_dir.hw.*/krnl.xclbin` (~47 MB)
 
 ### Run Inference on FPGA
 
