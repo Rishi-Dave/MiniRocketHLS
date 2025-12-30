@@ -55,8 +55,8 @@ reference_1to1/minirocket_hls_testbench_loader.cpp
 reference_1to1/minirocket_host.cpp
 reference_1to1/_x*
 
-# Temporary build files in optimized_version_*/
-optimized_version_*/package.*
+# Temporary build files in optimized_version/
+optimized_version/package.*
 
 # ============================================
 # Large Data Files (Don't commit to repo)
