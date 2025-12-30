@@ -33,6 +33,13 @@ const int_t kernel_indices[NUM_KERNELS][3] = {
     {6, 7, 8}
 };
 
+
+static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
+    #include "../include/weights.txt"
+};
+#pragma HLS ARRAY_PARTITION variable=weights complete
+
+
 // HLS-optimized convolution with specific kernel and dilation
 void apply_kernel_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
@@ -45,32 +52,34 @@ void apply_kernel_hls(
     #pragma HLS INLINE off
     
     const int_t kernel_length = KERNEL_SIZE;
-    *output_length = time_series_length - (kernel_length - 1) * dilation;
+    *output_length = time_series_length;
     
     if (*output_length <= 0) {
         *output_length = 0;
         return;
     }
-    
-    CONV_LOOP: for (int_t j = 0; j < *output_length; j++) {
+
+    static data_t sliding_window[KERNEL_SIZE] = {0};
+    #pragma HLS ARRAY_PARTITION variable=sliding_window complete
+
+    CONV_LOOP: for (int_t j = 0; j < time_series_length; j++) {
         #pragma HLS PIPELINE II=1
         
-        data_t value = 0.0;
-        convolutions[j] = 0.0;
-        KERNEL_LOOP: for (int_t k = 0; k < 3; k++) {
-            #pragma HLS UNROLL
-            
-            int_t pos = j + kernel_indices[kernel_idx][k] * dilation;
-            if (pos < time_series_length) {
-                // Weights: -1, 0, 1 pattern
-                //data_t weight = (k == 0) ? -1.0 : ((k == 2) ? 1.0 : 0.0);
-                
-                data_t weight = (k == 0) ? -1.0 : 2.0;
-
-                value += time_series[pos] * weight;
+        int i = 0;
+        for (int k = -4; k <= 4; k++) {
+            if (j + k * dilation < 0 || j + k * dilation >= time_series_length) {
+                sliding_window[i] = 0.0;
+            } else {
+                sliding_window[i] = time_series[j + k * dilation];
             }
+            i++;
         }
-        
+
+        data_t value = 0.0;
+        KERNEL_LOOP: for (int_t k = 0; k < KERNEL_SIZE; k++) {
+            #pragma HLS PIPELINE II=1
+            value += sliding_window[k] * weights[kernel_idx][k];
+        }
         convolutions[j] = value;
     }
 }
@@ -98,34 +107,40 @@ void minirocket_feature_extraction_hls(
         #pragma HLS LOOP_TRIPCOUNT min=1 max=8
         
         int_t dilation = dilations[dil_idx];
+        int_t features_this_dilation = num_features_per_dilation[dil_idx];
         
         KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
             #pragma HLS LOOP_TRIPCOUNT min=84 max=84
             #pragma HLS PIPELINE off
             
-            if (feature_idx >= num_features) break;
-            
+            if (feature_idx >= num_features) {
+                std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
+                break;
+            }
             // Apply kernel convolution
             int_t conv_length;
             apply_kernel_hls(time_series, convolutions, kernel_idx, dilation, 
                            time_series_length, &conv_length);
             
             // Calculate positive proportion of values (PPV)
-            data_t bias = biases[feature_idx];
-            int_t positive_count = 0;
-            
-            PPV_LOOP: for (int_t i = 0; i < conv_length; i++) {
-                #pragma HLS PIPELINE II=1
-                if (convolutions[i] > bias) {
-                    positive_count++;
+            for (int_t f = 0; f < features_this_dilation; f++) {
+                data_t bias = biases[feature_idx + f];
+                int_t positive_count = 0;
+                
+                PPV_LOOP: for (int_t i = 0; i < time_series_length; i++) {
+                    #pragma HLS PIPELINE II=1
+                    if (convolutions[i] > bias) {
+                        positive_count++;
+                    }
                 }
+                
+                // Compute PPV feature
+                data_t ppv = (data_t)positive_count / (data_t)time_series_length;
+                features[feature_idx + f] = ppv;
+                
             }
-            
-            // Compute PPV feature
-            data_t ppv = (data_t)positive_count / (data_t)conv_length;
-            
-            features[feature_idx] = ppv;
-            feature_idx++;
+
+            feature_idx+= features_this_dilation;
         }
     }
 }
@@ -248,6 +263,7 @@ extern "C" void minirocket_inference(
     COPY_INPUT: for (int_t i = 0; i < time_series_length; i++) {
         #pragma HLS PIPELINE II=1
         local_time_series[i] = time_series_input[i];
+
     }
     
     COPY_DILATIONS: for (int_t i = 0; i < num_dilations; i++) {

@@ -182,6 +182,9 @@ class MiniRocket:
         num_dilations = len(dilations)
 
         num_features = num_kernels * np.sum(num_features_per_dilation)
+        print(f"num_features: {num_features}")
+        print(f"num_features_per_dilation: {num_features_per_dilation}")
+        print(f"sum: {np.sum(num_features_per_dilation)}")
 
         features = np.zeros((n_instances, num_features), dtype=np.float32)
 
@@ -388,11 +391,19 @@ def main():
     
     print(f"Feature shape: {X_train_features.shape}")
     
+
+    print(X_test_features.shape)
+    print(X_test_features[0][:20])  # Print first 20 features of first test sample
+
     # Scale features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_features)
     X_test_scaled = scaler.transform(X_test_features)
     
+    print(X_test_scaled.shape)
+    print(X_test_scaled)
+
+
     # Train classifier
     print("Training classifier...")
     classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
@@ -400,6 +411,9 @@ def main():
     
     # Test accuracy
     y_pred = classifier.predict(X_test_scaled)
+
+    print(y_pred)
+
     accuracy = accuracy_score(y_test, y_pred)
     
     print(f"Test accuracy: {accuracy:.4f}")

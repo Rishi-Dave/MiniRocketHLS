@@ -261,6 +261,7 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     for (int i = 0; i < num_dilations_out; i++) {
         dilations[i] = dilations_vec[i];
         num_features_per_dilation[i] = num_features_per_dilation_vec[i];
+        printf("dilations[%d] = %d, num_features_per_dilation[%d] = %d\n", i, dilations[i], i, num_features_per_dilation[i]);
     }
     
     for (int i = 0; i < num_features_out; i++) {

@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
     
     // Test on loaded data
     int num_correct = 0;
-    int num_tests = std::min((int)test_inputs.size(), 1); // Test first 100 samples
+    int num_tests = std::min((int)test_inputs.size(), 1000); // Test first 100 samples
 
     std::cout << "\n" << std::string(60, '=') << std::endl;
     std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\n" << std::string(60, '=') << std::endl;
             std::cout << "STEP 1: FEATURE EXTRACTION (MiniRocket Transform)" << std::endl;
             std::cout << std::string(60, '=') << std::endl;
-            std::cout << "Running cumulative convolution with α=-1, γ=+3..." << std::endl;
+            std::cout << "Running cumulative convolution with α=-1, γ=2..." << std::endl;
         }
 
         minirocket_feature_extraction_hls(
