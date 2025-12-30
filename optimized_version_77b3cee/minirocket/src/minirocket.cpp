@@ -37,8 +37,6 @@ const int_t kernel_indices[NUM_KERNELS][3] = {
 static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
     #include "../include/weights.txt"
 };
-#pragma HLS ARRAY_PARTITION variable=weights complete
-
 
 // HLS-optimized convolution with specific kernel and dilation
 void apply_kernel_hls(
@@ -61,6 +59,7 @@ void apply_kernel_hls(
 
     static data_t sliding_window[KERNEL_SIZE] = {0};
     #pragma HLS ARRAY_PARTITION variable=sliding_window complete
+    #pragma HLS ARRAY_PARTITION variable=weights complete
 
     CONV_LOOP: for (int_t j = 0; j < time_series_length; j++) {
         #pragma HLS PIPELINE II=1
@@ -114,7 +113,7 @@ void minirocket_feature_extraction_hls(
             #pragma HLS PIPELINE off
             
             if (feature_idx >= num_features) {
-                std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
+                //std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
                 break;
             }
             // Apply kernel convolution
