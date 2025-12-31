@@ -56,7 +56,21 @@ tcl_template/minirocket_host.cpp
 tcl_template/_x*
 
 # Temporary build files in optimized_version_*/
-optimized_version_*/package.*
+optimized_version_*/*.cpp
+optimized_version_*/*.h
+optimized_version_*/*.hpp
+optimized_version_*/include/
+optimized_version_*/minirocket_hls_testbench_loader.cpp
+optimized_version_*/minirocket_host.cpp
+optimized_version_*/_x*
+
+fp_optimizization/*.cpp
+optimized_version_*/*.h
+optimized_version_*/*.hpp
+optimized_version_*/include/
+optimized_version_*/minirocket_hls_testbench_loader.cpp
+optimized_version_*/minirocket_host.cpp
+optimized_version_*/_x*
 
 # ============================================
 # Large Data Files (Don't commit to repo)
