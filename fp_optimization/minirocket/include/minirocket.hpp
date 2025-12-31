@@ -4,6 +4,7 @@
 #include "ap_int.h"
 #include "ap_fixed.h"
 #include "hls_stream.h"
+#include <stdint.h>
 
 // HLS-optimized data types
 //typedef ap_fixed<32,16> data_t;     // 32-bit fixed point: 16 integer, 16 fractional bits
