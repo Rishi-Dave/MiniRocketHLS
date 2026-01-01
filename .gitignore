@@ -1,4 +1,4 @@
-# MiniRocket FPGA Project - Git Ignore
+# MiniRocket/MultiRocket FPGA Project - Git Ignore
 
 # ============================================
 # Build Artifacts & Binaries
@@ -13,20 +13,26 @@ batch_benchmark
 ucr_benchmark
 ucr_benchmark_4cu
 minirocket_host
+multirocket_host
+host
+test_hls
 
 # Build directories
 build/
 build_*/
+build_dir.*/
 _x/
 _x.*/
 logs_*/
 .ipcache/
 .run/
 .Xil/
+package.*/
 
 # HLS validation directories (can be large)
 *_hls_validate/
 minirocket_hls_validate/
+multirocket_hls_validate/
 
 # HLS-specific (ignore build logs)
 *.log
@@ -38,49 +44,55 @@ minirocket_hls_validate/
 *_summary
 
 # Specific build logs to ignore
-reference_1to1/build_*.log
-reference_1to1/hw_build_full.log
+**/build_*.log
+**/hw_build_full.log
 
 # Vitis HLS project files (generated)
-reference_1to1/minirocket_hls/
-reference_1to1/export_ip.tcl
-reference_1to1/vitis_hls.log
+**/minirocket_hls/
+**/multirocket_hls/
+**/export_ip.tcl
+**/vitis_hls.log
 
-# Temporary build files in reference_1to1
-reference_1to1/*.cpp
-reference_1to1/*.h
-reference_1to1/*.hpp
-reference_1to1/include/
-reference_1to1/minirocket_hls_testbench_loader.cpp
-reference_1to1/minirocket_host.cpp
-reference_1to1/_x*
+# Temporary build files
+**/*.cpp.bak
+**/*.h.bak
+**/*.hpp.bak
 
-# Temporary build files in optimized_version/
-optimized_version/package.*
+# ============================================
+# Generated/Runtime Artifacts
+# ============================================
+
+# Results directories (generated at runtime)
+**/results/
+**/results/*.json
+**/results/*.txt
+**/results/*.csv
+
+# Testbench executables
+**/testbench/test_*
+**/testbench/*.exe
+
+# Third-party downloads (can be regenerated)
+**/third_party/
 
 # ============================================
 # Large Data Files (Don't commit to repo)
 # ============================================
 
-# Trained models (can be regenerated, but keep UCR benchmark models for validation)
+# Trained models in old locations (can be regenerated)
 *_fpga_model.json
 *_fpga_test.json
 minirocket_model.json
 minirocket_model_test_data.json
 minirocket_ucr_model.json
 minirocket_ucr_model_test_data.json
+multirocket_model.json
+multirocket_model_test_data.json
 
-# Keep specific UCR benchmark models for reproducibility
-!tcl_template/minirocket_gunpoint_model.json
-!tcl_template/minirocket_gunpoint_model_test_data.json
-!tcl_template/minirocket_italypower_model.json
-!tcl_template/minirocket_italypower_model_test_data.json
-!tcl_template/minirocket_arrowhead_model.json
-!tcl_template/minirocket_arrowhead_model_test_data.json
-
-# Compiled test executables
-test_hls
-test_cpp
+# Models directory - keep structure but ignore large files
+**/models/*.json
+# Exception: Keep specific benchmark models if needed
+!**/models/example_*.json
 
 # UCR datasets (download separately)
 ucr_data/
@@ -139,9 +151,6 @@ _xocc*/
 # Temporary process files
 *.pid
 
-# System paths (contains machine-specific info)
-# Note: config.cfg is kept as it's needed for builds
-
 # Credentials & keys
 *.pem
 *.key
@@ -155,6 +164,11 @@ credentials.json
 # Backup files
 *.backup
 *.bak
+*copy.cpp
+*copy.h
+*-old-*.py
+*-old-*.cpp
+*old-saved-for-ref*
 
 # ============================================
 # Keep These Files
@@ -164,8 +178,25 @@ credentials.json
 !src/**/*.cpp
 !src/**/*.hpp
 !src/**/*.h
+!**/src/**/*.cpp
+!**/src/**/*.hpp
+!**/src/**/*.h
+!**/include/**/*.cpp
+!**/include/**/*.hpp
+!**/include/**/*.h
+!**/host/**/*.cpp
+!**/host/**/*.hpp
+!**/host/**/*.h
+!**/multirocket/**/*.cpp
+!**/multirocket/**/*.hpp
+!**/multirocket/**/*.h
+!**/minirocket/**/*.cpp
+!**/minirocket/**/*.hpp
+!**/minirocket/**/*.h
 
-# Essential scripts
+# Essential scripts (keep organized structure)
+!**/scripts/*.py
+!**/scripts/*.sh
 !*.py
 !*.sh
 !*.tcl
@@ -173,14 +204,20 @@ credentials.json
 # Configuration (needed for builds)
 !config.cfg
 !config_4cu.cfg
+!**/config.cfg
+!**/config_4cu.cfg
 !CMakeLists.txt
+!**/CMakeLists.txt
 !Makefile
+!**/Makefile
+!*.mk
 
 # Documentation
 !*.md
+!**/docs/*.md
 !README.md
 !LICENSE
-!../1to1_vs_optimized_comparison.md
 
-# Example model (small reference)
-!example_model.json
+# Keep cmake modules
+!**/cmake/**/*.cmake
+!**/cmake/Find*.cmake
