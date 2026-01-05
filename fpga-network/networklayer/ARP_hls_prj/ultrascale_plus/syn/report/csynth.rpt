@@ -1,0 +1,195 @@
+
+
+================================================================
+== Synthesis Summary Report of 'arp_server'
+================================================================
++ General Information: 
+    * Date:           Fri Sep  8 14:08:19 2023
+    * Version:        2023.1 (Build 3854077 on May  4 2023)
+    * Project:        ARP_hls_prj
+    * Solution:       ultrascale_plus (Vivado IP Flow Target)
+    * Product family: virtexuplusHBM
+    * Target device:  xcu280-fsvh2892-2L-e
+    
+
++ Performance & Resource Estimates: 
+    
+    PS: '+' for module; 'o' for loop; '*' for dataflow
+    +---------------------+------+------+---------+--------+----------+---------+------+----------+---------+----+------------+------------+-----+
+    |       Modules       | Issue|      | Latency | Latency| Iteration|         | Trip |          |         |    |            |            |     |
+    |       & Loops       | Type | Slack| (cycles)|  (ns)  |  Latency | Interval| Count| Pipelined|  BRAM   | DSP|     FF     |     LUT    | URAM|
+    +---------------------+------+------+---------+--------+----------+---------+------+----------+---------+----+------------+------------+-----+
+    |+ arp_server*        |     -|  0.27|        6|  18.600|         -|        2|     -|  dataflow|  3 (~0%)|   -|  1213 (~0%)|  1911 (~0%)|    -|
+    | + arp_pkg_receiver  |     -|  1.49|        1|   3.100|         -|        1|     -|       yes|        -|   -|   251 (~0%)|   185 (~0%)|    -|
+    | + entry_proc        |     -|  1.45|        0|   0.000|         -|        0|     -|        no|        -|   -|     3 (~0%)|    65 (~0%)|    -|
+    | + genARPDiscovery   |     -|  1.37|        2|   6.200|         -|        1|     -|       yes|        -|   -|   170 (~0%)|   280 (~0%)|    -|
+    | + arp_pkg_sender    |     -|  0.34|        2|   6.200|         -|        1|     -|       yes|        -|   -|   234 (~0%)|   261 (~0%)|    -|
+    | + arp_table         |    II|  0.27|        4|  12.400|         -|        2|     -|       yes|        -|   -|    83 (~0%)|   287 (~0%)|    -|
+    +---------------------+------+------+---------+--------+----------+---------+------+----------+---------+----+------------+------------+-----+
+
+
+================================================================
+== HW Interfaces
+================================================================
+* S_AXILITE Interfaces
++-----------------+------------+---------------+--------+----------+-------------------+
+| Interface       | Data Width | Address Width | Offset | Register | Resource Estimate |
++-----------------+------------+---------------+--------+----------+-------------------+
+| s_axi_s_axilite | 32         | 12            | 2048   | 0        | BRAM=3            |
++-----------------+------------+---------------+--------+----------+-------------------+
+
+* S_AXILITE Registers
++-----------------+-----------------+--------+-------+--------+------------------------------+---------------------+
+| Interface       | Register        | Offset | Width | Access | Description                  | Bit Fields          |
++-----------------+-----------------+--------+-------+--------+------------------------------+---------------------+
+| s_axi_s_axilite | arp_scan_i      | 0x10   | 32    | W      | Data signal of arp_scan_i    |                     |
+| s_axi_s_axilite | arp_scan_o      | 0x18   | 32    | R      | Data signal of arp_scan_o    |                     |
+| s_axi_s_axilite | arp_scan_o_ctrl | 0x1c   | 32    | R      | Control signal of arp_scan_o | 0=arp_scan_o_ap_vld |
++-----------------+-----------------+--------+-------+--------+------------------------------+---------------------+
+
+* AXIS
++-----------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+| Interface       | Direction | Register Mode | TDATA | TKEEP | TLAST | TREADY | TSTRB | TVALID |
++-----------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+| arpDataIn       | in        | both          | 512   | 64    | 1     | 1      | 64    | 1      |
+| arpDataOut      | out       | both          | 512   | 64    | 1     | 1      | 64    | 1      |
+| macIpEncode_req | in        | both          | 32    |       |       | 1      |       | 1      |
+| macIpEncode_rsp | out       | both          | 128   |       |       | 1      |       | 1      |
++-----------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+
+* Other Ports
++--------------+---------+-----------+----------+
+| Port         | Mode    | Direction | Bitwidth |
++--------------+---------+-----------+----------+
+| gatewayIP    | ap_none | in        | 32       |
+| myIpAddress  | ap_none | in        | 32       |
+| myMacAddress | ap_none | in        | 48       |
+| networkMask  | ap_none | in        | 32       |
++--------------+---------+-----------+----------+
+
+* TOP LEVEL CONTROL
++-----------+--------------+----------+
+| Interface | Type         | Ports    |
++-----------+--------------+----------+
+| ap_clk    | clock        | ap_clk   |
+| ap_rst_n  | reset        | ap_rst_n |
+| ap_ctrl   | ap_ctrl_none |          |
++-----------+--------------+----------+
+
+
+================================================================
+== SW I/O Information
+================================================================
+* Top Function Arguments
++-----------------+-----------+----------------------------------------------+
+| Argument        | Direction | Datatype                                     |
++-----------------+-----------+----------------------------------------------+
+| arpDataIn       | in        | stream<hls::axis<ap_uint<512>, 0, 0, 0>, 0>& |
+| macIpEncode_req | in        | stream<ap_uint<32>, 0>&                      |
+| arpDataOut      | out       | stream<hls::axis<ap_uint<512>, 0, 0, 0>, 0>& |
+| macIpEncode_rsp | out       | stream<arpTableReply, 0>&                    |
+| arpTable        | inout     | arpTableEntry*                               |
+| arp_scan        | inout     | ap_uint<1>&                                  |
+| myMacAddress    | in        | ap_uint<48>&                                 |
+| myIpAddress     | in        | ap_uint<32>&                                 |
+| gatewayIP       | in        | ap_uint<32>&                                 |
+| networkMask     | in        | ap_uint<32>&                                 |
++-----------------+-----------+----------------------------------------------+
+
+* SW-to-HW Mapping
++-----------------+-----------------+-----------+-------------------------------------------+
+| Argument        | HW Interface    | HW Type   | HW Info                                   |
++-----------------+-----------------+-----------+-------------------------------------------+
+| arpDataIn       | arpDataIn       | interface |                                           |
+| macIpEncode_req | macIpEncode_req | interface |                                           |
+| arpDataOut      | arpDataOut      | interface |                                           |
+| macIpEncode_rsp | macIpEncode_rsp | interface |                                           |
+| arpTable        | s_axi_s_axilite | interface |                                           |
+| arpTable        | s_axi_s_axilite | interface |                                           |
+| arpTable        | s_axi_s_axilite | interface |                                           |
+| arp_scan        | s_axi_s_axilite | register  | name=arp_scan_i offset=0x10 range=32      |
+| arp_scan        | s_axi_s_axilite | register  | name=arp_scan_o offset=0x18 range=32      |
+| arp_scan        | s_axi_s_axilite | register  | name=arp_scan_o_ctrl offset=0x1c range=32 |
+| myMacAddress    | myMacAddress    | port      |                                           |
+| myIpAddress     | myIpAddress     | port      |                                           |
+| gatewayIP       | gatewayIP       | port      |                                           |
+| networkMask     | networkMask     | port      |                                           |
++-----------------+-----------------+-----------+-------------------------------------------+
+
+
+================================================================
+== Bind Op Report
+================================================================
++------------------------+-----+--------+-----------+-----+--------+---------+
+| Name                   | DSP | Pragma | Variable  | Op  | Impl   | Latency |
++------------------------+-----+--------+-----------+-----+--------+---------+
+| + arp_server           | 0   |        |           |     |        |         |
+|  + arp_pkg_receiver    | 0   |        |           |     |        |         |
+|    add_ln83_fu_298_p2  | -   |        | add_ln83  | add | fabric | 0       |
+|  + genARPDiscovery     | 0   |        |           |     |        |         |
+|    add_ln296_fu_288_p2 | -   |        | add_ln296 | add | fabric | 0       |
+|    add_ln290_fu_322_p2 | -   |        | add_ln290 | add | fabric | 0       |
++------------------------+-----+--------+-----------+-----+--------+---------+
+
+
+================================================================
+== Bind Storage Report
+================================================================
++---------------------+------+------+--------+-----------------+---------+------+---------+
+| Name                | BRAM | URAM | Pragma | Variable        | Storage | Impl | Latency |
++---------------------+------+------+--------+-----------------+---------+------+---------+
+| + arp_server        | 3    | 0    |        |                 |         |      |         |
+|   networkMask_c13_U | -    | -    |        | networkMask_c13 | fifo    | srl  | 0       |
+|   networkMask_c_U   | -    | -    |        | networkMask_c   | fifo    | srl  | 0       |
+|   gatewayIP_c12_U   | -    | -    |        | gatewayIP_c12   | fifo    | srl  | 0       |
+|   gatewayIP_c_U     | -    | -    |        | gatewayIP_c     | fifo    | srl  | 0       |
+|   myIpAddress_c11_U | -    | -    |        | myIpAddress_c11 | fifo    | srl  | 0       |
+|   myIpAddress_c_U   | -    | -    |        | myIpAddress_c   | fifo    | srl  | 0       |
+|   myMacAddress_c_U  | -    | -    |        | myMacAddress_c  | fifo    | srl  | 0       |
++---------------------+------+------+--------+-----------------+---------+------+---------+
+
+
+================================================================
+== Pragma Report
+================================================================
+* Pragmas with Warnings
++--------------+--------------------------------+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+| Type         | Options                        | Location                                                     | Messages                                                                                                                         |
++--------------+--------------------------------+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+| bind_storage | variable=arpTable type=ram_t2p | ../hls/arp_server/arp_server.cpp:383 in arp_server, arpTable | The resource pragma (bind_storage) on top-level function argument, in 'call' is unsupported, please use INTERFACE pragma instead |
++--------------+--------------------------------+--------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------+
+
+* Valid Pragma Syntax
++--------------+------------------------------------------+------------------------------------------------------------------------+
+| Type         | Options                                  | Location                                                               |
++--------------+------------------------------------------+------------------------------------------------------------------------+
+| pipeline     | II=1                                     | ../hls/arp_server/arp_server.cpp:50 in arp_pkg_receiver                |
+| inline       | off                                      | ../hls/arp_server/arp_server.cpp:51 in arp_pkg_receiver                |
+| pipeline     | II=1                                     | ../hls/arp_server/arp_server.cpp:108 in arp_pkg_sender                 |
+| inline       | off                                      | ../hls/arp_server/arp_server.cpp:109 in arp_pkg_sender                 |
+| pipeline     | II=1                                     | ../hls/arp_server/arp_server.cpp:214 in arp_table                      |
+| inline       | off                                      | ../hls/arp_server/arp_server.cpp:215 in arp_table                      |
+| dependence   | variable=arpTable inter false            | ../hls/arp_server/arp_server.cpp:217 in arp_table, arpTable            |
+| pipeline     | II=1                                     | ../hls/arp_server/arp_server.cpp:265 in genarpdiscovery                |
+| reset        | variable=gia_fsm_state                   | ../hls/arp_server/arp_server.cpp:275 in genarpdiscovery, gia_fsm_state |
+| interface    | ap_ctrl_none port=return                 | ../hls/arp_server/arp_server.cpp:368 in arp_server, return             |
+| dataflow     |                                          | ../hls/arp_server/arp_server.cpp:369 in arp_server                     |
+| interface    | ap_none register port=myMacAddress       | ../hls/arp_server/arp_server.cpp:371 in arp_server, myMacAddress       |
+| interface    | ap_none register port=myIpAddress        | ../hls/arp_server/arp_server.cpp:372 in arp_server, myIpAddress        |
+| interface    | ap_none register port=gatewayIP          | ../hls/arp_server/arp_server.cpp:373 in arp_server, gatewayIP          |
+| interface    | ap_none register port=networkMask        | ../hls/arp_server/arp_server.cpp:374 in arp_server, networkMask        |
+| interface    | axis register both port=arpDataIn        | ../hls/arp_server/arp_server.cpp:377 in arp_server, arpDataIn          |
+| interface    | axis register both port=arpDataOut       | ../hls/arp_server/arp_server.cpp:378 in arp_server, arpDataOut         |
+| interface    | axis register both port=macIpEncode_req  | ../hls/arp_server/arp_server.cpp:379 in arp_server, macIpEncode_req    |
+| interface    | axis register both port=macIpEncode_rsp  | ../hls/arp_server/arp_server.cpp:380 in arp_server, macIpEncode_rsp    |
+| interface    | s_axilite port=arp_scan bundle=s_axilite | ../hls/arp_server/arp_server.cpp:381 in arp_server, arp_scan           |
+| interface    | s_axilite port=arpTable bundle=s_axilite | ../hls/arp_server/arp_server.cpp:382 in arp_server, arpTable           |
+| disaggregate | variable=arpTable                        | ../hls/arp_server/arp_server.cpp:384 in arp_server, arpTable           |
+| stream       | variable=arpReplyFifo depth=4            | ../hls/arp_server/arp_server.cpp:387 in arp_server, arpReplyFifo       |
+| stream       | variable=arpRequestFifo depth=4          | ../hls/arp_server/arp_server.cpp:390 in arp_server, arpRequestFifo     |
+| stream       | variable=arpTableInsertFifo depth=4      | ../hls/arp_server/arp_server.cpp:393 in arp_server, arpTableInsertFifo |
+| stream       | variable=macIpEncode_i depth=4           | ../hls/arp_server/arp_server.cpp:396 in arp_server, macIpEncode_i      |
+| stream       | variable=macIpEncode_rsp_i depth=4       | ../hls/arp_server/arp_server.cpp:399 in arp_server, macIpEncode_rsp_i  |
++--------------+------------------------------------------+------------------------------------------------------------------------+
+
+

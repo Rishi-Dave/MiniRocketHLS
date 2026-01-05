@@ -24,6 +24,8 @@ logs_*/
 .run/
 .Xil/
 
+iprepo/
+
 # HLS validation directories (can be large)
 *_hls_validate/
 minirocket_hls_validate/

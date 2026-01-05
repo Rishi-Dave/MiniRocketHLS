@@ -1,0 +1,127 @@
+
+
+================================================================
+== Synthesis Summary Report of 'icmp_server'
+================================================================
++ General Information: 
+    * Date:           Fri Sep  8 14:08:17 2023
+    * Version:        2023.1 (Build 3854077 on May  4 2023)
+    * Project:        ICMP_hls_prj
+    * Solution:       ultrascale_plus (Vivado IP Flow Target)
+    * Product family: virtexuplusHBM
+    * Target device:  xcu280-fsvh2892-2L-e
+    
+
++ Performance & Resource Estimates: 
+    
+    PS: '+' for module; 'o' for loop; '*' for dataflow
+    +---------------+------+------+---------+--------+----------+---------+------+----------+------+----+------------+-----------+-----+
+    |    Modules    | Issue|      | Latency | Latency| Iteration|         | Trip |          |      |    |            |           |     |
+    |    & Loops    | Type | Slack| (cycles)|  (ns)  |  Latency | Interval| Count| Pipelined| BRAM | DSP|     FF     |    LUT    | URAM|
+    +---------------+------+------+---------+--------+----------+---------+------+----------+------+----+------------+-----------+-----+
+    |+ icmp_server  |     -|  0.22|        2|   6.200|         -|        1|     -|       yes|     -|   -|  1498 (~0%)|  605 (~0%)|    -|
+    +---------------+------+------+---------+--------+----------+---------+------+----------+------+----+------------+-----------+-----+
+
+
+================================================================
+== HW Interfaces
+================================================================
+* AXIS
++-------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+| Interface   | Direction | Register Mode | TDATA | TKEEP | TLAST | TREADY | TSTRB | TVALID |
++-------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+| m_axis_icmp | out       | both          | 512   | 64    | 1     | 1      | 64    | 1      |
+| s_axis_icmp | in        | both          | 512   | 64    | 1     | 1      | 64    | 1      |
++-------------+-----------+---------------+-------+-------+-------+--------+-------+--------+
+
+* Other Ports
++---------------+-----------+-----------+----------+
+| Port          | Mode      | Direction | Bitwidth |
++---------------+-----------+-----------+----------+
+| myIpAddress_0 | ap_stable | in        | 32       |
++---------------+-----------+-----------+----------+
+
+* TOP LEVEL CONTROL
++-----------+--------------+----------+
+| Interface | Type         | Ports    |
++-----------+--------------+----------+
+| ap_clk    | clock        | ap_clk   |
+| ap_rst_n  | reset        | ap_rst_n |
+| ap_ctrl   | ap_ctrl_none |          |
++-----------+--------------+----------+
+
+
+================================================================
+== SW I/O Information
+================================================================
+* Top Function Arguments
++-------------+-----------+----------------------------------------------+
+| Argument    | Direction | Datatype                                     |
++-------------+-----------+----------------------------------------------+
+| dataIn      | in        | stream<hls::axis<ap_uint<512>, 0, 0, 0>, 0>& |
+| myIpAddress | in        | ap_uint<32>&                                 |
+| dataOut     | out       | stream<hls::axis<ap_uint<512>, 0, 0, 0>, 0>& |
++-------------+-----------+----------------------------------------------+
+
+* SW-to-HW Mapping
++-------------+---------------+-----------+
+| Argument    | HW Interface  | HW Type   |
++-------------+---------------+-----------+
+| dataIn      | s_axis_icmp   | interface |
+| myIpAddress | myIpAddress_0 | port      |
+| dataOut     | m_axis_icmp   | interface |
++-------------+---------------+-----------+
+
+
+================================================================
+== Bind Op Report
+================================================================
++-----------------------------+-----+--------+-----------------+-----+--------+---------+
+| Name                        | DSP | Pragma | Variable        | Op  | Impl   | Latency |
++-----------------------------+-----+--------+-----------------+-----+--------+---------+
+| + icmp_server               | 0   |        |                 |     |        |         |
+|   icmpChecksumTmp_fu_954_p2 | -   |        | icmpChecksumTmp | add | fabric | 0       |
+|   add_ln160_fu_616_p2       | -   |        | add_ln160       | add | fabric | 0       |
+|   checksumL1_fu_716_p2      | -   |        | checksumL1      | add | fabric | 0       |
+|   checksumL1_1_fu_730_p2    | -   |        | checksumL1_1    | add | fabric | 0       |
+|   checksumL1_2_fu_744_p2    | -   |        | checksumL1_2    | add | fabric | 0       |
+|   checksumL1_3_fu_758_p2    | -   |        | checksumL1_3    | add | fabric | 0       |
+|   checksumL1_4_fu_772_p2    | -   |        | checksumL1_4    | add | fabric | 0       |
+|   checksumL2_fu_786_p2      | -   |        | checksumL2      | add | fabric | 0       |
+|   checksumL2_1_fu_800_p2    | -   |        | checksumL2_1    | add | fabric | 0       |
+|   add_ln61_fu_1054_p2       | -   |        | add_ln61        | add | fabric | 0       |
+|   checksumL3_fu_1067_p2     | -   |        | checksumL3      | add | fabric | 0       |
+|   checksumL4_r_fu_1099_p2   | -   |        | checksumL4_r    | add | fabric | 0       |
++-----------------------------+-----+--------+-----------------+-----+--------+---------+
+
+
+================================================================
+== Bind Storage Report
+================================================================
+  No bind storage info in design
+
+================================================================
+== Pragma Report
+================================================================
+* Pragmas with Warnings
++-----------+------------------------------------------------------+--------------------------------------------------------------------+-----------------------------------------------------------------------------------+
+| Type      | Options                                              | Location                                                           | Messages                                                                          |
++-----------+------------------------------------------------------+--------------------------------------------------------------------+-----------------------------------------------------------------------------------+
+| interface | ap_stable register port=myIpAddress name=myIpAddress | ../hls/icmp_server/icmp_server.cpp:129 in icmp_server, myIpAddress | 'Ap_stable' in '#pragma HLS INTERFACE' is deprecated, use 'Stable Pragma' instead |
++-----------+------------------------------------------------------+--------------------------------------------------------------------+-----------------------------------------------------------------------------------+
+
+* Valid Pragma Syntax
++-----------+--------------------------------------------------+----------------------------------------------------------------+
+| Type      | Options                                          | Location                                                       |
++-----------+--------------------------------------------------+----------------------------------------------------------------+
+| inline    |                                                  | ../hls/icmp_server/icmp_server.cpp:40 in computechecksum20b    |
+| unroll    |                                                  | ../hls/icmp_server/icmp_server.cpp:50 in computechecksum20b    |
+| unroll    |                                                  | ../hls/icmp_server/icmp_server.cpp:55 in computechecksum20b    |
+| interface | ap_ctrl_none port=return                         | ../hls/icmp_server/icmp_server.cpp:124 in icmp_server, return  |
+| interface | axis register both port=dataIn name=s_axis_icmp  | ../hls/icmp_server/icmp_server.cpp:127 in icmp_server, dataIn  |
+| interface | axis register both port=dataOut name=m_axis_icmp | ../hls/icmp_server/icmp_server.cpp:128 in icmp_server, dataOut |
+| pipeline  | II=1                                             | ../hls/icmp_server/icmp_server.cpp:131 in icmp_server          |
+| unroll    |                                                  | ../hls/icmp_server/icmp_server.cpp:153 in icmp_server          |
++-----------+--------------------------------------------------+----------------------------------------------------------------+
+
+

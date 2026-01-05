@@ -1,0 +1,111 @@
+#ifndef GLOBALS_HPP
+#define GLOBALS_HPP
+
+#include <hls_stream.h>
+#include <ap_int.h>
+#include "ap_axi_sdata.h"
+#include <ap_fixed.h>
+
+
+#include <iostream>
+#include <stdlib.h>
+
+#pragma once
+
+#define DEBUG 1
+
+#define DWIDTH512 512
+#define DWIDTH256 256
+#define DWIDTH128 128
+#define DWIDTH64 64
+#define DWIDTH32 32
+#define DWIDTH16 16
+#define DWIDTH8 8
+
+typedef ap_axiu<DWIDTH512, 0, 0, 0> pkt512;
+typedef ap_axiu<DWIDTH256, 0, 0, 0> pkt256;
+typedef ap_axiu<DWIDTH128, 0, 0, 0> pkt128;
+typedef ap_axiu<DWIDTH64, 0, 0, 0> pkt64;
+typedef ap_axiu<DWIDTH32, 0, 0, 0> pkt32;
+typedef ap_axiu<DWIDTH16, 0, 0, 0> pkt16;
+typedef ap_axiu<DWIDTH8, 0, 0, 0> pkt8;
+
+
+const int NUM_NODES = 8; 
+const int NUM_SLOTS = 128 * 2; 
+const int FIFO_LENGTH = 1;
+
+// Constants for HeartBeat Memory
+// Only 1 HB regardless of number of sync groups
+const int HB_BASE_PTR = 0;
+const int HB_BASE_ADDR = 0;
+const int HB_PTR_LEN = 2 * NUM_NODES; 
+const int HB_ADDR_LEN = 4 * HB_PTR_LEN; 
+
+// Constants for replication logs
+// Scales with numberof sync groups
+const int LOG_BASE_PTR = HB_PTR_LEN; 
+const int LOG_BASE_ADDR = HB_ADDR_LEN; 
+
+const int LOG_MIN_PROP_PTR_LEN = 2 + (NUM_NODES-1) * FIFO_LENGTH; // local heartbeat and remote heartbeat queue
+const int LOG_MIN_PROP_ADDR_LEN = 4 * LOG_MIN_PROP_PTR_LEN; 
+
+const int LOG_LOCAL_LOG_PTR_LEN = NUM_SLOTS; // local log 
+const int LOG_LOCAL_LOG_ADDR_LEN = 4 * LOG_LOCAL_LOG_PTR_LEN; 
+
+const int LOG_REMOTE_LOG_QUEUE_PTR_LEN = 2 * (NUM_NODES-1) * FIFO_LENGTH;
+const int LOG_REMOTE_LOG_QUEUE_ADDR_LEN = 4 * LOG_REMOTE_LOG_QUEUE_PTR_LEN; 
+
+const int LOG_PTR_LEN = LOG_MIN_PROP_PTR_LEN + LOG_LOCAL_LOG_PTR_LEN + LOG_REMOTE_LOG_QUEUE_PTR_LEN; 
+const int LOG_ADDR_LEN = LOG_PTR_LEN * 4; 
+
+
+struct LocalMemOp {
+    bool read; 
+    ap_uint<32> index;
+    ap_uint<32> value; 
+    LocalMemOp()
+        :read(false) {}
+    LocalMemOp(bool r, ap_uint<32> i, ap_uint<32> v)
+        :read(r), index(i), value(v) {}
+};
+
+struct ProposedValue {
+    ap_uint<32> value; 
+    ap_uint<32> syncronizationGroup;
+    ProposedValue()
+        :value(0), syncronizationGroup(0){}
+    ProposedValue(int v, ap_uint<32> s)
+        : value(v), syncronizationGroup(s) {}
+};
+
+struct updateLocalValue {
+    ap_uint<32> value; 
+    ap_uint<32> syncGroup;
+    updateLocalValue()
+        :value(0), syncGroup(0) {}
+    updateLocalValue(ap_uint<32> v, ap_uint<32> s)
+        :value(v), syncGroup(s) {} 
+};
+
+struct LogEntry
+{
+    ap_uint<32> propVal;
+    ap_uint<32> value;
+	ap_uint<32> fuo;
+	ap_uint<32> syncGroup; 
+	bool valid; 
+    LogEntry()
+        :valid(false) {}
+    LogEntry(ap_uint<32> p, ap_uint<32> f)
+        :propVal(p), fuo(f) {}
+    LogEntry(ap_uint<32> s)
+        :valid(false), syncGroup(s) {}
+    LogEntry(ap_uint<32> p, ap_uint<32> v, ap_uint<32> s) 
+        :propVal(p), value(v), syncGroup(s) {}
+    LogEntry(ap_uint<32> p, ap_uint<32> v, bool va) 
+        :propVal(p), value(v), valid(va) {}
+};
+
+
+#endif
