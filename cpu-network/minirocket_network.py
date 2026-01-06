@@ -9,6 +9,12 @@ from sklearn.metrics import accuracy_score
 import argparse
 import os
 from itertools import combinations
+import socket
+import time
+import struct
+
+
+BUFFER_SIZE = 4 # float size in bytes
 
 # sktime datasets import will be done locally in functions
 
@@ -182,9 +188,9 @@ class MiniRocket:
         num_dilations = len(dilations)
 
         num_features = num_kernels * np.sum(num_features_per_dilation)
-        print(f"num_features: {num_features}")
-        print(f"num_features_per_dilation: {num_features_per_dilation}")
-        print(f"sum: {np.sum(num_features_per_dilation)}")
+        # print(f"num_features: {num_features}")
+        # print(f"num_features_per_dilation: {num_features_per_dilation}")
+        # print(f"sum: {np.sum(num_features_per_dilation)}")
 
         features = np.zeros((n_instances, num_features), dtype=np.float32)
 
@@ -300,150 +306,92 @@ def load_real_dataset(dataset_name='arrow_head'):
         traceback.print_exc()
         return generate_sample_data()
 
-def generate_sample_data(n_samples=1000, length=128, n_classes=4):
-    """Generate sample time series data for testing"""
-    np.random.seed(42)
-    
-    X = np.zeros((n_samples, length))
-    y = np.zeros(n_samples, dtype=int)
-    
-    for i in range(n_samples):
-        class_id = i % n_classes
-        
-        # Generate different patterns for different classes
-        if class_id == 0:
-            # Sine wave
-            X[i] = np.sin(np.linspace(0, 4*np.pi, length)) + 0.1 * np.random.randn(length)
-        elif class_id == 1:
-            # Square wave
-            X[i] = np.sign(np.sin(np.linspace(0, 4*np.pi, length))) + 0.1 * np.random.randn(length)
-        elif class_id == 2:
-            # Random walk
-            X[i] = np.cumsum(0.1 * np.random.randn(length))
-        else:
-            # Exponential decay
-            X[i] = np.exp(-np.linspace(0, 3, length)) + 0.1 * np.random.randn(length)
-            
-        y[i] = class_id
-    
-    return X.astype(np.float32), y
 
-def save_model_parameters(minirocket, scaler, classifier, filename="minirocket_model.json"):
-    """Save all model parameters needed for C++ implementation"""
-
-    # Generate the 84 kernel indices (combinations of 3 from 0-8)
-    kernel_indices = np.array(list(combinations(range(9), 3)), dtype=np.int32)
-
-    # Prepare data for JSON serialization
-    model_data = {
-        "num_kernels": 84,  # Always 84 in MiniRocket
-        "num_dilations": len(minirocket.dilations),
-        "num_features": len(minirocket.biases),
-        "num_classes": len(classifier.classes_),
-        "time_series_length": minirocket.time_series_length,
-        "kernel_indices": kernel_indices.tolist(),
-        "dilations": minirocket.dilations.tolist(),
-        "num_features_per_dilation": minirocket.num_features_per_dilation.tolist(),
-        "biases": minirocket.biases.tolist(),
-        "scaler_mean": scaler.mean_.tolist(),
-        "scaler_scale": scaler.scale_.tolist(),
-        "classifier_coef": classifier.coef_.tolist(),
-        "classifier_intercept": classifier.intercept_.tolist(),
-        "classes": classifier.classes_.tolist()
-    }
-
-    with open(filename, 'w') as f:
-        json.dump(model_data, f, indent=2)
-
-    print(f"Model parameters saved to {filename}")
-    return model_data
 
 def main():
     parser = argparse.ArgumentParser(description='Train MiniRocket model')
     parser.add_argument('--dataset', type=str, default='arrow_head', 
                        choices=['arrow_head', 'gun_point', 'italy_power', 'synthetic'],
                        help='Dataset to use (arrow_head, gun_point, italy_power, or synthetic)')
-    parser.add_argument('--samples', type=int, default=1000, help='Number of samples (for synthetic data)')
-    parser.add_argument('--length', type=int, default=128, help='Time series length (for synthetic data)')
-    parser.add_argument('--classes', type=int, default=4, help='Number of classes (for synthetic data)')
-    parser.add_argument('--output', type=str, default='minirocket_model.json', help='Output file')
+    parser.add_argument('--client_ip', type=str, default='127.0.0.1', help='Client IP address')
+    parser.add_argument('--server_ip', type=str, default='127.0.0.1', help='Server IP address')
+    parser.add_argument('--client_port', type=int, default=8080, help='Client port (for synthetic data)')
+    parser.add_argument('--server_port', type=int, default=9090, help='Server port (for synthetic data)')
+    parser.add_argument('--client', action='store_true', help='Run as client')
+    parser.add_argument('--server', action='store_true', help='Run as server')
     args = parser.parse_args()
     
-    # Load data based on dataset choice
-    if args.dataset == 'synthetic':
-        print("Generating synthetic data...")
-        X, y = generate_sample_data(args.samples, args.length, args.classes)
-    else:
-        print(f"Loading real dataset: {args.dataset}")
-        X, y = load_real_dataset(args.dataset)
-    
-    print(f"Data shape: {X.shape}")
-    print(f"Classes: {np.unique(y)}")
+    X, y = load_real_dataset(args.dataset)
     
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
     
-    n = len(X_test[0])
-    X_stream_test_0 = np.array([[0]*(n-(i+1)) + X_test[0].tolist()[:i+1] for i in range(n)])
-    print(X_stream_test_0)
+    pred = []
 
-    print("Training MiniRocket...")
-    # Fit MiniRocket (num_kernels must be multiple of 84, using 840 to fit HLS limits)
-    minirocket = MiniRocket(num_kernels=840, random_state=42)
-    X_train_features = minirocket.fit_transform(X_train)
-    X_test_features = minirocket.transform(X_stream_test_0)
-    
-    print(f"Feature shape: {X_train_features.shape}")
-    
+    if args.client:
+        print("Starting UDP client to send/receive data...")
+        local_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        local_sock.bind((args.client_ip, args.client_port))  # Bind to client IP and port
+        # remote_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # remote_sock.bind((args.server_ip, args.server_port))  # Bind to server IP and port
 
-    print(X_test_features.shape)
-    print(X_test_features[0][:20])  # Print first 20 features of first test sample
+        print("Client generate data to send of UDP...")
+        data = X_test[0]
+        for value in data:
+            data = struct.pack("f", value)  # float32 → 4 bytes
+            local_sock.sendto(data, (args.server_ip, args.server_port))
+            data, addr = local_sock.recvfrom(4)  # Wait for ACK
+            value = struct.unpack("f", data)[0]
+            pred.append(value)
 
-    # Scale features
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train_features)
-    X_test_scaled = scaler.transform(X_test_features)
-    
-    print(X_test_scaled.shape)
-    print(X_test_scaled)
+        print("Predictions received from server:")
+        print(pred)
 
 
-    # Train classifier
-    print("Training classifier...")
-    classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
-    classifier.fit(X_train_scaled, y_train)
-    
-    # Test accuracy
-    y_pred = classifier.predict(X_test_scaled)
+    elif args.server:
+        print("Training MiniRocket...")
+        # Fit MiniRocket (num_kernels must be multiple of 84, using 840 to fit HLS limits)
+        minirocket = MiniRocket(num_kernels=840, random_state=42)
+        X_train_features = minirocket.fit_transform(X_train)
+        
+        # Scale features
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train_features)
 
-    print(y_pred)
+        # Train classifier
+        print("Training classifier...")
+        classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
+        classifier.fit(X_train_scaled, y_train)
 
-    #accuracy = accuracy_score(y_test, y_pred)
-    
-    #print(f"Test accuracy: {accuracy:.4f}")
-    
-    # Save model
-    model_data = save_model_parameters(minirocket, scaler, classifier, args.output)
-    
-    # Save test data for C++ verification with dataset info
-    test_data = {
-        "dataset_name": args.dataset,
-        "X_test": X_test[0].tolist(),
-        "y_test": y_test.tolist(),
-        "y_pred": y_pred.tolist(),
-        #"test_accuracy": float(accuracy),
-        "num_samples": len(X_test),
-        "series_length": X_test.shape[1] if len(X_test.shape) > 1 else len(X_test[0]),
-        "num_classes": len(np.unique(y))
-    }
-    
-    test_filename = args.output.replace('.json', '_test_data.json')
-    with open(test_filename, 'w') as f:
-        json.dump(test_data, f, indent=2)
-    
-    print(f"Test data saved to {test_filename}")
-    #print(f"Python baseline accuracy: {accuracy:.4f}")
-    print("Training complete!")
+        window = np.zeros((minirocket.time_series_length,), dtype=np.float32)  # sliding windo
+        window = window.reshape(1, -1)       # shape (1, time_series_length)
+        print("Starting UDP client to send/receive data...")
+        # remote_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # remote_sock.bind((args.client_ip, args.client_port))  # Bind to client IP and port
+        local_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        local_sock.bind((args.server_ip, args.server_port))  # Bind to server IP and port
+
+        print("Server online for data over UDP...")
+
+        while True:
+            
+            data, addr = local_sock.recvfrom(4)  # Wait for ACK
+            value = struct.unpack("f", data)[0]
+            
+            window = np.roll(window, -1, axis=1)
+            window[0, -1] = value
+
+            print(window.flatten())
+
+            window_features = minirocket.transform(window)
+            window_scaled = scaler.transform(window_features)
+            window_pred = classifier.predict(window_scaled)
+
+            data = struct.pack("f", float(window_pred[0]))  # float32 → 4 bytes
+            local_sock.sendto(data, (args.client_ip, args.client_port))
+            
+
+
 
 if __name__ == "__main__":
     main()
