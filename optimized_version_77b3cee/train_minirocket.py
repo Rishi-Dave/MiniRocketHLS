@@ -262,7 +262,6 @@ def load_real_dataset(dataset_name='arrow_head'):
     try:
         print(f"Attempting to import sktime for dataset: {dataset_name}")
         from sktime.datasets import load_arrow_head, load_gunpoint, load_italy_power_demand
-        from aeon.datasets import load_classification
         print("sktime import successful")
         
         if dataset_name == 'arrow_head':
