@@ -257,6 +257,59 @@ class MiniRocket:
         self.fit(X)
         return self.transform(X)
 
+
+def load_large_dataset(dataset_name='InsectSound'):
+    """Load real time series datasets from sktime"""
+    try:
+        print(f"Attempting to load dataset: {dataset_name} from UCRArchive")
+        
+        from aeon.datasets import load_classification, load_from_arff_file
+        from pathlib import Path
+        
+        if dataset_name == "InsectSound":
+            X, y, meta = load_classification(dataset_name, return_metadata=True)
+        else:
+            X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
+        
+
+        # X = np.array([series.values for series in X.iloc[:, 0]])
+        # y = np.array([label_to_int[label] for label in y])
+        X = np.squeeze(X)
+        unique_labels = sorted(set(y))
+        label_to_int = {label: i for i, label in enumerate(unique_labels)}
+        y_numpy = np.array([label_to_int[label] for label in y])
+
+
+        print(f"Real dataset loaded: {dataset_name}")
+        print(f"  Classes: {len(np.unique(y))} ({np.unique(y)})")
+        print(f"  X Shape: {X.shape}")
+        print(f"  y Shape: {y.shape}")
+        print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
+        
+        return X.astype(np.float32), y_numpy.astype(int)
+        
+    except ImportError as e:
+        print(f"sktime import error: {e}")
+        print("falling back to synthetic data")
+        return generate_sample_data()
+    except Exception as e:
+        print(f"Error loading dataset {dataset_name}: {e}. Using local file instead.")
+        from pathlib import Path
+        X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data//{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
+        X = np.squeeze(X)
+        unique_labels = sorted(set(y))
+        label_to_int = {label: i for i, label in enumerate(unique_labels)}
+        y_numpy = np.array([label_to_int[label] for label in y])
+
+
+        print(f"Real dataset loaded: {dataset_name}")
+        print(f"  Classes: {len(np.unique(y))} ({np.unique(y)})")
+        print(f"  X Shape: {X.shape}")
+        print(f"  y Shape: {y.shape}")
+        print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
+        return X.astype(np.float32), y_numpy.astype(int)
+
+
 def load_real_dataset(dataset_name='arrow_head'):
     """Load real time series datasets from sktime"""
     try:
@@ -360,22 +413,16 @@ def save_model_parameters(minirocket, scaler, classifier, filename="minirocket_m
 
 def main():
     parser = argparse.ArgumentParser(description='Train MiniRocket model')
-    parser.add_argument('--dataset', type=str, default='arrow_head', 
-                       choices=['arrow_head', 'gun_point', 'italy_power', 'synthetic'],
-                       help='Dataset to use (arrow_head, gun_point, italy_power, or synthetic)')
+    parser.add_argument('--dataset', type=str, default='InsectSound', help='Dataset to use (arrow_head, gun_point, italy_power, or synthetic)')
     parser.add_argument('--samples', type=int, default=1000, help='Number of samples (for synthetic data)')
     parser.add_argument('--length', type=int, default=128, help='Time series length (for synthetic data)')
     parser.add_argument('--classes', type=int, default=4, help='Number of classes (for synthetic data)')
     parser.add_argument('--output', type=str, default='minirocket_model.json', help='Output file')
     args = parser.parse_args()
     
-    # Load data based on dataset choice
-    if args.dataset == 'synthetic':
-        print("Generating synthetic data...")
-        X, y = generate_sample_data(args.samples, args.length, args.classes)
-    else:
-        print(f"Loading real dataset: {args.dataset}")
-        X, y = load_real_dataset(args.dataset)
+
+    print(f"Loading real dataset: {args.dataset}")
+    X, y = load_large_dataset(args.dataset)
     
     print(f"Data shape: {X.shape}")
     print(f"Classes: {np.unique(y)}")
@@ -419,7 +466,7 @@ def main():
     print(f"Test accuracy: {accuracy:.4f}")
     
     # Save model
-    model_data = save_model_parameters(minirocket, scaler, classifier, args.output)
+    model_data = save_model_parameters(minirocket, scaler, classifier, f"{args.dataset}_{args.output}")
     
     # Save test data for C++ verification with dataset info
     test_data = {
@@ -433,7 +480,7 @@ def main():
         "num_classes": len(np.unique(y))
     }
     
-    test_filename = args.output.replace('.json', '_test_data.json')
+    test_filename = f"{args.dataset}_{args.output}".replace('.json', '_test_data.json')
     with open(test_filename, 'w') as f:
         json.dump(test_data, f, indent=2)
     

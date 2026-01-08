@@ -57,6 +57,8 @@ tcl_template/minirocket_hls_testbench_loader.cpp
 tcl_template/minirocket_host.cpp
 tcl_template/_x*
 
+*.json
+
 # Temporary build files in optimized_version_*/
 optimized_version_*/*.cpp
 optimized_version_*/*.h
