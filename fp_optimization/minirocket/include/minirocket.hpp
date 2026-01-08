@@ -13,13 +13,12 @@ typedef ap_int<32> int_t;           // 32-bit signed integer
 typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 
 // Constants for MiniRocket (compile-time known)
-#define MAX_TIME_SERIES_LENGTH 512
-#define MAX_FEATURES 10000
+#define MAX_TIME_SERIES_LENGTH 8192
+#define MAX_FEATURES 1024
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
-#define MAX_DILATIONS 8
-#define MAX_CLASSES 4
-
+#define MAX_DILATIONS 16
+#define MAX_CLASSES 16
 typedef union {
     data_t fp_num;
     uint32_t raw_bits;

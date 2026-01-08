@@ -9,6 +9,7 @@ from sklearn.metrics import accuracy_score
 import argparse
 import os
 from itertools import combinations
+import time
 
 # sktime datasets import will be done locally in functions
 
@@ -182,9 +183,9 @@ class MiniRocket:
         num_dilations = len(dilations)
 
         num_features = num_kernels * np.sum(num_features_per_dilation)
-        print(f"num_features: {num_features}")
-        print(f"num_features_per_dilation: {num_features_per_dilation}")
-        print(f"sum: {np.sum(num_features_per_dilation)}")
+        # print(f"num_features: {num_features}")
+        # print(f"num_features_per_dilation: {num_features_per_dilation}")
+        # print(f"sum: {np.sum(num_features_per_dilation)}")
 
         features = np.zeros((n_instances, num_features), dtype=np.float32)
 
@@ -257,20 +258,13 @@ class MiniRocket:
         self.fit(X)
         return self.transform(X)
 
-
-def load_large_dataset(dataset_name='InsectSound'):
+def load_real_dataset(dataset_name='ArrowHead'):
     """Load real time series datasets from sktime"""
     try:
         print(f"Attempting to load dataset: {dataset_name} from UCRArchive")
         
-        from aeon.datasets import load_classification, load_from_arff_file
-        from pathlib import Path
-        
-        if dataset_name == "InsectSound":
-            X, y, meta = load_classification(dataset_name, return_metadata=True)
-        else:
-            X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
-        
+        from aeon.datasets import load_classification
+        X, y, meta = load_classification(dataset_name, return_metadata=True)
 
         # X = np.array([series.values for series in X.iloc[:, 0]])
         # y = np.array([label_to_int[label] for label in y])
@@ -293,200 +287,48 @@ def load_large_dataset(dataset_name='InsectSound'):
         print("falling back to synthetic data")
         return generate_sample_data()
     except Exception as e:
-        print(f"Error loading dataset {dataset_name}: {e}. Using local file instead.")
-        from pathlib import Path
-        X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data//{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
-        X = np.squeeze(X)
-        unique_labels = sorted(set(y))
-        label_to_int = {label: i for i, label in enumerate(unique_labels)}
-        y_numpy = np.array([label_to_int[label] for label in y])
-
-
-        print(f"Real dataset loaded: {dataset_name}")
-        print(f"  Classes: {len(np.unique(y))} ({np.unique(y)})")
-        print(f"  X Shape: {X.shape}")
-        print(f"  y Shape: {y.shape}")
-        print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
-        return X.astype(np.float32), y_numpy.astype(int)
-
-
-def load_real_dataset(dataset_name='arrow_head'):
-    """Load real time series datasets from sktime"""
-    try:
-        print(f"Attempting to import sktime for dataset: {dataset_name}")
-        from sktime.datasets import load_arrow_head, load_gunpoint, load_italy_power_demand
-        print("sktime import successful")
-        
-        if dataset_name == 'arrow_head':
-            X, y = load_arrow_head()
-        elif dataset_name == 'gun_point':
-            X, y = load_gunpoint()
-        elif dataset_name == 'italy_power':
-            X, y = load_italy_power_demand()
-        else:
-            print(f"Unknown dataset {dataset_name}, using arrow_head")
-            X, y = load_arrow_head()
-        
-        # Convert from pandas to numpy
-        X_numpy = np.array([series.values for series in X.iloc[:, 0]])
-        
-        # Convert string labels to integers
-        unique_labels = sorted(set(y))
-        label_to_int = {label: i for i, label in enumerate(unique_labels)}
-        y_numpy = np.array([label_to_int[label] for label in y])
-        
-        print(f"Real dataset loaded: {dataset_name}")
-        print(f"  Shape: {X_numpy.shape}")
-        print(f"  Classes: {len(unique_labels)} ({unique_labels})")
-        print(f"  Class distribution: {np.bincount(y_numpy)}")
-        
-        return X_numpy.astype(np.float32), y_numpy
-        
-    except ImportError as e:
-        print(f"sktime import error: {e}")
-        print("falling back to synthetic data")
-        return generate_sample_data()
-    except Exception as e:
         print(f"Error loading dataset {dataset_name}: {e}")
         print("Falling back to synthetic data")
         import traceback
         traceback.print_exc()
         return generate_sample_data()
 
-def generate_sample_data(n_samples=1000, length=128, n_classes=4):
-    """Generate sample time series data for testing"""
-    np.random.seed(42)
-    
-    X = np.zeros((n_samples, length))
-    y = np.zeros(n_samples, dtype=int)
-    
-    for i in range(n_samples):
-        class_id = i % n_classes
-        
-        # Generate different patterns for different classes
-        if class_id == 0:
-            # Sine wave
-            X[i] = np.sin(np.linspace(0, 4*np.pi, length)) + 0.1 * np.random.randn(length)
-        elif class_id == 1:
-            # Square wave
-            X[i] = np.sign(np.sin(np.linspace(0, 4*np.pi, length))) + 0.1 * np.random.randn(length)
-        elif class_id == 2:
-            # Random walk
-            X[i] = np.cumsum(0.1 * np.random.randn(length))
-        else:
-            # Exponential decay
-            X[i] = np.exp(-np.linspace(0, 3, length)) + 0.1 * np.random.randn(length)
-            
-        y[i] = class_id
-    
-    return X.astype(np.float32), y
-
-def save_model_parameters(minirocket, scaler, classifier, filename="minirocket_model.json"):
-    """Save all model parameters needed for C++ implementation"""
-
-    # Generate the 84 kernel indices (combinations of 3 from 0-8)
-    kernel_indices = np.array(list(combinations(range(9), 3)), dtype=np.int32)
-
-    # Prepare data for JSON serialization
-    model_data = {
-        "num_kernels": 84,  # Always 84 in MiniRocket
-        "num_dilations": len(minirocket.dilations),
-        "num_features": len(minirocket.biases),
-        "num_classes": len(classifier.classes_),
-        "time_series_length": minirocket.time_series_length,
-        "kernel_indices": kernel_indices.tolist(),
-        "dilations": minirocket.dilations.tolist(),
-        "num_features_per_dilation": minirocket.num_features_per_dilation.tolist(),
-        "biases": minirocket.biases.tolist(),
-        "scaler_mean": scaler.mean_.tolist(),
-        "scaler_scale": scaler.scale_.tolist(),
-        "classifier_coef": classifier.coef_.tolist(),
-        "classifier_intercept": classifier.intercept_.tolist(),
-        "classes": classifier.classes_.tolist()
-    }
-
-    with open(filename, 'w') as f:
-        json.dump(model_data, f, indent=2)
-
-    print(f"Model parameters saved to {filename}")
-    return model_data
 
 def main():
     parser = argparse.ArgumentParser(description='Train MiniRocket model')
-    parser.add_argument('--dataset', type=str, default='InsectSound', help='Dataset to use (arrow_head, gun_point, italy_power, or synthetic)')
-    parser.add_argument('--samples', type=int, default=1000, help='Number of samples (for synthetic data)')
-    parser.add_argument('--length', type=int, default=128, help='Time series length (for synthetic data)')
-    parser.add_argument('--classes', type=int, default=4, help='Number of classes (for synthetic data)')
-    parser.add_argument('--output', type=str, default='minirocket_model.json', help='Output file')
+    parser.add_argument('--dataset', type=str, default='ArrowHead', 
+                       help='Dataset to use from UCR Archive')
     args = parser.parse_args()
     
 
     print(f"Loading real dataset: {args.dataset}")
-    X, y = load_large_dataset(args.dataset)
+    X, y = load_real_dataset(args.dataset)
     
-    print(f"Data shape: {X.shape}")
-    print(f"Classes: {np.unique(y)}")
-    
-    # Split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
-    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.75, random_state=42, stratify=y)
+
     print("Training MiniRocket...")
     # Fit MiniRocket (num_kernels must be multiple of 84, using 840 to fit HLS limits)
     minirocket = MiniRocket(num_kernels=840, random_state=42)
     X_train_features = minirocket.fit_transform(X_train)
-    X_test_features = minirocket.transform(X_test)
-    
-    print(f"Feature shape: {X_train_features.shape}")
-    
-
-    print(X_test_features.shape)
-    print(X_test_features[0][:20])  # Print first 20 features of first test sample
 
     # Scale features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train_features)
-    X_test_scaled = scaler.transform(X_test_features)
-    
-    print(X_test_scaled.shape)
-    print(X_test_scaled)
-
-
     # Train classifier
-    print("Training classifier...")
     classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
     classifier.fit(X_train_scaled, y_train)
     
-    # Test accuracy
+    print("Evaluating model...")
+    start_time = time.perf_counter()
+    X_test_features = minirocket.transform(X_test)
+    X_test_scaled = scaler.transform(X_test_features)
     y_pred = classifier.predict(X_test_scaled)
-
-    print(y_pred)
-
+    end_time = time.perf_counter()
     accuracy = accuracy_score(y_test, y_pred)
-    
-    print(f"Test accuracy: {accuracy:.4f}")
-    
-    # Save model
-    model_data = save_model_parameters(minirocket, scaler, classifier, f"{args.dataset}_{args.output}")
-    
-    # Save test data for C++ verification with dataset info
-    test_data = {
-        "dataset_name": args.dataset,
-        "X_test": X_test.tolist(),
-        "y_test": y_test.tolist(),
-        "y_pred": y_pred.tolist(),
-        "test_accuracy": float(accuracy),
-        "num_samples": len(X_test),
-        "series_length": X_test.shape[1] if len(X_test.shape) > 1 else len(X_test[0]),
-        "num_classes": len(np.unique(y))
-    }
-    
-    test_filename = f"{args.dataset}_{args.output}".replace('.json', '_test_data.json')
-    with open(test_filename, 'w') as f:
-        json.dump(test_data, f, indent=2)
-    
-    print(f"Test data saved to {test_filename}")
-    print(f"Python baseline accuracy: {accuracy:.4f}")
-    print("Training complete!")
+
+    print(f"Accuracy: {accuracy:.6f}")  
+    print(f"Test time: {end_time - start_time:.6f} seconds")
+
 
 if __name__ == "__main__":
     main()

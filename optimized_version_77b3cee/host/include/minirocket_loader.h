@@ -10,12 +10,12 @@
 typedef float data_t;
 typedef int32_t int_t;
 
-#define MAX_TIME_SERIES_LENGTH 512
-#define MAX_FEATURES 10000
+#define MAX_TIME_SERIES_LENGTH 8192
+#define MAX_FEATURES 1024
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
-#define MAX_DILATIONS 8
-#define MAX_CLASSES 4
+#define MAX_DILATIONS 16
+#define MAX_CLASSES 16
 
 // Testbench-only loader (NOT synthesizable - for simulation only)
 class MiniRocketTestbenchLoader {
