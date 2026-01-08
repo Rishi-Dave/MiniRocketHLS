@@ -1,0 +1,58 @@
+# Vitis HLS TCL script for HYDRA synthesis
+
+# Create project
+open_project -reset hydra_inference
+
+# Set top function
+set_top hydra_inference
+
+# Add source files
+add_files @CMAKE_CURRENT_SOURCE_DIR@/src/hydra.cpp
+add_files @CMAKE_CURRENT_SOURCE_DIR@/src/hydra_pooling.cpp
+
+# Add testbench files
+add_files -tb @CMAKE_CURRENT_SOURCE_DIR@/test/test_hydra.cpp
+add_files -tb @CMAKE_CURRENT_SOURCE_DIR@/test/hydra_hls_testbench_loader.cpp
+
+# Create solution
+open_solution -reset solution
+
+# Set target FPGA part
+set_part xcu280-fsvh2892-2L-e
+
+# Create clock with 300 MHz (3.33 ns period)
+create_clock -period 3.333333
+
+# Configure interface
+config_interface -m_axi_latency=64
+config_interface -m_axi_alignment_byte_size=64
+config_interface -m_axi_max_widen_bitwidth=512
+
+# Configure RTL
+config_rtl -register_reset_num=3
+
+# Configure export
+config_export -format xo -output hydra_inference.xo
+
+# Parse TCL arguments
+# Find where csim/synthesis/cosim/ip is in argv (it's the last argument)
+set command [lindex $argv end]
+
+if {$command == "csim"} {
+    # C Simulation
+    csim_design -argv "@CMAKE_SOURCE_DIR@/models/hydra_model.json @CMAKE_SOURCE_DIR@/models/hydra_test.json csim"
+} elseif {$command == "synthesis"} {
+    # Synthesis
+    csynth_design
+} elseif {$command == "cosim"} {
+    # Co-simulation
+    cosim_design -argv "@CMAKE_SOURCE_DIR@/models/hydra_model.json @CMAKE_SOURCE_DIR@/models/hydra_test.json cosim"
+} elseif {$command == "ip"} {
+    # Export IP (run synthesis first if needed)
+    csynth_design
+    export_design -flow impl
+} else {
+    puts "Usage: vitis_hls -f make.tcl -tclargs <csim|synthesis|cosim|ip>"
+}
+
+exit
