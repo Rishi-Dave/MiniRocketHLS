@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Train HYDRA models on UCR datasets and save them for FPGA testing.
+Train MultiRocket models on UCR datasets and save them for FPGA testing.
 This script trains once and saves the models so we don't need to retrain.
 """
 
@@ -8,8 +8,10 @@ import argparse
 import json
 import time
 import numpy as np
-from custom_hydra import Hydra
 from aeon.datasets import load_classification
+from aeon.transformations.collection.convolution_based import MultiRocket
+from sklearn.linear_model import RidgeClassifierCV
+from sklearn.preprocessing import StandardScaler
 import sys
 
 def load_ucr_dataset(name):
@@ -20,8 +22,8 @@ def load_ucr_dataset(name):
 
     start_load = time.time()
 
-    # Use project directory for dataset extraction (not /tmp which is limited to 8GB)
-    extract_path = "../datasets/ucr_data"
+    # Use shared dataset directory (same as HYDRA)
+    extract_path = "../../hydra_optimized/datasets/ucr_data"
 
     # Load dataset
     X_train, y_train = load_classification(name, split="train", extract_path=extract_path)
@@ -50,34 +52,46 @@ def load_ucr_dataset(name):
     return X_train, y_train, X_test, y_test
 
 
-def train_and_save(dataset_name, num_kernels=512):
-    """Train HYDRA model and save it along with test data"""
+def train_and_save(dataset_name, num_kernels=6250):
+    """Train MultiRocket model and save it along with test data"""
 
     print(f"\n{'='*70}")
-    print(f"TRAINING HYDRA FOR {dataset_name}")
+    print(f"TRAINING MULTIROCKET FOR {dataset_name}")
     print(f"{'='*70}")
 
     try:
         # Load dataset
         X_train, y_train, X_test, y_test = load_ucr_dataset(dataset_name)
 
-        # Train HYDRA
-        print(f"\nTraining HYDRA with {num_kernels} kernels...")
+        # Train MultiRocket
+        # MultiRocket generates: num_kernels × 4 pooling × 2 representations
+        # For 6,250 kernels: 6,250 × 4 × 2 = 50,000 features
+        print(f"\nTraining MultiRocket with {num_kernels} kernels...")
         print(f"Training samples: {len(X_train)}, Length: {X_train.shape[1]}")
 
         start_train = time.time()
-        hydra = Hydra(num_kernels=num_kernels, random_state=42)
-        hydra.fit(X_train, y_train, verbose=True)
+        multirocket = MultiRocket(n_kernels=num_kernels, random_state=42)
+        multirocket.fit(X_train)
+        X_train_transform = multirocket.transform(X_train)
+
+        # Train classifier
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train_transform)
+
+        classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
+        classifier.fit(X_train_scaled, y_train)
         train_time = time.time() - start_train
 
         print(f"\nTraining completed in {train_time:.2f}s")
 
         # Evaluate
         print(f"\nEvaluating...")
-        train_acc = hydra.score(X_train, y_train)
+        train_acc = classifier.score(X_train_scaled, y_train)
 
         start_test = time.time()
-        y_pred = hydra.predict(X_test)
+        X_test_transform = multirocket.transform(X_test)
+        X_test_scaled = scaler.transform(X_test_transform)
+        y_pred = classifier.predict(X_test_scaled)
         test_time = time.time() - start_test
 
         test_acc = np.mean(y_pred == y_test)
@@ -88,37 +102,64 @@ def train_and_save(dataset_name, num_kernels=512):
         print(f"  Test time: {test_time:.2f}s")
 
         # Save model parameters for FPGA
-        model_file = f"../models/hydra_{dataset_name.lower()}_model.json"
+        model_file = f"../models/multirocket_{dataset_name.lower()}_model.json"
 
+        # Extract parameters from the aeon MultiRocket implementation
+        # MultiRocket has two parameter tuples:
+        # - parameter: (dilations, n_features_per_dilation, biases) for original series
+        # - parameter1: (dilations, n_features_per_dilation, biases) for diff series
+
+        dilations_original = multirocket.parameter[0].tolist()
+        n_features_per_dilation_original = multirocket.parameter[1].tolist()
+        biases_original = multirocket.parameter[2].tolist()
+
+        dilations_diff = multirocket.parameter1[0].tolist()
+        n_features_per_dilation_diff = multirocket.parameter1[1].tolist()
+        biases_diff = multirocket.parameter1[2].tolist()
+
+        # MultiRocket has more complex structure than MiniRocket
         model_params = {
             "dataset": dataset_name,
-            "num_kernels": hydra.num_kernels,
-            "num_groups": hydra.num_groups,
-            "kernel_size": 9,
-            "num_features": hydra.num_kernels * 2,
+            "num_kernels": multirocket.n_kernels,
+            "num_features": multirocket.n_kernels * 8,  # 4 pooling × 2 representations
             "num_classes": len(np.unique(y_test)),
             "time_series_length": X_test.shape[1],
 
-            # Dictionary kernel weights [512, 9]
-            "kernel_weights": hydra.dictionary_.flatten().tolist(),
+            # MultiRocket uses 84 fixed kernel patterns (same as MiniRocket)
+            "num_base_kernels": 84,
+            "kernel_size": 9,
+            "n_features_per_kernel": multirocket.n_features_per_kernel,
 
-            # Biases [512]
-            "biases": hydra.biases_.tolist(),
+            # Parameters for original series transformation
+            "parameter_original": {
+                "dilations": dilations_original,
+                "n_features_per_dilation": n_features_per_dilation_original,
+                "biases": biases_original
+            },
 
-            # Dilations [512]
-            "dilations": hydra.dilations_.tolist(),
+            # Parameters for first-order differenced series transformation
+            "parameter_diff": {
+                "dilations": dilations_diff,
+                "n_features_per_dilation": n_features_per_dilation_diff,
+                "biases": biases_diff
+            },
 
             # StandardScaler parameters
-            "scaler_mean": hydra.scaler_.mean_.tolist(),
-            "scaler_scale": hydra.scaler_.scale_.tolist(),
+            "scaler_mean": scaler.mean_.tolist(),
+            "scaler_scale": scaler.scale_.tolist(),
 
             # Ridge classifier coefficients
-            "coefficients": hydra.classifier_.coef_.T.flatten().tolist(),
-            "intercept": hydra.classifier_.intercept_.tolist(),
+            "coefficients": classifier.coef_.T.flatten().tolist(),
+            "intercept": classifier.intercept_.tolist(),
 
             # Accuracy metrics
             "train_accuracy": float(train_acc),
-            "test_accuracy": float(test_acc)
+            "test_accuracy": float(test_acc),
+
+            # Note for FPGA implementation
+            "note": "MultiRocket uses 84 fixed kernel patterns from combinations(9,3) "
+                    "with 4 pooling operators (PPV, MPV, MIPV, LSPV) on both original "
+                    "and first-order differenced series."
         }
 
         print(f"\nSaving model to {model_file}...")
@@ -126,7 +167,7 @@ def train_and_save(dataset_name, num_kernels=512):
             json.dump(model_params, f, indent=2)
 
         # Save test data (all samples for comprehensive testing)
-        test_file = f"../models/hydra_{dataset_name.lower()}_test.json"
+        test_file = f"../models/multirocket_{dataset_name.lower()}_test.json"
 
         test_data = {
             "dataset": dataset_name,
@@ -163,11 +204,11 @@ def train_and_save(dataset_name, num_kernels=512):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train and save HYDRA models')
+    parser = argparse.ArgumentParser(description='Train and save MultiRocket models')
     parser.add_argument('--dataset', type=str, nargs='+',
                         help='Dataset name(s) (InsectSound, MosquitoSound, FruitFlies). Can specify multiple.')
-    parser.add_argument('--num-kernels', type=int, default=512,
-                        help='Number of kernels (default: 512)')
+    parser.add_argument('--num-kernels', type=int, default=6250,
+                        help='Number of kernels (default: 6250)')
     parser.add_argument('--all', action='store_true',
                         help='Train all three datasets: InsectSound, MosquitoSound, FruitFlies')
 
@@ -183,7 +224,7 @@ def main():
         sys.exit(1)
 
     print(f"\n{'='*70}")
-    print(f"HYDRA MODEL TRAINING")
+    print(f"MULTIROCKET MODEL TRAINING")
     print(f"{'='*70}")
     print(f"Datasets to train: {', '.join(datasets)}")
     print(f"Number of kernels: {args.num_kernels}")

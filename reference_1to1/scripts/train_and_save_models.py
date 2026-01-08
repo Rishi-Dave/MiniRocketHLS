@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Train HYDRA models on UCR datasets and save them for FPGA testing.
+Train MiniRocket models on UCR datasets and save them for FPGA testing.
 This script trains once and saves the models so we don't need to retrain.
 """
 
@@ -8,8 +8,10 @@ import argparse
 import json
 import time
 import numpy as np
-from custom_hydra import Hydra
 from aeon.datasets import load_classification
+from aeon.transformations.collection.convolution_based import MiniRocket
+from sklearn.linear_model import RidgeClassifierCV
+from sklearn.preprocessing import StandardScaler
 import sys
 
 def load_ucr_dataset(name):
@@ -20,8 +22,8 @@ def load_ucr_dataset(name):
 
     start_load = time.time()
 
-    # Use project directory for dataset extraction (not /tmp which is limited to 8GB)
-    extract_path = "../datasets/ucr_data"
+    # Use shared dataset directory (same as HYDRA)
+    extract_path = "../../hydra_optimized/datasets/ucr_data"
 
     # Load dataset
     X_train, y_train = load_classification(name, split="train", extract_path=extract_path)
@@ -50,34 +52,44 @@ def load_ucr_dataset(name):
     return X_train, y_train, X_test, y_test
 
 
-def train_and_save(dataset_name, num_kernels=512):
-    """Train HYDRA model and save it along with test data"""
+def train_and_save(dataset_name, num_kernels=10000):
+    """Train MiniRocket model and save it along with test data"""
 
     print(f"\n{'='*70}")
-    print(f"TRAINING HYDRA FOR {dataset_name}")
+    print(f"TRAINING MINIROCKET FOR {dataset_name}")
     print(f"{'='*70}")
 
     try:
         # Load dataset
         X_train, y_train, X_test, y_test = load_ucr_dataset(dataset_name)
 
-        # Train HYDRA
-        print(f"\nTraining HYDRA with {num_kernels} kernels...")
+        # Train MiniRocket
+        print(f"\nTraining MiniRocket with {num_kernels} kernels...")
         print(f"Training samples: {len(X_train)}, Length: {X_train.shape[1]}")
 
         start_train = time.time()
-        hydra = Hydra(num_kernels=num_kernels, random_state=42)
-        hydra.fit(X_train, y_train, verbose=True)
+        minirocket = MiniRocket(n_kernels=num_kernels, random_state=42)
+        minirocket.fit(X_train)
+        X_train_transform = minirocket.transform(X_train)
+
+        # Train classifier
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train_transform)
+
+        classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
+        classifier.fit(X_train_scaled, y_train)
         train_time = time.time() - start_train
 
         print(f"\nTraining completed in {train_time:.2f}s")
 
         # Evaluate
         print(f"\nEvaluating...")
-        train_acc = hydra.score(X_train, y_train)
+        train_acc = classifier.score(X_train_scaled, y_train)
 
         start_test = time.time()
-        y_pred = hydra.predict(X_test)
+        X_test_transform = minirocket.transform(X_test)
+        X_test_scaled = scaler.transform(X_test_transform)
+        y_pred = classifier.predict(X_test_scaled)
         test_time = time.time() - start_test
 
         test_acc = np.mean(y_pred == y_test)
@@ -88,37 +100,56 @@ def train_and_save(dataset_name, num_kernels=512):
         print(f"  Test time: {test_time:.2f}s")
 
         # Save model parameters for FPGA
-        model_file = f"../models/hydra_{dataset_name.lower()}_model.json"
+        model_file = f"../models/minirocket_{dataset_name.lower()}_model.json"
+
+        # Extract parameters from the aeon MiniRocket implementation
+        # parameters is a tuple: (n_channels_per_combination, channel_indices,
+        #                         dilations, n_features_per_dilation, biases)
+        n_channels_per_combination = minirocket.parameters[0].tolist()
+        channel_indices = minirocket.parameters[1].tolist()
+        dilations = minirocket.parameters[2].tolist()
+        n_features_per_dilation = minirocket.parameters[3].tolist()
+        biases = minirocket.parameters[4].tolist()
+
+        # MiniRocket uses 84 fixed kernel patterns (combinations of 9 indices choosing 3)
+        # The kernel weights are not stored but are implicitly -1 and 2
+        # We need to document this for FPGA implementation
 
         model_params = {
             "dataset": dataset_name,
-            "num_kernels": hydra.num_kernels,
-            "num_groups": hydra.num_groups,
-            "kernel_size": 9,
-            "num_features": hydra.num_kernels * 2,
+            "num_kernels": minirocket.n_kernels,
+            "num_features": minirocket.n_kernels * 2,
             "num_classes": len(np.unique(y_test)),
             "time_series_length": X_test.shape[1],
 
-            # Dictionary kernel weights [512, 9]
-            "kernel_weights": hydra.dictionary_.flatten().tolist(),
+            # MiniRocket uses 84 fixed kernel patterns
+            # Kernel structure: weights are [-1, -1, -1, -1, -1, -1, 2, 2, 2]
+            # with the three 2s at positions determined by combinations(9, 3)
+            "num_base_kernels": 84,
+            "kernel_size": 9,
 
-            # Biases [512]
-            "biases": hydra.biases_.tolist(),
-
-            # Dilations [512]
-            "dilations": hydra.dilations_.tolist(),
+            # Parameters from aeon MiniRocket
+            "n_channels_per_combination": n_channels_per_combination,
+            "channel_indices": channel_indices,
+            "dilations": dilations,
+            "n_features_per_dilation": n_features_per_dilation,
+            "biases": biases,
 
             # StandardScaler parameters
-            "scaler_mean": hydra.scaler_.mean_.tolist(),
-            "scaler_scale": hydra.scaler_.scale_.tolist(),
+            "scaler_mean": scaler.mean_.tolist(),
+            "scaler_scale": scaler.scale_.tolist(),
 
             # Ridge classifier coefficients
-            "coefficients": hydra.classifier_.coef_.T.flatten().tolist(),
-            "intercept": hydra.classifier_.intercept_.tolist(),
+            "coefficients": classifier.coef_.T.flatten().tolist(),
+            "intercept": classifier.intercept_.tolist(),
 
             # Accuracy metrics
             "train_accuracy": float(train_acc),
-            "test_accuracy": float(test_acc)
+            "test_accuracy": float(test_acc),
+
+            # Note for FPGA implementation
+            "note": "MiniRocket uses 84 fixed kernel patterns from combinations(9,3). "
+                    "Kernel weights are 6 values of -1 and 3 values of 2 at specific indices."
         }
 
         print(f"\nSaving model to {model_file}...")
@@ -126,7 +157,7 @@ def train_and_save(dataset_name, num_kernels=512):
             json.dump(model_params, f, indent=2)
 
         # Save test data (all samples for comprehensive testing)
-        test_file = f"../models/hydra_{dataset_name.lower()}_test.json"
+        test_file = f"../models/minirocket_{dataset_name.lower()}_test.json"
 
         test_data = {
             "dataset": dataset_name,
@@ -163,11 +194,11 @@ def train_and_save(dataset_name, num_kernels=512):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train and save HYDRA models')
+    parser = argparse.ArgumentParser(description='Train and save MiniRocket models')
     parser.add_argument('--dataset', type=str, nargs='+',
                         help='Dataset name(s) (InsectSound, MosquitoSound, FruitFlies). Can specify multiple.')
-    parser.add_argument('--num-kernels', type=int, default=512,
-                        help='Number of kernels (default: 512)')
+    parser.add_argument('--num-kernels', type=int, default=10000,
+                        help='Number of kernels (default: 10000)')
     parser.add_argument('--all', action='store_true',
                         help='Train all three datasets: InsectSound, MosquitoSound, FruitFlies')
 
@@ -183,7 +214,7 @@ def main():
         sys.exit(1)
 
     print(f"\n{'='*70}")
-    print(f"HYDRA MODEL TRAINING")
+    print(f"MINIROCKET MODEL TRAINING")
     print(f"{'='*70}")
     print(f"Datasets to train: {', '.join(datasets)}")
     print(f"Number of kernels: {args.num_kernels}")
