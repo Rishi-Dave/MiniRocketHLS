@@ -38,6 +38,29 @@ static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
     #include "../include/weights.txt"
 };
 
+// Compute first-order difference: diff[i] = series[i+1] - series[i]
+void compute_first_order_difference(
+    data_t time_series[MAX_TIME_SERIES_LENGTH],
+    data_t diff_series[MAX_TIME_SERIES_LENGTH],
+    int_t length
+) {
+    #pragma HLS INLINE off
+    #pragma HLS PIPELINE off
+
+    if (length <= 1) {
+        return;
+    }
+
+    DIFF_LOOP: for (int_t i = 0; i < length - 1; i++) {
+        #pragma HLS PIPELINE II=1
+        #pragma HLS LOOP_TRIPCOUNT min=99 max=5119
+        diff_series[i] = time_series[i + 1] - time_series[i];
+    }
+
+    // Last element set to 0 (or could replicate last difference)
+    diff_series[length - 1] = 0.0;
+}
+
 // HLS-optimized convolution with specific kernel and dilation
 void apply_kernel_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
@@ -83,7 +106,7 @@ void apply_kernel_hls(
     }
 }
 
-// HLS-optimized MiniRocket feature extraction
+// HLS-optimized MultiRocket feature extraction with all 4 pooling operators and 2 representations
 void multirocket_feature_extraction_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],
     data_t features[MAX_FEATURES],
@@ -95,51 +118,61 @@ void multirocket_feature_extraction_hls(
     int_t num_features
 ) {
     #pragma HLS INLINE off
-    
+
     // Local arrays for computations
     data_t convolutions[MAX_TIME_SERIES_LENGTH];
+    data_t diff_series[MAX_TIME_SERIES_LENGTH];
     #pragma HLS ARRAY_PARTITION variable=convolutions type=cyclic factor=8
-    
-    int_t feature_idx = 0;
-    
-    DILATION_LOOP: for (int_t dil_idx = 0; dil_idx < num_dilations; dil_idx++) {
-        #pragma HLS LOOP_TRIPCOUNT min=1 max=8
-        
-        int_t dilation = dilations[dil_idx];
-        int_t features_this_dilation = num_features_per_dilation[dil_idx];
-        
-        KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
-            #pragma HLS LOOP_TRIPCOUNT min=84 max=84
-            #pragma HLS PIPELINE off
-            
-            if (feature_idx >= num_features) {
-                //std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
-                break;
-            }
-            // Apply kernel convolution
-            int_t conv_length;
-            apply_kernel_hls(time_series, convolutions, kernel_idx, dilation, 
-                           time_series_length, &conv_length);
-            
-            // Calculate positive proportion of values (PPV)
-            for (int_t f = 0; f < features_this_dilation; f++) {
-                data_t bias = biases[feature_idx + f];
-                int_t positive_count = 0;
-                
-                PPV_LOOP: for (int_t i = 0; i < time_series_length; i++) {
-                    #pragma HLS PIPELINE II=1
-                    if (convolutions[i] > bias) {
-                        positive_count++;
-                    }
-                }
-                
-                // Compute PPV feature
-                data_t ppv = (data_t)positive_count / (data_t)time_series_length;
-                features[feature_idx + f] = ppv;
-                
-            }
+    #pragma HLS ARRAY_PARTITION variable=diff_series type=cyclic factor=8
 
-            feature_idx+= features_this_dilation;
+    // Compute first-order difference representation
+    compute_first_order_difference(time_series, diff_series, time_series_length);
+
+    int_t feature_idx = 0;
+
+    // Process both representations: Original (rep=0) and Difference (rep=1)
+    REPRESENTATION_LOOP: for (int_t rep = 0; rep < NUM_REPRESENTATIONS; rep++) {
+        #pragma HLS LOOP_TRIPCOUNT min=2 max=2
+
+        // Select which representation to process
+        data_t* current_series = (rep == 0) ? time_series : diff_series;
+
+        DILATION_LOOP: for (int_t dil_idx = 0; dil_idx < num_dilations; dil_idx++) {
+            #pragma HLS LOOP_TRIPCOUNT min=1 max=8
+
+            int_t dilation = dilations[dil_idx];
+            int_t biases_this_dilation = num_features_per_dilation[dil_idx];
+
+            KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
+                #pragma HLS LOOP_TRIPCOUNT min=84 max=84
+                #pragma HLS PIPELINE off
+
+                if (feature_idx >= num_features) {
+                    break;
+                }
+
+                // Apply kernel convolution on current representation
+                int_t conv_length;
+                apply_kernel_hls(current_series, convolutions, kernel_idx, dilation,
+                               time_series_length, &conv_length);
+
+                // For each bias, compute all 4 pooling operators
+                BIAS_LOOP: for (int_t b = 0; b < biases_this_dilation && feature_idx < num_features; b++) {
+                    #pragma HLS PIPELINE off
+
+                    data_t bias = biases[feature_idx];
+                    PoolingStats stats;
+
+                    // Compute all 4 pooling operators in single pass
+                    compute_four_pooling_operators(convolutions, bias, time_series_length, &stats);
+
+                    // Store all 4 features (ensure we don't overflow)
+                    if (feature_idx < num_features) features[feature_idx++] = stats.ppv;
+                    if (feature_idx < num_features) features[feature_idx++] = stats.mpv;
+                    if (feature_idx < num_features) features[feature_idx++] = stats.mipv;
+                    if (feature_idx < num_features) features[feature_idx++] = stats.lspv;
+                }
+            }
         }
     }
 }

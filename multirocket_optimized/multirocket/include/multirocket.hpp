@@ -11,16 +11,26 @@ typedef float data_t;
 typedef ap_int<32> int_t;           // 32-bit signed integer
 typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 
-// Constants for MiniRocket (compile-time known)
-#define MAX_TIME_SERIES_LENGTH 512
-#define MAX_FEATURES 10000
+// Constants for MultiRocket (compile-time known)
+#define MAX_TIME_SERIES_LENGTH 5120  // Updated for UCR datasets (matches HYDRA)
+#define MAX_FEATURES 20000  // Increased for 4 pooling operators × 2 representations
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
 #define MAX_DILATIONS 8
-#define MAX_CLASSES 4
+#define MAX_CLASSES 10  // Increased to match HYDRA
+#define NUM_POOLING_OPERATORS 4  // PPV, MPV, MIPV, LSPV
+#define NUM_REPRESENTATIONS 2  // Original + First-order difference
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)
 extern const int_t kernel_indices[NUM_KERNELS][3];
+
+// Structure to hold all four pooling operator results
+struct PoolingStats {
+    data_t ppv;   // Proportion of Positive Values
+    data_t mpv;   // Mean of Positive Values
+    data_t mipv;  // Mean of Indices of Positive Values
+    data_t lspv;  // Longest Stretch of Positive Values
+};
 
 // HLS-optimized structure for model parameters (arrays instead of vectors)
 struct MiniRocketModelParams_HLS {
@@ -85,6 +95,49 @@ void linear_classifier_predict_hls(
     data_t intercept[MAX_CLASSES],
     int_t num_features,
     int_t num_classes
+);
+
+// Pooling operator functions
+void compute_ppv(
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
+    data_t bias,
+    int_t length,
+    data_t* ppv_out
+);
+
+void compute_mpv(
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
+    data_t bias,
+    int_t length,
+    data_t* mpv_out
+);
+
+void compute_mipv(
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
+    data_t bias,
+    int_t length,
+    data_t* mipv_out
+);
+
+void compute_lspv(
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
+    data_t bias,
+    int_t length,
+    data_t* lspv_out
+);
+
+void compute_four_pooling_operators(
+    data_t convolutions[MAX_TIME_SERIES_LENGTH],
+    data_t bias,
+    int_t length,
+    PoolingStats* stats
+);
+
+// First-order difference computation
+void compute_first_order_difference(
+    data_t time_series[MAX_TIME_SERIES_LENGTH],
+    data_t diff_series[MAX_TIME_SERIES_LENGTH],
+    int_t length
 );
 
 #endif // MINIROCKET_INFERENCE_HLS_H

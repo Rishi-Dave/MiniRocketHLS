@@ -34,6 +34,9 @@ package.*/
 minirocket_hls_validate/
 multirocket_hls_validate/
 
+# Temporary script directories
+**/tmp*/
+
 # HLS-specific (ignore build logs)
 *.log
 *.jou
