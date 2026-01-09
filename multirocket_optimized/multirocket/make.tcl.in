@@ -18,11 +18,11 @@ config_interface -m_axi_max_widen_bitwidth=512
 config_rtl -register_reset_num=3
 config_export -format xo
 
-add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/minirocket.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include"
-add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/minirocket.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include"
+add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/multirocket.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include"
+add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/multirocket_pooling.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include"
 
-add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/minirocket_hls_testbench_loader.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
-add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/test_minirocket.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
+add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/multirocket_hls_testbench_loader.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
+add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/test_multirocket.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
 
 
 #Check which command
@@ -31,9 +31,9 @@ set command [lindex $argv 2]
 if {$command == "synthesis"} {
    csynth_design
 } elseif {$command == "csim"} {
-   csim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model_test_data.json csim"
+   csim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/../models/multirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/../models/multirocket_model_test_data.json csim full"
 } elseif {$command == "cosim"} {
-   cosim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/../minirocket_model_test_data.json cosim"
+   cosim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/../models/multirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/../models/multirocket_model_test_data.json cosim"
 } elseif {$command == "ip"} {
    export_design -format xo
 } elseif {$command == "installip"} {

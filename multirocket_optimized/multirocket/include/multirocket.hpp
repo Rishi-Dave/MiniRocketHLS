@@ -12,17 +12,17 @@ typedef ap_int<32> int_t;           // 32-bit signed integer
 typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 
 // Constants for MultiRocket (compile-time known)
-#define MAX_TIME_SERIES_LENGTH 5120  // Updated for UCR datasets (matches HYDRA)
-#define MAX_FEATURES 20000  // Increased for 4 pooling operators × 2 representations
+#define MAX_TIME_SERIES_LENGTH 8192  // Updated for UCR datasets (matches HYDRA)
+#define MAX_FEATURES 50000  // Increased for 4 pooling operators × 2 representations
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
-#define MAX_DILATIONS 8
-#define MAX_CLASSES 10  // Increased to match HYDRA
+#define MAX_DILATIONS 32
+#define MAX_CLASSES 16  // Increased to match HYDRA
 #define NUM_POOLING_OPERATORS 4  // PPV, MPV, MIPV, LSPV
 #define NUM_REPRESENTATIONS 2  // Original + First-order difference
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)
-extern const int_t kernel_indices[NUM_KERNELS][3];
+// extern const int_t kernel_indices[NUM_KERNELS][3];
 
 // Structure to hold all four pooling operator results
 struct PoolingStats {
@@ -57,14 +57,21 @@ extern "C" void multirocket_inference(
     data_t* intercept,              // Model intercept
     data_t* scaler_mean,            // Scaler mean values
     data_t* scaler_scale,           // Scaler scale values
-    int_t* dilations,               // Dilation values
-    int_t* num_features_per_dilation, // Features per dilation
-    data_t* biases,                 // Bias values
+    int_t* dilations_0,               // Dilation values
+    int_t* num_features_per_dilation_0, // Features per dilation
+    data_t* biases_0,                 // Bias values
+    int_t num_dilations_0,
+    int_t num_features_0,
+    int_t* dilations_1,               // Dilation values
+    int_t* num_features_per_dilation_1, // Features per dilation
+    data_t* biases_1,                 // Bias values
+    int_t num_dilations_1,
+    int_t num_features_1,
     int_t time_series_length,
     int_t num_features,
     int_t num_classes,
-    int_t num_dilations
-);
+    int_t n_feature_per_kernel
+);//
 
 // HLS-optimized MultiRocket feature extraction
 void multirocket_feature_extraction_hls(
@@ -75,7 +82,9 @@ void multirocket_feature_extraction_hls(
     data_t biases[MAX_FEATURES],
     int_t time_series_length,
     int_t num_dilations,
-    int_t num_features
+    int_t num_features,
+    int_t n_feature_per_kernel,
+    int_t starting_feature_idx
 );
 
 // HLS-optimized scaling function
@@ -129,6 +138,7 @@ void compute_lspv(
 void compute_four_pooling_operators(
     data_t convolutions[MAX_TIME_SERIES_LENGTH],
     data_t bias,
+    int_t start,
     int_t length,
     PoolingStats* stats
 );

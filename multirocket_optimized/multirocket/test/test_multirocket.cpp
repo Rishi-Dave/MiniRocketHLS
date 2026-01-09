@@ -11,11 +11,13 @@ int main(int argc, char* argv[]) {
     std::string model_file = "minirocket_model.json";
     std::string test_file = "minirocket_model_test_data.json";
     bool csim;
+    bool full;
     // Allow command line arguments like C++ version
     if (argc >= 4) {
         model_file = argv[1];
         test_file = argv[2];
         csim = (std::string(argv[3]) == "csim") ? true : false;
+        full = (argc >=5 && std::string(argv[4]) == "full") ? true : false;
     }
     
     std::cout << "HLS MiniRocket Test" << std::endl;
@@ -31,22 +33,34 @@ int main(int argc, char* argv[]) {
     data_t *intercept = new data_t[MAX_CLASSES];
     data_t *scaler_mean = new data_t[MAX_FEATURES];
     data_t *scaler_scale = new data_t[MAX_FEATURES];
-    int_t *dilations = new int_t[MAX_DILATIONS];
-    int_t *num_features_per_dilation = new int_t[MAX_DILATIONS];
-    data_t *biases = new data_t[MAX_FEATURES];
+   
     
-    int_t num_dilations, num_features, num_classes, time_series_length;
+    int_t *dilations_0 = new int_t[MAX_DILATIONS];
+    int_t *num_features_per_dilation_0 = new int_t[MAX_DILATIONS];
+    data_t *biases_0 = new data_t[MAX_FEATURES];
+
+    int_t *dilations_1 = new int_t[MAX_DILATIONS];
+    int_t *num_features_per_dilation_1 = new int_t[MAX_DILATIONS];
+    data_t *biases_1 = new data_t[MAX_FEATURES];
     
+    int_t num_dilations_out_0, num_features_out_0;
+    int_t num_dilations_out_1, num_features_out_1;
+    int_t num_classes, time_series_length, n_feature_per_kernel;
+
     // Load model into HLS arrays
     std::cout << "Loading model..." << std::endl;
     if (!loader.load_model_to_hls_arrays(model_file, coefficients, intercept, 
-                                        scaler_mean, scaler_scale, dilations,
-                                        num_features_per_dilation, biases,
-                                        num_dilations, num_features, num_classes,
-                                        time_series_length)) {
+                                        scaler_mean, scaler_scale, dilations_0,
+                                        num_features_per_dilation_0, biases_0,
+                                        num_dilations_out_0, num_features_out_0,
+                                        dilations_1, num_features_per_dilation_1, biases_1,
+                                        num_dilations_out_1, num_features_out_1,
+                                        num_classes, time_series_length, n_feature_per_kernel)) {
         std::cerr << "Failed to load model!" << std::endl;
         return 1;
     }
+
+    int_t num_features = (num_features_out_0 + num_features_out_1) * n_feature_per_kernel;
 
     for (int i = 0; i < num_classes * num_features; i++) {
         int row = i / num_features;
@@ -94,16 +108,21 @@ int main(int argc, char* argv[]) {
     std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;
     std::cout << std::string(60, '=') << std::endl;
 
-    if (csim) {
+    if (csim && !full) {
         std::cout << "Running in C simulation mode (limited to 1000 samples)..." << std::endl;
 
         for (int test_idx = 0; test_idx < num_tests; test_idx++) {
             // Copy input to HLS array (heap allocated to avoid stack overflow)
             data_t *time_series = new data_t[MAX_TIME_SERIES_LENGTH];
+            data_t *diff_time_series = new data_t[MAX_TIME_SERIES_LENGTH-1];
             int input_length = std::min((int)test_inputs[test_idx].size(), MAX_TIME_SERIES_LENGTH);
 
             for (int i = 0; i < input_length; i++) {
                 time_series[i] = test_inputs[test_idx][i];
+            }
+
+            for (int i = 0; i < input_length - 1; i++) {
+                diff_time_series[i] = test_inputs[test_idx][i + 1] - test_inputs[test_idx][i];
             }
 
             // Show detailed output for first test sample only
@@ -131,16 +150,34 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running cumulative convolution with α=-1, γ=2..." << std::endl;
             }
 
+            //std::cout << "Regular time series convolution..." << std::endl;
             multirocket_feature_extraction_hls(
                 time_series,
                 features,
-                dilations,
-                num_features_per_dilation,
-                biases,
+                dilations_0,
+                num_features_per_dilation_0,
+                biases_0,
                 input_length,
-                num_dilations,
-                num_features
+                num_dilations_out_0,
+                num_features_out_0,
+                n_feature_per_kernel,
+                0
             );
+
+            //std::cout << "Differenced time series convolution..." << std::endl;
+            multirocket_feature_extraction_hls(
+                diff_time_series,
+                features,
+                dilations_1,
+                num_features_per_dilation_1,
+                biases_1,
+                input_length - 1,
+                num_dilations_out_1,
+                num_features_out_1,
+                n_feature_per_kernel,
+                ((num_features_out_1 + num_features_out_0) * n_feature_per_kernel)/2
+            );
+
 
             if (test_idx == 0) {
                 std::cout << "\n=== C++: Extracted Features ===" << std::endl;
@@ -192,6 +229,12 @@ int main(int argc, char* argv[]) {
 
                 std::cout << "Scaled features (first 10): ";
                 for (int i = 0; i < std::min(10, (int)num_features); i++) {
+                    std::cout << std::fixed << std::setprecision(6) << scaled_features[i] << " ";
+                }
+                std::cout << std::endl;
+
+                std::cout << "Scaled features (last 10): ";
+                for (int i = num_features-10; i <num_features; i++) {
                     std::cout << std::fixed << std::setprecision(6) << scaled_features[i] << " ";
                 }
                 std::cout << std::endl;
@@ -292,6 +335,7 @@ int main(int argc, char* argv[]) {
             
             // Cleanup
             delete[] time_series;
+            delete[] diff_time_series;
             delete[] features;
             delete[] scaled_features;
             delete[] predictions;
@@ -306,19 +350,26 @@ int main(int argc, char* argv[]) {
             for (int i = 0; i < input_length; i++) {
                 time_series[i] = test_inputs[test_idx][i];
             }
-            // data_t* time_series_input,      // Input time series
-            // data_t* prediction_output,      // Output predictions
-            // data_t* coefficients,           // Model coefficients (flattened)
-            // data_t* intercept,              // Model intercept
-            // data_t* scaler_mean,            // Scaler mean values
-            // data_t* scaler_scale,           // Scaler scale values
-            // int_t* dilations,               // Dilation values
-            // int_t* num_features_per_dilation, // Features per dilation
-            // data_t* biases,                 // Bias values
-            // int_t time_series_length,
-            // int_t num_features,
-            // int_t num_classes,
-            // int_t num_dilations
+    // data_t* time_series_input,      // Input time series
+    // data_t* prediction_output,      // Output predictions
+    // data_t* coefficients,           // Model coefficients (flattened)
+    // data_t* intercept,              // Model intercept
+    // data_t* scaler_mean,            // Scaler mean values
+    // data_t* scaler_scale,           // Scaler scale values
+    // int_t* dilations_0,               // Dilation values
+    // int_t* num_features_per_dilation_0, // Features per dilation
+    // data_t* biases_0,                 // Bias values
+    // int_t num_dilations_0,
+    // int_t num_features_0
+    // int_t* dilations_1,               // Dilation values
+    // int_t* num_features_per_dilation_1, // Features per dilation
+    // data_t* biases_1,                 // Bias values
+    // int_t num_dilations_1,
+    // int_t num_features_1,
+    // int_t time_series_length,
+    // int_t num_features,
+    // int_t num_classes,
+    // int_t n_feature_per_kernel
             multirocket_inference(
                 time_series,
                 predictions,
@@ -326,13 +377,20 @@ int main(int argc, char* argv[]) {
                 intercept,
                 scaler_mean,
                 scaler_scale,
-                dilations,
-                num_features_per_dilation,
-                biases,
+                dilations_0,
+                num_features_per_dilation_0,
+                biases_0,
+                num_dilations_out_0,
+                num_features_out_0,
+                dilations_1,
+                num_features_per_dilation_1,
+                biases_1,
+                num_dilations_out_1,
+                num_features_out_1,
                 input_length,
                 num_features,
                 num_classes,
-                num_dilations
+                n_feature_per_kernel
             );
             // Find predicted class
             int predicted_class = 0;
@@ -422,9 +480,14 @@ int main(int argc, char* argv[]) {
     delete[] intercept;
     delete[] scaler_mean;
     delete[] scaler_scale;
-    delete[] dilations;
-    delete[] num_features_per_dilation;
-    delete[] biases;
+
+    delete[] dilations_0;
+    delete[] num_features_per_dilation_0;
+    delete[] biases_0;
+
+    delete[] dilations_1;
+    delete[] num_features_per_dilation_1;
+    delete[] biases_1;
 
     // Determine success criteria
     bool success;

@@ -25,17 +25,28 @@ public:
     // Load model and populate HLS arrays (testbench only)
     bool load_model_to_hls_arrays(
         const std::string& model_filename,
+        // Classifier parameters
         data_t coefficients[MAX_CLASSES][MAX_FEATURES],
         data_t intercept[MAX_CLASSES],
+        // Scaler parameters
         data_t scaler_mean[MAX_FEATURES],
         data_t scaler_scale[MAX_FEATURES],
-        int_t dilations[MAX_DILATIONS],
-        int_t num_features_per_dilation[MAX_DILATIONS],
-        data_t biases[MAX_FEATURES],
-        int_t& num_dilations,
-        int_t& num_features,
-        int_t& num_classes,
-        int_t& time_series_length
+        // Model architecture
+        int_t dilations_0[MAX_DILATIONS],
+        int_t num_features_per_dilation_0[MAX_DILATIONS],
+        data_t biases_0[MAX_FEATURES],
+        int_t& num_dilations_out_0,
+        int_t& num_features_out_0,
+
+        int_t dilations_1[MAX_DILATIONS],
+        int_t num_features_per_dilation_1[MAX_DILATIONS],
+        data_t biases_1[MAX_FEATURES],
+        int_t& num_dilations_out_1,
+        int_t& num_features_out_1,
+
+        int_t& num_classes_out,
+        int_t& time_series_length_out,
+        int_t& n_feature_per_kernel
     );
     
     // Load test data for verification (testbench only)

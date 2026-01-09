@@ -189,52 +189,75 @@ std::vector<std::vector<float>> MiniRocketTestbenchLoader::parse_2d_float_array(
 
 bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     const std::string& model_filename,
+    // Classifier parameters
     data_t coefficients[MAX_CLASSES][MAX_FEATURES],
     data_t intercept[MAX_CLASSES],
+    // Scaler parameters
     data_t scaler_mean[MAX_FEATURES],
     data_t scaler_scale[MAX_FEATURES],
-    int_t dilations[MAX_DILATIONS],
-    int_t num_features_per_dilation[MAX_DILATIONS],
-    data_t biases[MAX_FEATURES],
-    int_t& num_dilations_out,
-    int_t& num_features_out,
+    // Model architecture
+    int_t dilations_0[MAX_DILATIONS],
+    int_t num_features_per_dilation_0[MAX_DILATIONS],
+    data_t biases_0[MAX_FEATURES],
+    int_t& num_dilations_out_0,
+    int_t& num_features_out_0,
+
+    int_t dilations_1[MAX_DILATIONS],
+    int_t num_features_per_dilation_1[MAX_DILATIONS],
+    data_t biases_1[MAX_FEATURES],
+    int_t& num_dilations_out_1,
+    int_t& num_features_out_1,
+
     int_t& num_classes_out,
-    int_t& time_series_length_out
+    int_t& time_series_length_out,
+    int_t& n_feature_per_kernel
 ) {
 
     std::cout << "Reading model file: " << model_filename << std::endl;
     std::string content = read_file(model_filename);
     if (content.empty()) return false;
     
-    // Parse basic parameters
-    num_dilations_out = parse_int_value(content, "num_dilations");
-    num_features_out = parse_int_value(content, "num_features");
     num_classes_out = parse_int_value(content, "num_classes");
     time_series_length_out = parse_int_value(content, "time_series_length");
+    n_feature_per_kernel = parse_int_value(content, "n_feature_per_kernel");
+
+    // Parse basic parameters
+    num_dilations_out_0 = parse_int_value(content, "num_dilations_0");
+    num_features_out_0 = parse_int_value(content, "num_features_0");
+    num_dilations_out_1 = parse_int_value(content, "num_dilations_1");
+    num_features_out_1 = parse_int_value(content, "num_features_1");
 
     std::cout << "Parsed model parameters:" << std::endl;
-    std::cout << "  num_dilations: " << num_dilations_out << std::endl;
-    std::cout << "  num_features: " << num_features_out << std::endl;
+    std::cout << "  num_dilations: " << num_dilations_out_0 << ", " << num_dilations_out_1 << std::endl;
+    std::cout << "  num_features: " << num_features_out_0 << ", " << num_features_out_1 << std::endl;
     std::cout << "  num_classes: " << num_classes_out << std::endl;
     std::cout << "  time_series_length: " << time_series_length_out << std::endl;
     
-    if (num_dilations_out > MAX_DILATIONS || num_features_out > MAX_FEATURES || num_classes_out > MAX_CLASSES) {
+    if (num_dilations_out_0 > MAX_DILATIONS || num_features_out_0 > MAX_FEATURES || num_classes_out > MAX_CLASSES) {
         std::cerr << "Error: Model parameters exceed HLS limits" << std::endl;
         return false;
     }
     
     // Parse arrays
-    auto dilations_vec = parse_int_array(content, "dilations");
-    auto num_features_per_dilation_vec = parse_int_array(content, "num_features_per_dilation");
-    auto biases_vec = parse_float_array(content, "biases");
+    auto dilations_vec_0 = parse_int_array(content, "dilations_0");
+    auto num_features_per_dilation_vec_0 = parse_int_array(content, "num_features_per_dilation_0");
+    auto biases_vec_0 = parse_float_array(content, "biases_0");
+    auto dilations_vec_1 = parse_int_array(content, "dilations_1");
+    auto num_features_per_dilation_vec_1 = parse_int_array(content, "num_features_per_dilation_1");
+    auto biases_vec_1 = parse_float_array(content, "biases_1");
+
     auto scaler_mean_vec = parse_float_array(content, "scaler_mean");
     auto scaler_scale_vec = parse_float_array(content, "scaler_scale");
     auto intercept_vec = parse_float_array(content, "classifier_intercept");
     
     std::cout << "Parsed model arrays." << std::endl;
-    std::cout << "  dilations size: " << dilations_vec.size() << std::endl;
-    std::cout << "  num_features_per_dilation size: " << num_features_per_dilation_vec.size() << std::endl;
-    std::cout << "  biases size: " << biases_vec.size() << std::endl;
+    std::cout << "  dilations_0 size: " << dilations_vec_0.size() << std::endl;
+    std::cout << "  num_features_per_dilation_0 size: " << num_features_per_dilation_vec_0.size() << std::endl;
+    std::cout << "  biases_0 size: " << biases_vec_0.size() << std::endl;
+    std::cout << "  dilations_1 size: " << dilations_vec_1.size() << std::endl;
+    std::cout << "  num_features_per_dilation_1 size: " << num_features_per_dilation_vec_1.size() << std::endl;
+    std::cout << "  biases_1 size: " << biases_vec_1.size() << std::endl;
+    
     std::cout << "  scaler_mean size: " << scaler_mean_vec.size() << std::endl;
     std::cout << "  scaler_scale size: " << scaler_scale_vec.size() << std::endl;
     std::cout << "  intercept size: " << intercept_vec.size() << std::endl;
@@ -258,14 +281,25 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     std::cout << "  Coefficients size: " << coef_2d.size() << " x " << (coef_2d.empty() ? 0 : coef_2d[0].size()) << std::endl;
 
     // Copy to HLS arrays
-    for (int i = 0; i < num_dilations_out; i++) {
-        dilations[i] = dilations_vec[i];
-        num_features_per_dilation[i] = num_features_per_dilation_vec[i];
-        printf("dilations[%d] = %d, num_features_per_dilation[%d] = %d\n", i, dilations[i], i, num_features_per_dilation[i]);
+    for (int i = 0; i < num_dilations_out_0; i++) {
+        dilations_0[i] = dilations_vec_0[i];
+        num_features_per_dilation_0[i] = num_features_per_dilation_vec_0[i];
+    }
+
+    for (int i = 0; i < num_dilations_out_1; i++) {
+        dilations_1[i] = dilations_vec_1[i];
+        num_features_per_dilation_1[i] = num_features_per_dilation_vec_1[i];
     }
     
-    for (int i = 0; i < num_features_out; i++) {
-        biases[i] = biases_vec[i];
+    for (int i = 0; i < num_features_out_0; i++) {
+        biases_0[i] = biases_vec_0[i];
+    }
+
+    for (int i = 0; i < num_features_out_1; i++) {
+        biases_1[i] = biases_vec_1[i];
+    }
+
+    for (int i = 0; i < (num_features_out_0 + num_features_out_1) * n_feature_per_kernel; i++) {
         scaler_mean[i] = scaler_mean_vec[i];
         scaler_scale[i] = scaler_scale_vec[i];
     }
@@ -283,15 +317,15 @@ bool MiniRocketTestbenchLoader::load_model_to_hls_arrays(
     }
     
     for (int i = 0; i < num_classes_out; i++) {
-        for (int j = 0; j < num_features_out; j++) {
+        for (int j = 0; j < (num_features_out_0 + num_features_out_1) * n_feature_per_kernel; j++) {
             coefficients[i][j] = coef_2d[i][j];
         }
     }
     
     std::cout << "Model loaded successfully into HLS arrays:" << std::endl;
-    std::cout << "  Features: " << num_features_out << std::endl;
+    std::cout << "  Features: " << num_features_out_0 << ", " << num_features_out_1 << std::endl;
     std::cout << "  Classes: " << num_classes_out << std::endl;
-    std::cout << "  Dilations: " << num_dilations_out << std::endl;
+    std::cout << "  Dilations: " << num_dilations_out_0 << ", " << num_dilations_out_1 << std::endl;
     
     return true;
 }

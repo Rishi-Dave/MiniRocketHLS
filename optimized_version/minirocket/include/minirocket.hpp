@@ -16,7 +16,7 @@ typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 #define MAX_FEATURES 10000
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
-#define MAX_DILATIONS 8
+#define MAX_DILATIONS 10
 #define MAX_CLASSES 4
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)

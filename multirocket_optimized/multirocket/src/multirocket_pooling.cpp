@@ -140,9 +140,76 @@ void compute_lspv(
  * OPTIMIZATION NOTE: Single-pass computation reduces memory bandwidth
  * All operators computed from same convolution array
  */
+// void compute_four_pooling_operators(
+//     data_t convolutions[MAX_TIME_SERIES_LENGTH],
+//     data_t bias,
+//     int_t start,
+//     int_t length,
+//     PoolingStats* stats
+// ) {
+//     #pragma HLS INLINE off
+//     // Note: Not pipelining outer function, but inner loop is pipelined
+
+//     // Accumulators for all 4 operators
+//     int_t ppv_count = 0;
+//     data_t mpv_sum = 0.0;
+//     int_t mpv_count = 0;
+//     int_t mipv_index_sum = 0;
+//     int_t mipv_count = 0;
+//     int_t lspv_current = 0;
+//     int_t lspv_max = 0;
+
+//     // Single pass computes all 4 operators simultaneously
+//     POOLING_LOOP: for (int_t i = start; i < length; i++) {
+//         #pragma HLS PIPELINE II=1
+//         #pragma HLS LOOP_TRIPCOUNT min=100 max=512 avg=250
+
+//         bool is_positive = (convolutions[i] > bias);
+
+//         if (is_positive) {
+//             // PPV
+//             ppv_count++;
+
+//             // MPV
+//             mpv_sum += convolutions[i];
+//             mpv_count++;
+
+//             // MIPV
+//             mipv_index_sum += i;
+//             mipv_count++;
+
+//             // LSPV
+//             lspv_current++;
+//             if (lspv_current > lspv_max) {
+//                 lspv_max = lspv_current;
+//             }
+//         } else {
+//             lspv_current = 0;
+//         }
+//     }
+
+//     // Compute final values
+//     stats->ppv = (data_t)ppv_count / (data_t)length;
+
+//     if (mpv_count > 0) {
+//         stats->mpv = mpv_sum / (data_t)mpv_count;
+//     } else {
+//         stats->mpv = 0.0;
+//     }
+
+//     if (mipv_count > 0) {
+//         stats->mipv = (data_t)mipv_index_sum / ((data_t)mipv_count * (data_t)length);
+//     } else {
+//         stats->mipv = 0.0;
+//     }
+
+//     stats->lspv = (data_t)lspv_max / (data_t)length;
+// }
+
 void compute_four_pooling_operators(
     data_t convolutions[MAX_TIME_SERIES_LENGTH],
     data_t bias,
+    int_t start,
     int_t length,
     PoolingStats* stats
 ) {
@@ -150,57 +217,37 @@ void compute_four_pooling_operators(
     // Note: Not pipelining outer function, but inner loop is pipelined
 
     // Accumulators for all 4 operators
-    int_t ppv_count = 0;
-    data_t mpv_sum = 0.0;
-    int_t mpv_count = 0;
-    int_t mipv_index_sum = 0;
-    int_t mipv_count = 0;
-    int_t lspv_current = 0;
-    int_t lspv_max = 0;
-
+    int_t ppv = 0;
+    int_t last_val = 0;
+    data_t max_stretch = 0.0;
+    int_t mean_index = 0;
+    data_t mean = 0;
+    data_t stretch = 0.0;
     // Single pass computes all 4 operators simultaneously
-    POOLING_LOOP: for (int_t i = 0; i < length; i++) {
+    POOLING_LOOP: for (int_t i = start; i < length; i++) {
         #pragma HLS PIPELINE II=1
         #pragma HLS LOOP_TRIPCOUNT min=100 max=512 avg=250
 
-        bool is_positive = (convolutions[i] > bias);
-
-        if (is_positive) {
-            // PPV
-            ppv_count++;
-
-            // MPV
-            mpv_sum += convolutions[i];
-            mpv_count++;
-
-            // MIPV
-            mipv_index_sum += i;
-            mipv_count++;
-
-            // LSPV
-            lspv_current++;
-            if (lspv_current > lspv_max) {
-                lspv_max = lspv_current;
+        if (convolutions[i] > bias) {
+            ppv += 1;
+            mean_index += (i - start);
+            mean += convolutions[i] + bias;
+        }else if (convolutions[i] < bias) {
+            stretch = (i - start) - last_val;
+            if (stretch > max_stretch) {
+                max_stretch = stretch;
             }
-        } else {
-            lspv_current = 0;
+            last_val = (i - start);
         }
+    }
+    stretch = (length - start) - 1 - last_val;
+    if (stretch > max_stretch) {
+        max_stretch = stretch;
     }
 
     // Compute final values
-    stats->ppv = (data_t)ppv_count / (data_t)length;
-
-    if (mpv_count > 0) {
-        stats->mpv = mpv_sum / (data_t)mpv_count;
-    } else {
-        stats->mpv = 0.0;
-    }
-
-    if (mipv_count > 0) {
-        stats->mipv = (data_t)mipv_index_sum / ((data_t)mipv_count * (data_t)length);
-    } else {
-        stats->mipv = 0.0;
-    }
-
-    stats->lspv = (data_t)lspv_max / (data_t)length;
+    stats->ppv = (data_t)ppv / (data_t)(length - start);
+    stats->mpv = max_stretch;
+    stats->mipv = (ppv > 0) ? (data_t)mean / (data_t)ppv : 0.0;
+    stats->lspv = (ppv > 0) ? (data_t)mean_index / (data_t)ppv : -1.0;
 }
