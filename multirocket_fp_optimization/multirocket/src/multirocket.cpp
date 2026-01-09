@@ -2,10 +2,27 @@
 #include <cstring>
 
 
-static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
-    #include "../include/weights.txt"
+static ap_uint<1> weights[NUM_KERNELS][KERNEL_SIZE] = {
+    #include "../include/weights01.txt"
 };
 
+
+data_t optimized_fp_multiply(ap_uint<1> x, data_t y) {
+    #pragma HLS INTERFACE s_axilite port=x bundle=control
+    #pragma HLS INTERFACE s_axilite port=y bundle=control
+    #pragma HLS INTERFACE s_axilite port=return bundle=control
+
+    #pragma HLS PIPELINE
+
+    float_num_t yb;
+    yb.fp_num = y;
+
+    yb.sign = ~(yb.sign ^ x);
+    yb.bexp = yb.bexp + x;
+    yb.mant = yb.mant;
+    
+    return yb.fp_num;
+}
 // HLS-optimized convolution with specific kernel and dilation
 void apply_kernel_hls(
     data_t time_series[MAX_TIME_SERIES_LENGTH],

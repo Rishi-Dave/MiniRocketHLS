@@ -14,8 +14,11 @@ ucr_benchmark
 ucr_benchmark_4cu
 minirocket_host
 multirocket_host
-host
+# host
 test_hls
+
+*.csv
+*.json
 
 # Build directories
 build/
