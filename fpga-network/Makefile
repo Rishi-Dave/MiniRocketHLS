@@ -22,7 +22,7 @@ SHELL := /bin/bash
 
 help::
 	$(ECHO) "Makefile Usage:"
-	$(ECHO) "  make all TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform> HOST_ARCH=<aarch32/aarch64/x86> EDGE_COMMON_SW=<rootfs and kernel image path>"
+	$(ECHO) "  make build PLATFORM=<FPGA platform>"
 	$(ECHO) "      Command to generate the design for specified Target and Shell."
 	$(ECHO) ""
 	$(ECHO) "  make clean "
@@ -31,23 +31,7 @@ help::
 	$(ECHO) "  make cleanall"
 	$(ECHO) "      Command to remove all the generated files."
 	$(ECHO) ""
-	$(ECHO) "  make test PLATFORM=<FPGA platform>"
-	$(ECHO) "      Command to run the application. This is same as 'run' target but does not have any makefile dependency."
-	$(ECHO) ""
-	$(ECHO) "  make sd_card TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform> HOST_ARCH=<aarch32/aarch64/x86> EDGE_COMMON_SW=<rootfs and kernel image path>"
-	$(ECHO) "      Command to prepare sd_card files."
-	$(ECHO) ""
-	$(ECHO) "  make run TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform> HOST_ARCH=<aarch32/aarch64/x86> EDGE_COMMON_SW=<rootfs and kernel image path>"
-	$(ECHO) "      Command to run application in emulation."
-	$(ECHO) ""
-	$(ECHO) "  make build TARGET=<sw_emu/hw_emu/hw> PLATFORM=<FPGA platform> HOST_ARCH=<aarch32/aarch64/x86> EDGE_COMMON_SW=<rootfs and kernel image path>"
-	$(ECHO) "      Command to build xclbin application."
-	$(ECHO) ""
-	$(ECHO) "  make host HOST_ARCH=<aarch32/aarch64/x86> EDGE_COMMON_SW=<rootfs and kernel image path>"
-	$(ECHO) "      Command to build host application."
-	$(ECHO) "      By default, HOST_ARCH=x86. HOST_ARCH and EDGE_COMMON_SW are required for SoC shells. Please download and use the pre-built image from - "
-	$(ECHO) "      https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-platforms.html"
-	$(ECHO) ""
+
 
 ############################## Setting up Project Variables ##############################
 # Points to top directory of Git repository
@@ -57,149 +41,87 @@ PWD = $(shell readlink -f .)
 XF_PROJ_ROOT = $(shell readlink -f $(COMMON_REPO))
 
 TARGET := hw
-HOST_ARCH := x86
-SYSROOT := 
+
 IPREPOPATH ?= ./iprepo
 export IPREPOPATH
 include ./utils.mk
+include ./opencl.mk
+
 
 XSA := 
 ifneq ($(PLATFORM), )
 XSA := $(call device2xsa, $(PLATFORM))
 endif
-TEMP_DIR := ./_x.$(TARGET).$(XSA)
+
+TEMP_DIR := _x.$(XSA)
 BUILD_DIR := ./build_dir.$(TARGET).$(XSA)
-IP_REPO := ./build/iprepo
-STATIC_IP_REPO := ./static_xo
+NETLAYERDIR := ./NetLayers/
+CMACDIR := ./cmac_krnl/
+
+MINIROCKET_XO_REPO := ./build/iprepo
+NETLAYER_XO_REPO := $(NETLAYERDIR)$(TEMP_DIR)
+NETLAYERHLS = 100G-fpga-network-stack-core
+CMAC_XO_REPO := $(CMACDIR)$(TEMP_DIR)
+
+HLS_IP_FOLDER  = $(shell readlink -f ./$(NETLAYERDIR)$(NETLAYERHLS)/synthesis_results_HBM)
+LIST_REPOS := --user_ip_repo_paths $(HLS_IP_FOLDER) --user_ip_repo_paths $(IPREPOPATH)
 
 HOST_DIR := ./host
 
-# SoC variables
-RUN_APP_SCRIPT = ./run_app.sh
-PACKAGE_OUT = ./package.$(TARGET)
-
-LAUNCH_EMULATOR = $(PACKAGE_OUT)/launch_$(TARGET).sh
-RESULT_STRING = TEST PASSED
-
 VPP := v++
-VPP_PFLAGS := 
-CMD_ARGS = $(BUILD_DIR)/krnl.xclbin minirocket_model.json minirocket_model_test_data.json
-SDCARD := sd_card
-
-include ./opencl.mk
 CXXFLAGS += $(opencl_CXXFLAGS) -Wall -O0 -g -std=c++1y
 LDFLAGS += $(opencl_LDFLAGS)
 
 INCLUDES = ./src
-CMAC_KRNL:=cmac_0
 
-########################## Checking if PLATFORM in whitelist #######################
-PLATFORM_BLOCKLIST += nodma 
+MINIROCKET_KRNL := minirocket_inference
+NETLAYER_KRNL := networklayer
+CMAC_KRNL:=cmac_krnl
+include config_cmac.mk
+XOs += $(MINIROCKET_XO_REPO)/$(MINIROCKET_KRNL).xo $(NETLAYER_XO_REPO)/$(NETLAYER_KRNL).xo $(CMAC_XO_REPO)/${CMAC_KRNL}.xo
+
 ############################## Setting up Host Variables ##############################
-#Include Required Host Source Files
+
 HOST_SRCS += $(HOST_DIR)/src/minirocket_host.cpp $(HOST_DIR)/src/minirocket_loader.cpp
-
-
-# Host compiler global settings
 CXXFLAGS += -fmessage-length=0 -I$(INCLUDES) -I${HOST_DIR}/include
 LDFLAGS += -lrt -lstdc++ 
 
-ifneq ($(HOST_ARCH), x86)
-	LDFLAGS += --sysroot=$(SYSROOT)
-endif
-
 ############################## Setting up Kernel Variables ##############################
-# Kernel compiler global settings
 VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM) --save-temps -I$(INCLUDES) --config config.cfg
 ifneq ($(TARGET), hw)
 	VPP_FLAGS += -g
 endif
 
-NETLAYERDIR = ./networklayer/
-HLS_IP_FOLDER  = $(shell readlink -f ./$(NETLAYERDIR))
-LIST_REPOS := --user_ip_repo_paths $(HLS_IP_FOLDER) 
 
-
-EXECUTABLE = ./minirocket_host
-EMCONFIG_DIR = $(TEMP_DIR)
-EMU_DIR = $(SDCARD)/data/emulation
 
 ############################## Declaring Binary Containers ##############################
-BINARY_CONTAINERS += $(BUILD_DIR)/krnl.xclbin
-#BINARY_CONTAINER_krnl_OBJS += $(TEMP_DIR)/krnl.xo
+XLCBIN += $(BUILD_DIR)/krnl.xclbin
+EXECUTABLE = ./minirocket_host
 
 ############################## Setting Targets ##############################
 CP = cp -rf
 
-.PHONY: all clean cleanall docs emconfig
-all: check-platform check-device check-vitis $(EXECUTABLE) $(BINARY_CONTAINERS) emconfig sd_card
+.PHONY: all clean cleanall 
+all: check-platform check-device check-vitis $(EXECUTABLE) $(XLCBIN) 
 
 .PHONY: host
 host: $(EXECUTABLE)
 
 .PHONY: build
-build: check-vitis check-device $(BINARY_CONTAINERS)
+build: check-vitis check-device $(XLCBIN)
 
 .PHONY: xclbin
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
-BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/minirocket_inference.xo $(STATIC_IP_REPO)/networklayer.xo $(STATIC_IP_REPO)/${CMAC_KRNL}.xo
 
-$(BUILD_DIR)/krnl.xclbin: $(BINARY_CONTAINER_krnl_OBJS)
+$(XLCBIN): $(XOs)
 	mkdir -p $(BUILD_DIR)
 ifeq ($(HOST_ARCH), x86)
 	$(VPP) $(VPP_FLAGS) -l $(VPP_LDFLAGS) $(LIST_REPOS) --temp_dir $(TEMP_DIR) -o'$(BUILD_DIR)/krnl.link.xclbin' $(+)
 	$(VPP) -p $(BUILD_DIR)/krnl.link.xclbin -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) -o $(BUILD_DIR)/krnl.xclbin
 else
 	$(VPP) $(VPP_FLAGS) -l $(VPP_LDFLAGS) $(LIST_REPOS) --temp_dir $(TEMP_DIR) -o'$(BUILD_DIR)/krnl.xclbin' $(+)
-endif
-
-############################## Setting Rules for Host (Building Host Executable) ##############################
-$(EXECUTABLE): $(HOST_SRCS) | check-xrt
-		$(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
-
-emconfig:$(EMCONFIG_DIR)/emconfig.json
-$(EMCONFIG_DIR)/emconfig.json:
-	emconfigutil --platform $(PLATFORM) --od $(EMCONFIG_DIR)
-
-############################## Setting Essential Checks and Running Rules ##############################
-run: all
-ifeq ($(TARGET),$(filter $(TARGET),sw_emu hw_emu))
-ifeq ($(HOST_ARCH), x86)
-	$(CP) $(EMCONFIG_DIR)/emconfig.json .
-	XCL_EMULATION_MODE=$(TARGET) $(EXECUTABLE) $(CMD_ARGS)
-else
-	$(LAUNCH_EMULATOR) -run-app $(RUN_APP_SCRIPT) | tee run_app.log; exit $${PIPESTATUS[0]}
-endif
-else
-ifeq ($(HOST_ARCH), x86)
-	$(EXECUTABLE) $(CMD_ARGS)
-endif
-endif
-
-
-.PHONY: test
-test: $(EXECUTABLE)
-ifeq ($(TARGET),$(filter $(TARGET),sw_emu hw_emu))
-ifeq ($(HOST_ARCH), x86)
-	XCL_EMULATION_MODE=$(TARGET) $(EXECUTABLE) $(CMD_ARGS)
-else
-	$(LAUNCH_EMULATOR) -run-app $(RUN_APP_SCRIPT) | tee run_app.log; exit $${PIPESTATUS[0]}
-endif
-else
-ifeq ($(HOST_ARCH), x86)
-	$(EXECUTABLE) $(CMD_ARGS)
-else
-	$(ECHO) "Please copy the content of sd_card folder and data to an SD Card and run on the board"
-endif
-endif
-
-
-############################## Preparing sdcard ##############################
-sd_card: $(BINARY_CONTAINERS) $(EXECUTABLE) gen_run_app
-ifneq ($(HOST_ARCH), x86)
-	$(VPP) $(VPP_PFLAGS) -p $(BUILD_DIR)/krnl_vadd.xclbin -t $(TARGET) --platform $(PLATFORM) --package.out_dir $(PACKAGE_OUT) --package.rootfs $(EDGE_COMMON_SW)/rootfs.ext4 --package.sd_file $(SD_IMAGE_FILE) --package.sd_file xrt.ini --package.sd_file $(RUN_APP_SCRIPT) --package.sd_file $(EXECUTABLE) -o krnl_vadd.xclbin
 endif
 
 ############################## Cleaning Rules ##############################
