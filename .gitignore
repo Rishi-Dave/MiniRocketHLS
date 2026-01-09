@@ -16,6 +16,9 @@ minirocket_host
 
 *.csv
 
+*.csv
+*.json
+
 # Build directories
 build/
 build_*/
@@ -33,6 +36,9 @@ iprepo/
 *_hls_validate/
 minirocket_hls_validate/
 multirocket_hls_validate/
+
+# Temporary script directories
+**/tmp*/
 
 # HLS-specific (ignore build logs)
 *.log

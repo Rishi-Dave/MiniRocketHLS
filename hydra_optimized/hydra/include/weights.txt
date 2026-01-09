@@ -1,0 +1,14 @@
+# HYDRA Dictionary Kernel Weights
+# 512 kernels × 9 values each = 4,608 total weights
+# Format: One weight per line, kernels arranged sequentially
+# Kernel 0: weights[0-8], Kernel 1: weights[9-17], ..., Kernel 511: weights[4599-4607]
+#
+# NOTE: This file contains placeholder random weights.
+# To use trained weights, run: python scripts/train_hydra.py
+# which will generate actual dictionary kernels from training data.
+#
+# These weights are initialized with a simple pattern for testing:
+# - Positions 0, 3, 6: +1.0
+# - Positions 1, 4, 7: -0.5
+# - Positions 2, 5, 8: +0.5
+# This creates 512 kernels with slight variations based on kernel index.

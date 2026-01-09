@@ -11,12 +11,12 @@ typedef ap_int<32> int_t;           // 32-bit signed integer
 typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 
 // Constants for MiniRocket (compile-time known)
-#define MAX_TIME_SERIES_LENGTH 512
+#define MAX_TIME_SERIES_LENGTH 5120  // Updated for UCR datasets (matches HYDRA/MultiRocket)
 #define MAX_FEATURES 10000
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
 #define MAX_DILATIONS 8
-#define MAX_CLASSES 4
+#define MAX_CLASSES 10  // Increased to match HYDRA/MultiRocket
 
 // Fixed kernel indices (84 combinations of 3 indices from 0-8)
 extern const int_t kernel_indices[NUM_KERNELS][3];

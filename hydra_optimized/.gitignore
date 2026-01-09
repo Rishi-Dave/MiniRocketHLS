@@ -1,0 +1,223 @@
+# MiniRocket/MultiRocket FPGA Project - Git Ignore
+
+# ============================================
+# Build Artifacts & Binaries
+# ============================================
+
+# Compiled binaries
+*.o
+*.xo
+*.xclbin
+*.ltx
+batch_benchmark
+ucr_benchmark
+ucr_benchmark_4cu
+minirocket_host
+multirocket_host
+host
+test_hls
+
+# Build directories
+build/
+build_*/
+build_dir.*/
+_x/
+_x.*/
+logs_*/
+.ipcache/
+.run/
+.Xil/
+package.*/
+
+# HLS validation directories (can be large)
+*_hls_validate/
+minirocket_hls_validate/
+multirocket_hls_validate/
+
+# HLS-specific (ignore build logs)
+*.log
+*.jou
+*.str
+*.dir/
+*.pb
+*.pb3
+*_summary
+
+# Specific build logs to ignore
+**/build_*.log
+**/hw_build_full.log
+
+# Vitis HLS project files (generated)
+**/minirocket_hls/
+**/multirocket_hls/
+**/export_ip.tcl
+**/vitis_hls.log
+
+# Temporary build files
+**/*.cpp.bak
+**/*.h.bak
+**/*.hpp.bak
+
+# ============================================
+# Generated/Runtime Artifacts
+# ============================================
+
+# Results directories (generated at runtime)
+**/results/
+**/results/*.json
+**/results/*.txt
+**/results/*.csv
+
+# Testbench executables
+**/testbench/test_*
+**/testbench/*.exe
+
+# Third-party downloads (can be regenerated)
+**/third_party/
+
+# ============================================
+# Large Data Files (Don't commit to repo)
+# ============================================
+
+# Trained models in old locations (can be regenerated)
+*_fpga_model.json
+*_fpga_test.json
+minirocket_model.json
+minirocket_model_test_data.json
+minirocket_ucr_model.json
+minirocket_ucr_model_test_data.json
+multirocket_model.json
+multirocket_model_test_data.json
+
+# Models directory - keep structure but ignore large files
+**/models/*.json
+# Exception: Keep specific benchmark models if needed
+!**/models/example_*.json
+
+# UCR datasets (download separately)
+ucr_data/
+*.arff
+*.ts
+
+# ============================================
+# System & IDE Files
+# ============================================
+
+# OS-specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+.ipynb_checkpoints/
+
+# ============================================
+# Xilinx/Vitis Specific
+# ============================================
+
+# Vivado
+vivado*.log
+vivado*.jou
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+
+# Vitis
+*.compile_summary
+*.link_summary
+packaged_kernel*/
+tmp_kernel_pack*/
+_xocc*/
+
+# ============================================
+# Sensitive/Private Information
+# ============================================
+
+# Temporary process files
+*.pid
+
+# Credentials & keys
+*.pem
+*.key
+credentials.json
+.env
+
+# ============================================
+# Debug & Investigation Files
+# ============================================
+
+# Backup files
+*.backup
+*.bak
+*copy.cpp
+*copy.h
+*-old-*.py
+*-old-*.cpp
+*old-saved-for-ref*
+
+# ============================================
+# Keep These Files
+# ============================================
+
+# Essential source code
+!src/**/*.cpp
+!src/**/*.hpp
+!src/**/*.h
+!**/src/**/*.cpp
+!**/src/**/*.hpp
+!**/src/**/*.h
+!**/include/**/*.cpp
+!**/include/**/*.hpp
+!**/include/**/*.h
+!**/host/**/*.cpp
+!**/host/**/*.hpp
+!**/host/**/*.h
+!**/multirocket/**/*.cpp
+!**/multirocket/**/*.hpp
+!**/multirocket/**/*.h
+!**/minirocket/**/*.cpp
+!**/minirocket/**/*.hpp
+!**/minirocket/**/*.h
+
+# Essential scripts (keep organized structure)
+!**/scripts/*.py
+!**/scripts/*.sh
+!*.py
+!*.sh
+!*.tcl
+
+# Configuration (needed for builds)
+!config.cfg
+!config_4cu.cfg
+!**/config.cfg
+!**/config_4cu.cfg
+!CMakeLists.txt
+!**/CMakeLists.txt
+!Makefile
+!**/Makefile
+!*.mk
+
+# Documentation
+!*.md
+!**/docs/*.md
+!README.md
+!LICENSE
+
+# Keep cmake modules
+!**/cmake/**/*.cmake
+!**/cmake/Find*.cmake
