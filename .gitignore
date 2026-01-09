@@ -13,9 +13,8 @@ batch_benchmark
 ucr_benchmark
 ucr_benchmark_4cu
 minirocket_host
-multirocket_host
-# host
-test_hls
+
+*.csv
 
 *.csv
 *.json
@@ -30,7 +29,8 @@ logs_*/
 .ipcache/
 .run/
 .Xil/
-package.*/
+
+iprepo/
 
 # HLS validation directories (can be large)
 *_hls_validate/
@@ -59,27 +59,33 @@ multirocket_hls_validate/
 **/export_ip.tcl
 **/vitis_hls.log
 
-# Temporary build files
-**/*.cpp.bak
-**/*.h.bak
-**/*.hpp.bak
+# Temporary build files in tcl_template
+tcl_template/*.cpp
+tcl_template/*.h
+tcl_template/*.hpp
+tcl_template/include/
+tcl_template/minirocket_hls_testbench_loader.cpp
+tcl_template/minirocket_host.cpp
+tcl_template/_x*
 
-# ============================================
-# Generated/Runtime Artifacts
-# ============================================
+*.json
 
-# Results directories (generated at runtime)
-**/results/
-**/results/*.json
-**/results/*.txt
-**/results/*.csv
+# Temporary build files in optimized_version_*/
+optimized_version_*/*.cpp
+optimized_version_*/*.h
+optimized_version_*/*.hpp
+optimized_version_*/include/
+optimized_version_*/minirocket_hls_testbench_loader.cpp
+optimized_version_*/minirocket_host.cpp
+optimized_version_*/_x*
 
-# Testbench executables
-**/testbench/test_*
-**/testbench/*.exe
-
-# Third-party downloads (can be regenerated)
-**/third_party/
+fp_optimizization/*.cpp
+optimized_version_*/*.h
+optimized_version_*/*.hpp
+optimized_version_*/include/
+optimized_version_*/minirocket_hls_testbench_loader.cpp
+optimized_version_*/minirocket_host.cpp
+optimized_version_*/_x*
 
 # ============================================
 # Large Data Files (Don't commit to repo)
