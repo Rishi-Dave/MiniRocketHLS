@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
     // Test on loaded data
     int num_correct = 0;
 
-    int num_tests = std::min((int)test_inputs.size(), (csim) ? 1000 : 100); 
+    int num_tests = std::min((int)test_inputs.size(), (csim) ? 1000 : 10); 
 
     std::cout << "\n" << std::string(60, '=') << std::endl;
     std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;

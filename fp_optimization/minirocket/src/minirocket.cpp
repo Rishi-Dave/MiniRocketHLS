@@ -93,11 +93,15 @@ void minirocket_feature_extraction_hls(
         
         int_t dilation = dilations[dil_idx];
         int_t features_this_dilation = num_features_per_dilation[dil_idx];
+        int_t _padding0 = dil_idx % 2;
+        int_t padding = ((9-1) * dilation) / 2;
         
         KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
             #pragma HLS LOOP_TRIPCOUNT min=84 max=84
             #pragma HLS PIPELINE off
             
+            int_t _padding1 = (_padding0 + kernel_idx) % 2;
+
             if (feature_idx >= num_features) {
                 //std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
                 break;
@@ -111,16 +115,24 @@ void minirocket_feature_extraction_hls(
             for (int_t f = 0; f < features_this_dilation; f++) {
                 data_t bias = biases[feature_idx + f];
                 int_t positive_count = 0;
-                
-                PPV_LOOP: for (int_t i = 0; i < time_series_length; i++) {
-                    #pragma HLS PIPELINE II=1
-                    if (convolutions[i] > bias) {
-                        positive_count++;
+                data_t ppv = 0.0;
+                if (_padding1 == 0) {
+                    PPV_LOOP_0: for (int_t i = 0; i < time_series_length; i++) {
+                        #pragma HLS PIPELINE II=1
+                        if (convolutions[i] > bias) {
+                            positive_count++;
+                        }
                     }
+                    ppv = (data_t)positive_count / (data_t)time_series_length;
+                } else {
+                    PPV_LOOP_1: for (int_t i = padding; i < time_series_length - padding; i++) {
+                        #pragma HLS PIPELINE II=1
+                        if (convolutions[i] > bias) {
+                            positive_count++;
+                        }
+                    }
+                    ppv = (data_t)positive_count / (data_t)(time_series_length - 2 * padding);
                 }
-                
-                // Compute PPV feature
-                data_t ppv = (data_t)positive_count / (data_t)time_series_length;
                 features[feature_idx + f] = ppv;
                 
             }

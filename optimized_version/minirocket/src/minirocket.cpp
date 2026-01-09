@@ -1,38 +1,6 @@
 #include "../include/minirocket.hpp"
 #include <cstring>
 
-// Fixed kernel indices (84 combinations of 3 indices from 0-8)
-const int_t kernel_indices[NUM_KERNELS][3] = {
-    {0, 1, 2}, {0, 1, 3}, {0, 1, 4}, {0, 1, 5}, {0, 1, 6}, {0, 1, 7}, {0, 1, 8},
-    {0, 2, 3}, {0, 2, 4}, {0, 2, 5}, {0, 2, 6}, {0, 2, 7}, {0, 2, 8},
-    {0, 3, 4}, {0, 3, 5}, {0, 3, 6}, {0, 3, 7}, {0, 3, 8},
-    {0, 4, 5}, {0, 4, 6}, {0, 4, 7}, {0, 4, 8},
-    {0, 5, 6}, {0, 5, 7}, {0, 5, 8},
-    {0, 6, 7}, {0, 6, 8},
-    {0, 7, 8},
-    {1, 2, 3}, {1, 2, 4}, {1, 2, 5}, {1, 2, 6}, {1, 2, 7}, {1, 2, 8},
-    {1, 3, 4}, {1, 3, 5}, {1, 3, 6}, {1, 3, 7}, {1, 3, 8},
-    {1, 4, 5}, {1, 4, 6}, {1, 4, 7}, {1, 4, 8},
-    {1, 5, 6}, {1, 5, 7}, {1, 5, 8},
-    {1, 6, 7}, {1, 6, 8},
-    {1, 7, 8},
-    {2, 3, 4}, {2, 3, 5}, {2, 3, 6}, {2, 3, 7}, {2, 3, 8},
-    {2, 4, 5}, {2, 4, 6}, {2, 4, 7}, {2, 4, 8},
-    {2, 5, 6}, {2, 5, 7}, {2, 5, 8},
-    {2, 6, 7}, {2, 6, 8},
-    {2, 7, 8},
-    {3, 4, 5}, {3, 4, 6}, {3, 4, 7}, {3, 4, 8},
-    {3, 5, 6}, {3, 5, 7}, {3, 5, 8},
-    {3, 6, 7}, {3, 6, 8},
-    {3, 7, 8},
-    {4, 5, 6}, {4, 5, 7}, {4, 5, 8},
-    {4, 6, 7}, {4, 6, 8},
-    {4, 7, 8},
-    {5, 6, 7}, {5, 6, 8},
-    {5, 7, 8},
-    {6, 7, 8}
-};
-
 
 static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
     #include "../include/weights.txt"
@@ -47,7 +15,7 @@ void apply_kernel_hls(
     int_t time_series_length,
     int_t* output_length
 ) {
-    #pragma HLS INLINE off
+    #pragma HLS INLINE
     
     const int_t kernel_length = KERNEL_SIZE;
     *output_length = time_series_length;
@@ -57,29 +25,31 @@ void apply_kernel_hls(
         return;
     }
 
-    static data_t sliding_window[KERNEL_SIZE] = {0};
-    #pragma HLS ARRAY_PARTITION variable=sliding_window complete
+    #pragma HLS BIND_STORAGE variable=weights type=rom_1p impl=bram
     #pragma HLS ARRAY_PARTITION variable=weights complete
 
-    CONV_LOOP: for (int_t j = 0; j < time_series_length; j++) {
-        #pragma HLS PIPELINE II=1
-        
-        int i = 0;
-        for (int k = -4; k <= 4; k++) {
-            if (j + k * dilation < 0 || j + k * dilation >= time_series_length) {
-                sliding_window[i] = 0.0;
-            } else {
-                sliding_window[i] = time_series[j + k * dilation];
+    CONV_LOOP: for (int_t j = 0; j < MAX_TIME_SERIES_LENGTH; j++) {
+        #pragma HLS UNROLL factor=512
+        if (j < time_series_length) {
+            static data_t sliding_window[KERNEL_SIZE] = {0};
+            #pragma HLS ARRAY_PARTITION variable=sliding_window complete
+            int i = 0;
+            CENTERING_KERNEL_LOOP: for (int k = -4; k <= 4; k++) {
+                if (j + k * dilation < 0 || j + k * dilation >= time_series_length) {
+                    sliding_window[i] = 0.0;
+                } else {
+                    sliding_window[i] = time_series[j + k * dilation];
+                }
+                i++;
             }
-            i++;
-        }
 
-        data_t value = 0.0;
-        KERNEL_LOOP: for (int_t k = 0; k < KERNEL_SIZE; k++) {
-            #pragma HLS PIPELINE II=1
-            value += sliding_window[k] * weights[kernel_idx][k];
+            data_t value = 0.0;
+            KERNEL_LOOP: for (int_t k = 0; k < KERNEL_SIZE; k++) {
+                #pragma HLS PIPELINE II=1
+                value += sliding_window[k] * weights[kernel_idx][k];
+            }
+            convolutions[j] = value;
         }
-        convolutions[j] = value;
     }
 }
 
@@ -107,12 +77,17 @@ void minirocket_feature_extraction_hls(
         
         int_t dilation = dilations[dil_idx];
         int_t features_this_dilation = num_features_per_dilation[dil_idx];
+        int_t _padding0 = dil_idx % 2;
+        int_t padding = ((9-1) * dilation) / 2;
         
         KERNEL_LOOP: for (int_t kernel_idx = 0; kernel_idx < NUM_KERNELS; kernel_idx++) {
             #pragma HLS LOOP_TRIPCOUNT min=84 max=84
-            #pragma HLS PIPELINE off
+            #pragma HLS UNROLL
             
-            if (feature_idx >= num_features) {
+            int_t _padding1 = (_padding0 + kernel_idx) % 2;
+            int_t feature_idx_for_kernel = feature_idx + kernel_idx * features_this_dilation;
+
+            if (feature_idx_for_kernel >= num_features) {
                 //std::cout << "Warning: feature_idx exceeds num_features!" << std::endl;   
                 break;
             }
@@ -123,24 +98,31 @@ void minirocket_feature_extraction_hls(
             
             // Calculate positive proportion of values (PPV)
             for (int_t f = 0; f < features_this_dilation; f++) {
-                data_t bias = biases[feature_idx + f];
+                data_t bias = biases[feature_idx_for_kernel + f];
                 int_t positive_count = 0;
-                
-                PPV_LOOP: for (int_t i = 0; i < time_series_length; i++) {
-                    #pragma HLS PIPELINE II=1
-                    if (convolutions[i] > bias) {
-                        positive_count++;
+                data_t ppv = 0.0;
+                if (_padding1 == 0) {
+                    PPV_LOOP_0: for (int_t i = 0; i < time_series_length; i++) {
+                        #pragma HLS PIPELINE II=1
+                        if (convolutions[i] > bias) {
+                            positive_count++;
+                        }
                     }
+                    ppv = (data_t)positive_count / (data_t)time_series_length;
+                } else {
+                    PPV_LOOP_1: for (int_t i = padding; i < time_series_length - padding; i++) {
+                        #pragma HLS PIPELINE II=1
+                        if (convolutions[i] > bias) {
+                            positive_count++;
+                        }
+                    }
+                    ppv = (data_t)positive_count / (data_t)(time_series_length - 2 * padding);
                 }
-                
-                // Compute PPV feature
-                data_t ppv = (data_t)positive_count / (data_t)time_series_length;
-                features[feature_idx + f] = ppv;
+                features[feature_idx_for_kernel + f] = ppv;
                 
             }
-
-            feature_idx+= features_this_dilation;
         }
+        feature_idx+= features_this_dilation * NUM_KERNELS;
     }
 }
 
@@ -154,8 +136,8 @@ void apply_scaler_hls(
 ) {
     #pragma HLS INLINE off
     
-    SCALE_LOOP: for (int_t i = 0; i < num_features; i++) {
-        #pragma HLS PIPELINE II=1
+    SCALE_LOOP: for (int_t i = 0; i < MAX_FEATURES; i++) {
+        #pragma HLS UNROLL factor=512
         #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
         
         scaled_features[i] = (features[i] - scaler_mean[i]) / scaler_scale[i];
@@ -173,37 +155,44 @@ void linear_classifier_predict_hls(
 ) {
     #pragma HLS INLINE off
     
-    if (num_classes == 2) {
-        // Binary classification: use single decision function
-        data_t score = intercept[0];
+    // if (num_classes == 2) {
+    //     // Binary classification: use single decision function
+    //     data_t score = intercept[0];
         
-        BINARY_FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
-            #pragma HLS PIPELINE II=1
-            #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
+    //     BINARY_FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
+    //         #pragma HLS PIPELINE II=1
+    //         #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
             
-            score += coefficients[0][j] * scaled_features[j];
-        }
+    //         score += coefficients[0][j] * scaled_features[j];
+    //     }
         
-        predictions[0] = (data_t)0.0 - score;  // Class 0 score
-        predictions[1] = score;   // Class 1 score
-    } else {
+    //     predictions[0] = (data_t)0.0 - score;  // Class 0 score
+    //     predictions[1] = score;   // Class 1 score
+    // } else {
         // Multi-class classification
-        CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
-            #pragma HLS PIPELINE off
-            #pragma HLS LOOP_TRIPCOUNT min=2 max=4
-            
-            data_t score = intercept[i];
-            
-            FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
-                #pragma HLS PIPELINE II=1
-                #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
-                
-                score += coefficients[i][j] * scaled_features[j];
-            }
-            
-            predictions[i] = score;
+    CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
+        #pragma HLS PIPELINE off
+        #pragma HLS LOOP_TRIPCOUNT min=2 max=4
+        
+        data_t score = intercept[i];
+        
+        FEATURE_LOOP: for (int_t j = 0; j < MAX_FEATURES; j++) {
+            #pragma HLS UNROLL factor=512
+            #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
+            if (j < num_features) score += coefficients[i][j] * scaled_features[j];
         }
+        
+        predictions[i] = score;
     }
+
+    if (num_classes == 2) {
+        // For binary classification, adjust scores to represent both classes
+        data_t binary_score = predictions[0];
+        predictions[0] = (data_t)0.0 - binary_score;  // Class 0 score
+        predictions[1] = binary_score;   // Class 1 score
+    }
+
+    //}
 }
 
 // HLS-optimized top-level function for FPGA
