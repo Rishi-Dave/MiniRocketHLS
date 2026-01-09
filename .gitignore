@@ -14,6 +14,8 @@ ucr_benchmark
 ucr_benchmark_4cu
 minirocket_host
 
+*.csv
+
 # Build directories
 build/
 build_*/

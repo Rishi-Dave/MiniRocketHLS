@@ -258,7 +258,7 @@ class MiniRocket:
         return self.transform(X)
 
 
-def load_large_dataset(dataset_name='InsectSound'):
+def load_real_dataset(dataset_name='InsectSound'):
     """Load real time series datasets from sktime"""
     try:
         print(f"Attempting to load dataset: {dataset_name} from UCRArchive")
@@ -266,27 +266,28 @@ def load_large_dataset(dataset_name='InsectSound'):
         from aeon.datasets import load_classification, load_from_arff_file
         from pathlib import Path
         
-        if dataset_name == "InsectSound":
-            X, y, meta = load_classification(dataset_name, return_metadata=True)
-        else:
-            X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
-        
+        X_train, y_train = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
+        X_test, y_test = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TEST.arff"))
 
-        # X = np.array([series.values for series in X.iloc[:, 0]])
-        # y = np.array([label_to_int[label] for label in y])
-        X = np.squeeze(X)
-        unique_labels = sorted(set(y))
-        label_to_int = {label: i for i, label in enumerate(unique_labels)}
-        y_numpy = np.array([label_to_int[label] for label in y])
+        X_train = np.squeeze(X_train)
+        X_test = np.squeeze(X_test)
+        unique_labels_train = sorted(set(y_train))
+        unique_labels_test = sorted(set(y_test))
+        label_to_int_train = {label: i for i, label in enumerate(unique_labels_train)}
+        label_to_int_test = {label: i for i, label in enumerate(unique_labels_test)}
+        y_numpy_train = np.array([label_to_int_train[label] for label in y_train])
+        y_numpy_test = np.array([label_to_int_test[label] for label in y_test])
 
 
         print(f"Real dataset loaded: {dataset_name}")
-        print(f"  Classes: {len(np.unique(y))} ({np.unique(y)})")
-        print(f"  X Shape: {X.shape}")
-        print(f"  y Shape: {y.shape}")
-        print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
+        print(f"  Classes: {len(np.unique(y_numpy_train))} ({np.unique(y_numpy_train)})")
+        print(f"  X-train Shape: {X_train.shape}")
+        print(f"  y-train Shape: {y_numpy_train.shape}")
+        print(f"  X-test Shape: {X_test.shape}")
+        print(f"  y-test Shape: {y_numpy_test.shape}")
+        print(f"  distribution: {np.bincount(y_numpy_train.astype(int))}")
         
-        return X.astype(np.float32), y_numpy.astype(int)
+        return X_train.astype(np.float32), y_numpy_train.astype(int), X_test.astype(np.float32), y_numpy_test.astype(int)
         
     except ImportError as e:
         print(f"sktime import error: {e}")
@@ -308,50 +309,6 @@ def load_large_dataset(dataset_name='InsectSound'):
         print(f"  y Shape: {y.shape}")
         print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
         return X.astype(np.float32), y_numpy.astype(int)
-
-
-def load_real_dataset(dataset_name='arrow_head'):
-    """Load real time series datasets from sktime"""
-    try:
-        print(f"Attempting to import sktime for dataset: {dataset_name}")
-        from sktime.datasets import load_arrow_head, load_gunpoint, load_italy_power_demand
-        print("sktime import successful")
-        
-        if dataset_name == 'arrow_head':
-            X, y = load_arrow_head()
-        elif dataset_name == 'gun_point':
-            X, y = load_gunpoint()
-        elif dataset_name == 'italy_power':
-            X, y = load_italy_power_demand()
-        else:
-            print(f"Unknown dataset {dataset_name}, using arrow_head")
-            X, y = load_arrow_head()
-        
-        # Convert from pandas to numpy
-        X_numpy = np.array([series.values for series in X.iloc[:, 0]])
-        
-        # Convert string labels to integers
-        unique_labels = sorted(set(y))
-        label_to_int = {label: i for i, label in enumerate(unique_labels)}
-        y_numpy = np.array([label_to_int[label] for label in y])
-        
-        print(f"Real dataset loaded: {dataset_name}")
-        print(f"  Shape: {X_numpy.shape}")
-        print(f"  Classes: {len(unique_labels)} ({unique_labels})")
-        print(f"  Class distribution: {np.bincount(y_numpy)}")
-        
-        return X_numpy.astype(np.float32), y_numpy
-        
-    except ImportError as e:
-        print(f"sktime import error: {e}")
-        print("falling back to synthetic data")
-        return generate_sample_data()
-    except Exception as e:
-        print(f"Error loading dataset {dataset_name}: {e}")
-        print("Falling back to synthetic data")
-        import traceback
-        traceback.print_exc()
-        return generate_sample_data()
 
 def generate_sample_data(n_samples=1000, length=128, n_classes=4):
     """Generate sample time series data for testing"""
@@ -422,13 +379,11 @@ def main():
     
 
     print(f"Loading real dataset: {args.dataset}")
-    X, y = load_large_dataset(args.dataset)
+    X_train,  y_train, X_test, y_test = load_real_dataset(args.dataset)
+
     
-    print(f"Data shape: {X.shape}")
-    print(f"Classes: {np.unique(y)}")
-    
-    # Split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+    print(f"Data shape: {X_train.shape}")
+    print(f"Classes: {np.unique(y_train)}")
     
     print("Training MiniRocket...")
     # Fit MiniRocket (num_kernels must be multiple of 84, using 840 to fit HLS limits)
@@ -477,7 +432,7 @@ def main():
         "test_accuracy": float(accuracy),
         "num_samples": len(X_test),
         "series_length": X_test.shape[1] if len(X_test.shape) > 1 else len(X_test[0]),
-        "num_classes": len(np.unique(y))
+        "num_classes": len(np.unique(y_train))
     }
     
     test_filename = f"{args.dataset}_{args.output}".replace('.json', '_test_data.json')
