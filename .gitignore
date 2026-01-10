@@ -181,6 +181,29 @@ credentials.json
 *-old-*.py
 *-old-*.cpp
 *old-saved-for-ref*
+*_old
+*_old.*
+*.backup.log
+
+# Informal development documentation (keep only professional docs)
+**/HYDRA_FPGA_ISSUE_ANALYSIS.md
+**/HYDRA_FPGA_FIX_SUMMARY.md
+**/HYDRA_JSON_LOADER_FIX.md
+**/STATUS_REPORT.md
+**/SOLUTION_SUMMARY.md
+**/DELIVERABLES.md
+**/TRAINING_FIX_README.md
+**/DATASET_SPLIT_INFO.md
+**/BUILD_ARTIFACTS.md
+**/IMPLEMENTATION_COMPLETE.md
+
+# Test utility scripts (keep only active pipeline scripts)
+**/create_test_files.py
+**/create_full_tests.py
+**/create_quick_tests.py
+**/create_sample_test.py
+**/test_dataset_load.py
+**/test_performance.py
 
 # ============================================
 # Keep These Files
