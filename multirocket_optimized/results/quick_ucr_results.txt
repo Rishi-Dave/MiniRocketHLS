@@ -1,0 +1,120 @@
+================================================================================
+MultiRocket84 Quick UCR Benchmark
+================================================================================
+
+Testing on 5 diverse UCR datasets
+
+
+================================================================================
+Dataset: GunPoint
+================================================================================
+Loading data...
+  Train: 50, Test: 150, Length: 150, Classes: 2
+Extracting features...
+  Features: 4704
+  Feature extraction time: 232.99s
+Training classifier...
+Evaluating...
+
+Results:
+  Train accuracy: 100.00% (50/50)
+  Test accuracy:  100.00% (150/150)
+  Training time: 0.20s
+  Test inference: 0.11 ms/sample
+
+================================================================================
+Dataset: ItalyPowerDemand
+================================================================================
+Loading data...
+  Train: 67, Test: 1029, Length: 24, Classes: 2
+Extracting features...
+  Features: 1344
+  Feature extraction time: 67.48s
+Training classifier...
+Evaluating...
+
+Results:
+  Train accuracy: 100.00% (67/67)
+  Test accuracy:  96.60% (994/1029)
+  Training time: 0.16s
+  Test inference: 0.01 ms/sample
+
+================================================================================
+Dataset: Coffee
+================================================================================
+Loading data...
+  Train: 28, Test: 28, Length: 286, Classes: 2
+Extracting features...
+  Features: 4704
+  Feature extraction time: 125.67s
+Training classifier...
+Evaluating...
+
+Results:
+  Train accuracy: 100.00% (28/28)
+  Test accuracy:  100.00% (28/28)
+  Training time: 0.17s
+  Test inference: 0.01 ms/sample
+
+================================================================================
+Dataset: ECG200
+================================================================================
+Loading data...
+  Train: 100, Test: 100, Length: 96, Classes: 2
+Extracting features...
+  Features: 4032
+  Feature extraction time: 124.45s
+Training classifier...
+Evaluating...
+
+Results:
+  Train accuracy: 100.00% (100/100)
+  Test accuracy:  90.00% (90/100)
+  Training time: 0.25s
+  Test inference: 0.00 ms/sample
+
+================================================================================
+Dataset: Beef
+================================================================================
+Loading data...
+  Train: 30, Test: 30, Length: 470, Classes: 5
+Extracting features...
+  Features: 4704
+  Feature extraction time: 210.10s
+Training classifier...
+Evaluating...
+
+Results:
+  Train accuracy: 100.00% (30/30)
+  Test accuracy:  83.33% (25/30)
+  Training time: 0.18s
+  Test inference: 0.01 ms/sample
+
+================================================================================
+BENCHMARK SUMMARY
+================================================================================
+
+Datasets tested: 5
+  Successful: 5
+  Failed: 0
+Total time: 12.7 minutes
+
+Accuracy Statistics:
+  Train: 100.00% ± 0.00%
+         Min: 100.00%, Max: 100.00%
+  Test:  93.99% ± 6.46%
+         Min: 83.33%, Max: 100.00%
+
+Per-Dataset Results:
+--------------------------------------------------------------------------------
+Dataset                   Train      Test       Samples      Length  
+--------------------------------------------------------------------------------
+GunPoint                  100.00%   100.00%     50/150      150
+ItalyPowerDemand          100.00%    96.60%     67/1029      24
+Coffee                    100.00%   100.00%     28/28       286
+ECG200                    100.00%    90.00%    100/100       96
+Beef                      100.00%    83.33%     30/30       470
+--------------------------------------------------------------------------------
+
+Results saved to: multirocket_quick_ucr_results.json
+

@@ -1,0 +1,62 @@
+================================================================================
+MultiRocket FPGA Accelerator Initialization
+================================================================================
+
+Platform: Xilinx
+Device: xilinx_u280_gen3x16_xdma_base_1
+
+Loading bitstream: build/build_hw/multirocket.xclbin
+Creating kernel...
+
+✓ FPGA initialization complete!
+
+================================================================================
+Loading MultiRocket Model
+================================================================================
+
+Model file: multirocket84_gunpoint_model.json
+
+Model Configuration:
+  Features: 4704
+  Classes: 2
+  Time series length: 150
+  Dilations (orig): 7
+  Dilations (diff): 7
+  Biases (orig): 588
+  Biases (diff): 588
+  Scaler parameters: 4704
+  Classifier coefficients: 9408
+
+Allocating device buffers...
+✓ Model loaded and device buffers allocated
+
+================================================================================
+Loading Test Data
+================================================================================
+
+Loaded 10 test samples
+
+================================================================================
+Running FPGA Inference
+================================================================================
+
+Sample 0: Label=0, Predicted=0 ✓ (29.666 ms)
+Sample 1: Label=1, Predicted=1 ✓ (6.263 ms)
+Sample 2: Label=1, Predicted=1 ✓ (6.257 ms)
+Sample 3: Label=0, Predicted=0 ✓ (6.205 ms)
+Sample 4: Label=0, Predicted=0 ✓ (6.222 ms)
+Sample 5: Label=1, Predicted=1 ✓ (6.294 ms)
+Sample 6: Label=0, Predicted=0 ✓ (6.239 ms)
+Sample 7: Label=1, Predicted=1 ✓ (6.289 ms)
+Sample 8: Label=1, Predicted=1 ✓ (6.321 ms)
+Sample 9: Label=0, Predicted=0 ✓ (6.288 ms)
+
+================================================================================
+Results Summary
+================================================================================
+
+Accuracy: 100.00% (10/10)
+Average latency: 8.604 ms
+Throughput: 116.2 inferences/second
+
+================================================================================
