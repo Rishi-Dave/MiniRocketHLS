@@ -1,0 +1,51 @@
+================================================================================
+MultiRocket C++ Testbench
+================================================================================
+
+1. Loading model...
+  Loading basic parameters...
+  Loading dilations...
+  Loading biases...
+  Loading scaler parameters...
+  Loading classifier...
+  Generating kernel weights...
+✓ Model loaded successfully
+  Num features: 4704
+  Num classes: 2
+  Dilations (orig): 7
+  Dilations (diff): 7
+
+2. Loading test data...
+✓ Test data loaded successfully
+  Num samples: 10
+  Time series length: 150
+
+3. Extracting features and validating...
+--------------------------------------------------------------------------------
+Sample 0: Label=1, C++=0, Python=0, ✓ | Avg Error=0.863315, Max Error=6.698570
+Sample 1: Label=2, C++=1, Python=1, ✓ | Avg Error=0.930592, Max Error=6.433629
+Sample 2: Label=2, C++=1, Python=1, ✓ | Avg Error=1.292361, Max Error=6.898079
+Sample 3: Label=1, C++=0, Python=0, ✓ | Avg Error=0.871199, Max Error=6.416593
+Sample 4: Label=1, C++=0, Python=0, ✓ | Avg Error=0.998879, Max Error=8.294908
+Sample 5: Label=2, C++=1, Python=1, ✓ | Avg Error=1.106474, Max Error=6.450616
+Sample 6: Label=1, C++=0, Python=0, ✓ | Avg Error=0.908902, Max Error=6.864027
+Sample 7: Label=2, C++=1, Python=1, ✓ | Avg Error=0.914623, Max Error=7.205071
+Sample 8: Label=2, C++=1, Python=1, ✓ | Avg Error=0.885914, Max Error=6.433459
+Sample 9: Label=1, C++=0, Python=0, ✓ | Avg Error=0.982686, Max Error=8.294908
+--------------------------------------------------------------------------------
+
+4. Validation Summary
+================================================================================
+
+Classification:
+  Correct: 10/10
+  Accuracy: 100.00%
+
+Feature Error:
+  Average error: 9.75e-01
+  Maximum error: 8.29e+00
+
+Validation Status:
+  ⚠ PARTIAL - Classification correct but features differ
+
+================================================================================
