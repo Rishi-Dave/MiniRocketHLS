@@ -31,19 +31,26 @@ BINARY_CONTAINERS += $(BUILD_DIR)/krnl.xclbin
 
 # Host executable
 HOST_SRCS += host/src/hydra_host.cpp
-HOST_SRCS += host/src/hydra_loader.cpp
+HOST_SRCS += host/src/hydra_loader_v2.cpp
+HOST_SRCS += host/src/npy_loader.cpp
+EXECUTABLE = ./host/hydra_host
 
 CXXFLAGS += -I./host/include -I$(XILINX_XRT)/include -I$(XILINX_VIVADO)/include
 LDFLAGS += -L$(XILINX_XRT)/lib -pthread -lOpenCL -lrt -lstdc++
 
 # Arguments for host application
-CMD_ARGS = $(BUILD_DIR)/krnl.xclbin models/hydra_model.json models/hydra_test.json
+XCLBIN_FILE = build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+MODEL_FILE = models/hydra_insectsound_model.json
+TEST_FILE_FULL = models/hydra_insectsound_test.json
+TEST_FILE_QUICK = models/hydra_insectsound_test_1000.json
+
+CMD_ARGS = $(XCLBIN_FILE) $(MODEL_FILE) $(TEST_FILE_FULL)
 
 include ./opencl.mk
 
 # Build targets
 
-.PHONY: all clean cleanall help test run ip
+.PHONY: all clean cleanall help test run run-quick ip
 
 all: check-devices check-vitis check-xrt host xclbin
 
@@ -79,8 +86,8 @@ $(IP_REPO)/hydra_inference.xo: hydra/src/hydra.cpp hydra/src/hydra_pooling.cpp h
 
 # Host application
 host: check-xrt $(HOST_SRCS)
-	mkdir -p $(BUILD_DIR)
-	g++ $(CXXFLAGS) $(HOST_SRCS) $(LDFLAGS) -o $(BUILD_DIR)/hydra_host
+	mkdir -p host
+	g++ $(CXXFLAGS) $(HOST_SRCS) $(LDFLAGS) -o $(EXECUTABLE)
 
 # XClbin build
 build: check-vitis check-xrt $(BINARY_CONTAINERS)
@@ -93,8 +100,25 @@ $(BUILD_DIR)/krnl.xclbin: $(BINARY_CONTAINER_hydra_OBJS)
 xclbin: build
 
 # Run on hardware/emulation
-run: all
-	cd $(BUILD_DIR) && ./hydra_host $(CMD_ARGS)
+run:
+	@echo "========================================="
+	@echo "HYDRA FPGA Full Test - InsectSound"
+	@echo "========================================="
+	@echo "Test samples: 25,000"
+	@echo "Expected time: ~2 minutes"
+	@echo "========================================="
+	@echo ""
+	$(EXECUTABLE) $(XCLBIN_FILE) $(MODEL_FILE) $(TEST_FILE_FULL)
+
+run-quick:
+	@echo "========================================="
+	@echo "HYDRA FPGA Quick Test - InsectSound"
+	@echo "========================================="
+	@echo "Test samples: 1,000"
+	@echo "Expected time: ~5 seconds"
+	@echo "========================================="
+	@echo ""
+	$(EXECUTABLE) $(XCLBIN_FILE) $(MODEL_FILE) $(TEST_FILE_QUICK)
 
 test: run
 
@@ -128,8 +152,11 @@ help:
 	@echo "  make build TARGET=<hw/hw_emu/sw_emu>"
 	@echo "      Link kernel and generate xclbin"
 	@echo ""
-	@echo "  make run TARGET=<hw/hw_emu/sw_emu>"
-	@echo "      Run host application"
+	@echo "  make run"
+	@echo "      Run full HYDRA FPGA test (25,000 samples, ~2 min)"
+	@echo ""
+	@echo "  make run-quick"
+	@echo "      Run quick HYDRA FPGA test (1,000 samples, ~5 sec)"
 	@echo ""
 	@echo "  make clean"
 	@echo "      Remove temporary files"
