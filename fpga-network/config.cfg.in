@@ -23,10 +23,3 @@ sc=networklayer_0.M_AXIS_nl2sk:minirocket_inference_1.input_timeseries
 [debug]
 chipscope=minirocket_inference_1:OUTPUT_PREDICTIONS
 chipscope=networklayer_0:M_AXIS_nl2sk
-
-[advanced]
-param=compiler.userPostSysLinkOverlayTcl=/users/pyuvaraj/MiniRocketHLS/fpga-network/Ethernet/post_sys_link.tcl
-#param=compiler.worstNegativeSlack=-2
-#param=compiler.errorOnHoldViolation=false
-[vivado]
-prop=run.impl_1.strategy=Performance_NetDelay_low

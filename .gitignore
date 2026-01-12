@@ -16,6 +16,8 @@ minirocket_host
 
 *.csv
 
+benchmark.*/
+
 # Build directories
 build/
 build_*/

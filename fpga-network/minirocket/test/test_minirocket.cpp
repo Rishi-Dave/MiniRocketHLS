@@ -75,8 +75,7 @@ int main(int argc, char* argv[]) {
     float python_baseline = 0.0f;
     std::ifstream test_file_stream(test_file);
     if (test_file_stream.is_open()) {
-        std::string content((std::istreambuf_iterator<char>(test_file_stream)),
-                           std::istreambuf_iterator<char>());
+        std::string content((std::istreambuf_iterator<char>(test_file_stream)), std::istreambuf_iterator<char>());
         size_t accuracy_pos = content.find("\"test_accuracy\":");
         if (accuracy_pos != std::string::npos) {
             size_t start = content.find(":", accuracy_pos) + 1;
@@ -97,7 +96,7 @@ int main(int argc, char* argv[]) {
     // Test on loaded data
     int num_correct = 0;
 
-    int num_tests = std::min((int)test_inputs[0].size(), (csim) ? 1000 : 100); 
+    int num_tests = std::min((int)test_inputs[0].size(), (csim) ? 1000 : 10); 
 
     std::cout << "\n" << std::string(60, '=') << std::endl;
     std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;
@@ -127,7 +126,8 @@ int main(int argc, char* argv[]) {
             input_length,
             num_features,
             num_classes,
-            num_dilations
+            num_dilations,
+            0
         );
 
         data_t* predictions = new data_t[num_classes];

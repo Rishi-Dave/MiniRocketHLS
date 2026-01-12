@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include "ap_axi_sdata.h"
 
+#define BUILD 1
+
 // HLS-optimized data types
 //typedef ap_fixed<32,16> data_t;     // 32-bit fixed point: 16 integer, 16 fractional bits
 typedef float data_t;
@@ -25,6 +27,8 @@ typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 #define DWIDTH 512
 #define TDWIDTH 16
 typedef ap_axiu<DWIDTH, 1, 1, TDWIDTH> pkt;
+
+
 
 typedef union {
     data_t fp_num;
@@ -67,7 +71,8 @@ extern "C" void minirocket_inference(
     int_t time_series_length,
     int_t num_features,
     int_t num_classes,
-    int_t num_dilations
+    int_t num_dilations,
+    int_t dest
 );
 
 // HLS-optimized MiniRocket feature extraction
