@@ -1,0 +1,60 @@
+Found Platform
+Platform Name: Xilinx
+INFO: Reading build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+Loading: 'build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin'
+Trying to program device[0]: xilinx_u280_gen3x16_xdma_base_1
+Device[0]: program successful!
+Setting CU(s) up...
+Loading MiniRocket model and test data
+Model file: /home/pyuva001/models/minirocket/MosquitoSound_minirocket_model.json
+Test file: /home/pyuva001/models/minirocket/MosquitoSound_minirocket_model_test_data.json
+Loading model...
+Reading model file: /home/pyuva001/models/minirocket/MosquitoSound_minirocket_model.json
+Parsed model parameters:
+  num_dilations: 9
+  num_features: 840
+  num_classes: 6
+  time_series_length: 3750
+Parsed model arrays.
+  dilations size: 9
+  num_features_per_dilation size: 9
+  biases size: 840
+  scaler_mean size: 840
+  scaler_scale size: 840
+  intercept size: 6
+Parsing multi-class classifier coefficients...
+Parsed classifier coefficients.
+  Coefficients size: 6 x 840
+dilations[0] = 1, num_features_per_dilation[0] = 2
+dilations[1] = 3, num_features_per_dilation[1] = 1
+dilations[2] = 7, num_features_per_dilation[2] = 1
+dilations[3] = 15, num_features_per_dilation[3] = 1
+dilations[4] = 30, num_features_per_dilation[4] = 1
+dilations[5] = 60, num_features_per_dilation[5] = 1
+dilations[6] = 119, num_features_per_dilation[6] = 1
+dilations[7] = 236, num_features_per_dilation[7] = 1
+dilations[8] = 468, num_features_per_dilation[8] = 1
+Model loaded successfully into HLS arrays:
+  Features: 840
+  Classes: 6
+  Dilations: 9
+Loading test data...
+Test data loaded: 139786 samples
+Loading Weights to FPGA
+
+========== FINAL RESULTS ==========
+Model: /home/pyuva001/models/minirocket/MosquitoSound_minirocket_model.json
+Test data: /home/pyuva001/models/minirocket/MosquitoSound_minirocket_model_test_data.json
+Total correct predictions: 0 / 139786
+Overall accuracy: 0.00 %
+Python baseline accuracy: 81.96 %
+
+========== TIMING RESULTS ==========
+H2D transfer:      22686.984 ms
+Kernel execution:  2983841.654 ms
+D2H transfer:      24910.696 ms
+Total latency:     3031439.334 ms
+Throughput:        0.0 inferences/sec
+====================================
+
+MiniRocket FPGA inference complete!
