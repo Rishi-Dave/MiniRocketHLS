@@ -30,26 +30,51 @@ int main(int argc, char** argv) {
 
     cl_int err;
     cl::Context context;
-    cl::Kernel krnl;
-    cl::CommandQueue q;
-    
+    // Three separate kernels for 3-stage streaming pipeline
+    cl::Kernel load_krnl, minirocket_krnl, store_krnl;
+    // THREE SEPARATE QUEUES: inference kernel runs on q (never waited), load/store on separate queues
+    cl::CommandQueue q, q_load, q_store;
+
     auto devices = get_xil_devices();
     auto fileBuf = read_binary_file(binaryFile);
     cl::Program::Binaries bins{{fileBuf.data(), fileBuf.size()}};
     bool valid_device = false;
-    
+    cl::Program program;
+
     for (unsigned int i = 0; i < devices.size(); i++) {
         auto device = devices[i];
         OCL_CHECK(err, context = cl::Context(device, nullptr, nullptr, nullptr, &err));
         OCL_CHECK(err, q = cl::CommandQueue(context, device, 0, &err));
+        OCL_CHECK(err, q_load = cl::CommandQueue(context, device, 0, &err));
+        OCL_CHECK(err, q_store = cl::CommandQueue(context, device, 0, &err));
         std::cout << "Trying to program device[" << i << "]: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-        cl::Program program(context, {device}, bins, nullptr, &err);
+        program = cl::Program(context, {device}, bins, nullptr, &err);
         if (err != CL_SUCCESS) {
             std::cout << "Failed to program device[" << i << "] with xclbin file!\n";
         } else {
             std::cout << "Device[" << i << "]: program successful!\n";
-            std::cout << "Setting CU(s) up..." << std::endl; 
-            OCL_CHECK(err, krnl = cl::Kernel(program, "minirocket_inference", &err));  // Note: function name
+            std::cout << "Setting up 3-stage streaming pipeline (load → inference → store)..." << std::endl;
+
+            // Create all three kernel objects
+            OCL_CHECK(err, load_krnl = cl::Kernel(program, "load_kernel", &err));
+            if (err != CL_SUCCESS) {
+                std::cout << "Failed to create load_kernel!\n";
+                continue;
+            }
+
+            OCL_CHECK(err, minirocket_krnl = cl::Kernel(program, "minirocket_inference", &err));
+            if (err != CL_SUCCESS) {
+                std::cout << "Failed to create minirocket_inference kernel!\n";
+                continue;
+            }
+
+            OCL_CHECK(err, store_krnl = cl::Kernel(program, "store_kernel", &err));
+            if (err != CL_SUCCESS) {
+                std::cout << "Failed to create store_kernel!\n";
+                continue;
+            }
+
+            std::cout << "All three kernels created successfully!" << std::endl;
             valid_device = true;
             break;
         }
@@ -73,7 +98,8 @@ int main(int argc, char** argv) {
     data_t (*coefficients)[MAX_FEATURES] = new data_t[MAX_CLASSES][MAX_FEATURES];
 
     std::vector<data_t, aligned_allocator<data_t>> time_series_input(MAX_TIME_SERIES_LENGTH);
-    std::vector<data_t, aligned_allocator<data_t>> prediction_output(MAX_CLASSES);
+    // For streaming mode: time_series_length predictions, each with num_classes values
+    std::vector<data_t, aligned_allocator<data_t>> prediction_output(MAX_TIME_SERIES_LENGTH * MAX_CLASSES);
     std::vector<data_t, aligned_allocator<data_t>> flattened_coefficients(MAX_CLASSES * MAX_FEATURES);
 
     std::vector<data_t, aligned_allocator<data_t>> intercept(MAX_CLASSES);
@@ -96,7 +122,8 @@ int main(int argc, char** argv) {
     }
 
     time_series_input.resize(time_series_length);
-    prediction_output.resize(num_classes);
+    // For streaming mode: need time_series_length * num_classes predictions
+    prediction_output.resize(time_series_length * num_classes);
 
     for (int i = 0; i < num_classes * num_features; i++) {
         int row = i / num_features;
@@ -157,32 +184,64 @@ int main(int argc, char** argv) {
         sizeof(data_t) * biases.size(), biases.data(), &err));
 
     // Output buffer
-    OCL_CHECK(err, cl::Buffer buffer_predictions(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, 
-        sizeof(data_t) * num_classes, prediction_output.data(), &err));
+    // BUILD=0 (single-shot): num_classes predictions
+    // BUILD=1 (streaming): time_series_length * num_classes predictions
+    // Now using streaming mode (BUILD=1) with mentor's event-driven pattern
+    bool streaming_mode = true;  // Set to true for BUILD=1
+    int_t num_streaming_predictions = streaming_mode ? (time_series_length * num_classes) : num_classes;
+    OCL_CHECK(err, cl::Buffer buffer_predictions(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,
+        sizeof(data_t) * num_streaming_predictions, prediction_output.data(), &err));
 
-    // Set kernel arguments
-    OCL_CHECK(err, err = krnl.setArg(0, buffer_time_series));
-    OCL_CHECK(err, err = krnl.setArg(1, buffer_predictions));
-    OCL_CHECK(err, err = krnl.setArg(2, buffer_coefficients));
-    OCL_CHECK(err, err = krnl.setArg(3, buffer_intercept));
-    OCL_CHECK(err, err = krnl.setArg(4, buffer_scaler_mean));
-    OCL_CHECK(err, err = krnl.setArg(5, buffer_scaler_scale));
-    OCL_CHECK(err, err = krnl.setArg(6, buffer_dilations));
-    OCL_CHECK(err, err = krnl.setArg(7, buffer_num_features_per_dilation));
-    OCL_CHECK(err, err = krnl.setArg(8, buffer_biases));
-    OCL_CHECK(err, err = krnl.setArg(9, time_series_length));
-    OCL_CHECK(err, err = krnl.setArg(10, num_features));
-    OCL_CHECK(err, err = krnl.setArg(11, num_classes));
-    OCL_CHECK(err, err = krnl.setArg(12, num_dilations));
+    // Set kernel arguments for each of the three kernels
+    std::cout << "Setting kernel arguments for 3-stage pipeline..." << std::endl;
 
-    std::cout << "Loading Weights to FPGA" << std::endl;
-    std::vector<cl::Memory> input_buffers = {
+    // load_kernel arguments: only set m_axi ports, streams are auto-connected
+    // Arg 0: time_series_input (m_axi buffer)
+    // Arg 1: output stream (NOT set by host - auto-connected)
+    // Arg 2: num_values (s_axilite scalar)
+    OCL_CHECK(err, err = load_krnl.setArg(0, buffer_time_series));
+    OCL_CHECK(err, err = load_krnl.setArg(2, time_series_length));
+
+    // minirocket_inference arguments: skip stream ports (0,1), set m_axi and scalars
+    // Arg 0-1: input/output streams (NOT set by host - auto-connected)
+    // Arg 2-8: m_axi buffers (coefficients, intercept, scaler_mean, scaler_scale, dilations, num_features_per_dilation, biases)
+    // Arg 9-12: s_axilite scalars (time_series_length, num_features, num_classes, num_dilations)
+    OCL_CHECK(err, err = minirocket_krnl.setArg(2, buffer_coefficients));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(3, buffer_intercept));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(4, buffer_scaler_mean));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(5, buffer_scaler_scale));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(6, buffer_dilations));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(7, buffer_num_features_per_dilation));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(8, buffer_biases));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(9, time_series_length));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(10, num_features));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(11, num_classes));
+    OCL_CHECK(err, err = minirocket_krnl.setArg(12, num_dilations));
+
+    // store_kernel arguments: skip input stream, set m_axi buffer and scalar
+    // Arg 0: input stream (NOT set by host - auto-connected)
+    // Arg 1: predictions_output (m_axi buffer)
+    // Arg 2: num_predictions (s_axilite scalar) - streaming mode outputs time_series_length * num_classes
+    OCL_CHECK(err, err = store_krnl.setArg(1, buffer_predictions));
+    OCL_CHECK(err, err = store_krnl.setArg(2, num_streaming_predictions));
+
+    std::cout << "Loading model weights to FPGA..." << std::endl;
+    std::vector<cl::Memory> model_buffers = {
         buffer_coefficients, buffer_intercept,
         buffer_scaler_mean, buffer_scaler_scale, buffer_dilations,
         buffer_num_features_per_dilation, buffer_biases
     };
-    OCL_CHECK(err, err = q.enqueueMigrateMemObjects(input_buffers, 0));
+    OCL_CHECK(err, err = q.enqueueMigrateMemObjects(model_buffers, 0));
     q.finish();
+    std::cout << "Model weights loaded successfully!" << std::endl;
+
+    // Launch inference kernel ONCE (it runs in while(true) loop for BUILD=1)
+    // This matches the mentor's streaming pattern where inference kernel stays running
+    if (streaming_mode) {
+        std::cout << "Launching inference kernel (persistent while(true) loop)..." << std::endl;
+        OCL_CHECK(err, err = q.enqueueTask(minirocket_krnl));
+        // Don't wait - inference kernel runs continuously
+    }
 
     /*====================================================KERNEL===============================================================*/
 
@@ -192,78 +251,94 @@ int main(int argc, char** argv) {
 
     int correct_predictions = 0;
 
+    std::cout << "Starting inference on " << test_inputs.size() << " samples..." << std::endl;
+    if (streaming_mode) {
+        std::cout << "Mode: STREAMING (BUILD=1) - " << time_series_length << " values per sample, "
+                  << num_classes << " predictions per sample (event-driven)" << std::endl;
+    } else {
+        std::cout << "Mode: SINGLE-SHOT (BUILD=0) - " << time_series_length << " values per sample, "
+                  << num_classes << " predictions output" << std::endl;
+    }
+
     for (int test_inputs_idx = 0; test_inputs_idx < test_inputs.size(); test_inputs_idx++) {
+        std::cout << "Sample " << test_inputs_idx << ": Preparing..." << std::flush;
+
         // Prepare input time series
         for (int j = 0; j < time_series_length; j++) {
             time_series_input[j] = test_inputs[test_inputs_idx][j];
         }
 
-        // Host to device data transfer
-        //std::cout << "Loading time series data[" << test_inputs_idx << "] to FPGA" << std::endl;
+        // Host to device data transfer (use q_load queue)
+        std::cout << " H2D..." << std::flush;
         auto h2d_start = std::chrono::high_resolution_clock::now();
-        OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_time_series}, 0));
-        q.finish();
+        OCL_CHECK(err, err = q_load.enqueueMigrateMemObjects({buffer_time_series}, 0));
+        q_load.finish();
         auto h2d_end = std::chrono::high_resolution_clock::now();
         h2d_ms = std::chrono::duration<double, std::milli>(h2d_end - h2d_start).count();
         total_h2d_ms += h2d_ms;
 
-        // Execute kernel
-        //std::cout << "STARTING kernel for input[" << test_inputs_idx << "]" << std::endl;
+        // Execute streaming pipeline (load on q_load, store on q_store)
+        std::cout << " Kernels..." << std::flush;
         auto kernel_start = std::chrono::high_resolution_clock::now();
-        OCL_CHECK(err, err = q.enqueueTask(krnl));
-        q.finish();
+
+        if (streaming_mode) {
+            // BUILD=1: Inference kernel already running on q (infinite loop), just launch load/store
+            OCL_CHECK(err, err = q_load.enqueueTask(load_krnl));
+            OCL_CHECK(err, err = q_store.enqueueTask(store_krnl));
+            q_store.finish();  // Wait for store to complete (inference streams data to store)
+        } else {
+            // BUILD=0: Launch all three kernels on same queue
+            OCL_CHECK(err, err = q.enqueueTask(load_krnl));
+            OCL_CHECK(err, err = q.enqueueTask(minirocket_krnl));
+            OCL_CHECK(err, err = q.enqueueTask(store_krnl));
+            q.finish();
+        }
+        std::cout << " Done!" << std::endl;
+
         auto kernel_end = std::chrono::high_resolution_clock::now();
         kernel_ms = std::chrono::duration<double, std::milli>(kernel_end - kernel_start).count();
         total_kernel_ms += kernel_ms;
 
-        // Device to host data transfer
-        //std::cout << "Transferring results for input[" << test_inputs_idx << "] from FPGA to host" << std::endl;
+        // Device to host data transfer (use q_store queue)
         auto d2h_start = std::chrono::high_resolution_clock::now();
-        OCL_CHECK(err, err = q.enqueueMigrateMemObjects({buffer_predictions}, CL_MIGRATE_MEM_OBJECT_HOST));
-        q.finish();
+        OCL_CHECK(err, err = q_store.enqueueMigrateMemObjects({buffer_predictions}, CL_MIGRATE_MEM_OBJECT_HOST));
+        q_store.finish();
         auto d2h_end = std::chrono::high_resolution_clock::now();
         d2h_ms = std::chrono::duration<double, std::milli>(d2h_end - d2h_start).count();
         total_d2h_ms += d2h_ms;
     
         /*====================================================PRINTING OUTPUTS===============================================================*/
 
+        // In streaming mode, use the FINAL prediction (after all time series values processed)
+        // BUILD=0 (single-shot): offset = 0
+        // BUILD=1 (streaming): offset = (time_series_length - 1) * num_classes
+        int final_pred_offset = streaming_mode ? ((time_series_length - 1) * num_classes) : 0;
 
-        // // Find predicted class
-        // int predicted_class = 0;
-        // float max_score = prediction_output[0];
-        
-        // std::cout << "Classification scores: ";
-        // for (int i = 0; i < num_classes; i++) {
-        //     std::cout << "Class" << i << "=" << std::fixed << std::setprecision(4) << prediction_output[i] << " ";
-        //     if (prediction_output[i] > max_score) {
-        //         max_score = prediction_output[i];
-        //         predicted_class = i;
-        //     }
-        // }
-        // std::cout << std::endl;
-        
-        // std::cout << "Predicted class: " << predicted_class << " (score: " << std::fixed << std::setprecision(4) << max_score << ")" << std::endl;
-        
-        // // Get expected class directly from labels
-        // int expected_class = (test_inputs_idx < expected_classes.size()) ? expected_classes[test_inputs_idx] : 0;
-        // std::cout << "Expected class: " << expected_class << std::endl;
+        // Find predicted class from final prediction
+        int predicted_class = 0;
+        float max_score = prediction_output[final_pred_offset];
 
-        // bool correct = (predicted_class == expected_class);
-        // if (correct) {
-        //     correct_predictions++;
-        //     std::cout << "Prediction correct!" << std::endl;
-        // } else {
-        //     std::cout << "Prediction incorrect!" << std::endl;
-        // }
+        for (int i = 0; i < num_classes; i++) {
+            if (prediction_output[final_pred_offset + i] > max_score) {
+                max_score = prediction_output[final_pred_offset + i];
+                predicted_class = i;
+            }
+        }
 
-        // // Print timing results
-        // double single_ms = h2d_ms + kernel_ms + d2h_ms;
-        // std::cout << "\n========== TIMING RESULTS ==========" << std::endl;
-        // std::cout << "H2D transfer:      " << std::fixed << std::setprecision(3) << h2d_ms << " ms" << std::endl;
-        // std::cout << "Kernel execution:  " << std::fixed << std::setprecision(3) << kernel_ms << " ms" << std::endl;
-        // std::cout << "D2H transfer:      " << std::fixed << std::setprecision(3) << d2h_ms << " ms" << std::endl;
-        // std::cout << "Total latency:     " << std::fixed << std::setprecision(3) << single_ms << " ms" << std::endl;
-        // std::cout << "====================================" << std::endl;
+        // Get expected class directly from labels
+        int expected_class = (test_inputs_idx < expected_classes.size()) ? expected_classes[test_inputs_idx] : 0;
+
+        bool correct = (predicted_class == expected_class);
+        if (correct) {
+            correct_predictions++;
+        }
+
+        // Print per-sample results (optional - can comment out for speed)
+        if (test_inputs_idx < 5 || test_inputs_idx == test_inputs.size() - 1) {
+            std::cout << "Sample " << test_inputs_idx << ": Predicted=" << predicted_class
+                      << " Expected=" << expected_class
+                      << " (" << (correct ? "CORRECT" : "WRONG") << ")" << std::endl;
+        }
 
     }
     /*====================================================RESULTS===============================================================*/

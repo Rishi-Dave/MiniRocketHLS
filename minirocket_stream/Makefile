@@ -138,7 +138,10 @@ build: check-vitis check-device $(BINARY_CONTAINERS)
 xclbin: build
 
 ############################## Setting Rules for Binary Containers (Building Kernels) ##############################
+# All three kernels for 3-stage streaming pipeline
+BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/load.xo
 BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/minirocket_inference.xo
+BINARY_CONTAINER_krnl_OBJS += $(IP_REPO)/store_kernel.xo
 
 $(BUILD_DIR)/krnl.xclbin: $(BINARY_CONTAINER_krnl_OBJS)
 	mkdir -p $(BUILD_DIR)

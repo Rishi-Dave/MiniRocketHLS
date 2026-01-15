@@ -1,0 +1,19 @@
+Columns: ['timestamp', '12v_aux_curr', '12v_aux_vol', '12v_pex_curr', '12v_pex_vol', 'vccint_curr', 'vccint_vol', '3v3_pex_curr', '3v3_pex_vol', 'cage_temp0', 'cage_temp1', 'cage_temp2', 'cage_temp3', 'dimm_temp0', 'dimm_temp1', 'dimm_temp2', 'dimm_temp3', 'fan_temp', 'fpga_temp', 'hbm_temp', 'se98_temp0', 'se98_temp1', 'se98_temp2', 'vccint_temp', 'fan_rpm']
+
+=== POWER STATISTICS (W) ===
+12v_aux_power_W    mean= 14.82  min= 14.68  max= 14.95
+12v_pex_power_W    mean= 75.11  min= 71.88  max= 77.33
+vccint_power_W     mean=  0.00  min=  0.00  max=  0.00
+3v3_pex_power_W    mean=  0.00  min=  0.00  max=  0.00
+
+TOTAL BOARD POWER
+Mean : 89.93 W
+Min  : 86.65 W
+Max  : 92.08 W
+Std  : 1.05 W
+
+=== TEMPERATURE STATISTICS (°C) ===
+fan_temp        mean= 32.2  max= 33.0
+fpga_temp       mean= 27.1  max= 28.0
+hbm_temp        mean= 28.0  max= 28.0
+vccint_temp     mean=  0.0  max=  0.0
