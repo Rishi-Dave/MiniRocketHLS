@@ -149,12 +149,16 @@ void apply_scaler_hls(
     int_t num_features
 ) {
     #pragma HLS INLINE off
-    
-    SCALE_LOOP: for (int_t i = 0; i < num_features; i++) {
-        #pragma HLS PIPELINE II=1
-        #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
-        
-        scaled_features[i] = (features[i] - scaler_mean[i]) / scaler_scale[i];
+    #pragma HLS ARRAY_PARTITION variable=features complete dim=1
+    #pragma HLS ARRAY_PARTITION variable=scaled_features complete dim=1
+    #pragma HLS ARRAY_PARTITION variable=scaler_mean complete dim=1
+    #pragma HLS ARRAY_PARTITION variable=scaler_scale complete dim=1
+
+    SCALE_LOOP: for (int_t i = 0; i < MAX_FEATURES; i++) {
+        #pragma HLS UNROLL
+        if (i < num_features) {
+            scaled_features[i] = (features[i] - scaler_mean[i]) / scaler_scale[i];
+        }
     }
 }
 
@@ -168,37 +172,30 @@ void linear_classifier_predict_hls(
     int_t num_classes
 ) {
     #pragma HLS INLINE off
-    
-    if (num_classes == 2) {
-        // Binary classification: use single decision function
-        data_t score = intercept[0];
-        
-        BINARY_FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
-            #pragma HLS PIPELINE II=1
-            #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
-            
-            score += coefficients[0][j] * scaled_features[j];
-        }
-        
-        predictions[0] = (data_t)0.0 - score;  // Class 0 score
-        predictions[1] = score;   // Class 1 score
-    } else {
-        // Multi-class classification
-        CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
-            #pragma HLS PIPELINE off
-            #pragma HLS LOOP_TRIPCOUNT min=2 max=4
-            
+    #pragma HLS ARRAY_PARTITION variable=scaled_features complete dim=1
+    #pragma HLS ARRAY_PARTITION variable=predictions complete dim=1
+    #pragma HLS ARRAY_PARTITION variable=coefficients complete dim=2
+    #pragma HLS ARRAY_PARTITION variable=intercept complete dim=1
+
+    CLASS_LOOP: for (int_t i = 0; i < MAX_CLASSES; i++) {
+        #pragma HLS UNROLL
+        #pragma HLS LOOP_TRIPCOUNT min=2 max=4
+        if (i < num_classes) {
             data_t score = intercept[i];
-            
-            FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
-                #pragma HLS PIPELINE II=1
-                #pragma HLS LOOP_TRIPCOUNT min=100 max=10000
-                
+
+            FEATURE_LOOP: for (int_t j = 0; j < MAX_FEATURES; j++) {
+                #pragma HLS UNROLL
                 score += coefficients[i][j] * scaled_features[j];
             }
-            
             predictions[i] = score;
         }
+    }
+
+    if (num_classes == 2) {
+        // For binary classification, adjust scores to represent both classes
+        data_t binary_score = predictions[0];
+        predictions[0] = (data_t)0.0 - binary_score;  // Class 0 score
+        predictions[1] = binary_score;   // Class 1 score
     }
 }
 
@@ -328,55 +325,61 @@ extern "C" void minirocket_inference(
     }
 
 #else
-    // Streaming mode (BUILD == 1): Event-driven infinite loop (matches mentor's pattern)
-    // Inference kernel runs continuously, load/store kernels push/pull data per-sample
+    // Streaming mode (BUILD == 1): Batch processing of multiple samples
+    // Each sample = time_series_length consecutive values
+    // Only output predictions AFTER receiving a complete sample
+    int_t value_count = 0;  // Count values within current sample
+
     while (true) {
         if (!input_timeseries.empty()) {
-            // Read next sample from stream
+            // Read next value from stream
             data_t v = input_timeseries.read();
 
-            // Shift time series data (sliding window)
-            SHIFT_WINDOW: for (int_t i = time_series_length - 1; i > 0; i--) {
-                #pragma HLS PIPELINE II=1
-                local_time_series[i] = local_time_series[i-1];
-            }
-            local_time_series[0] = v;
+            // Store value at current position (filling buffer left-to-right)
+            local_time_series[value_count] = v;
+            value_count++;
 
-            // Feature extraction
-            minirocket_feature_extraction_hls(
-                local_time_series,
-                local_features,
-                local_dilations,
-                local_num_features_per_dilation,
-                local_biases,
-                time_series_length,
-                num_dilations,
-                num_features
-            );
+            // After receiving a complete sample, process and output predictions
+            if (value_count >= time_series_length) {
+                // Feature extraction
+                minirocket_feature_extraction_hls(
+                    local_time_series,
+                    local_features,
+                    local_dilations,
+                    local_num_features_per_dilation,
+                    local_biases,
+                    time_series_length,
+                    num_dilations,
+                    num_features
+                );
 
-            // Apply scaling
-            apply_scaler_hls(
-                local_features,
-                local_scaled_features,
-                local_scaler_mean,
-                local_scaler_scale,
-                num_features
-            );
+                // Apply scaling
+                apply_scaler_hls(
+                    local_features,
+                    local_scaled_features,
+                    local_scaler_mean,
+                    local_scaler_scale,
+                    num_features
+                );
 
-            // Linear classification
-            linear_classifier_predict_hls(
-                local_scaled_features,
-                local_predictions,
-                local_coefficients,
-                local_intercept,
-                num_features,
-                num_classes
-            );
+                // Linear classification
+                linear_classifier_predict_hls(
+                    local_scaled_features,
+                    local_predictions,
+                    local_coefficients,
+                    local_intercept,
+                    num_features,
+                    num_classes
+                );
 
-            // Write predictions to AXI stream (one prediction per sample)
-            WRITE_PREDS: for (int_t i = 0; i < num_classes; i++) {
-                #pragma HLS PIPELINE II=1
-                output_predictions.write(local_predictions[i]);
+                // Write predictions to AXI stream (one set per complete sample)
+                WRITE_PREDS: for (int_t i = 0; i < num_classes; i++) {
+                    #pragma HLS PIPELINE II=1
+                    output_predictions.write(local_predictions[i]);
+                }
+
+                // Reset counter for next sample
+                value_count = 0;
             }
         }
     }
