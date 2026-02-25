@@ -256,3 +256,7 @@ credentials.json
 # Keep cmake modules
 !**/cmake/**/*.cmake
 !**/cmake/Find*.cmake
+
+
+benchmarks/*.zip
+benchmarks/*/*
