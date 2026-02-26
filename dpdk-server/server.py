@@ -101,20 +101,20 @@ shm.close_fd()
 
 def send_to_dpdk(value):
     """Write float to DPDK, set ready flag."""
-    mapfile.seek(0)
+    mapfile.seek(4)
     # Wait if previous value hasn't been consumed
     while struct.unpack('i', mapfile.read(4))[0] == 1:
         time.sleep(0.001)
-        mapfile.seek(0)
+        mapfile.seek(4)
     # Write new value
     mapfile.seek(0)
     mapfile.write(struct.pack('f', value))
     mapfile.write(struct.pack('i', 1))  # ready_to_dpdk = 1
 
-def wait_for_reply():
-    """Block until DPDK writes a reply."""
+def wait_for_request():
+    """Block until DPDK writes a request."""
     while True:
-        mapfile.seek(8)  # offset of from_dpdk
+        mapfile.seek(12)  # offset of from_dpdk
         ready = struct.unpack('i', mapfile.read(4))[0]
         if ready == 1:
             mapfile.seek(8)
@@ -137,12 +137,12 @@ def main():
     rocket = None
 
     if args.model == 'MiniRocket':
-        rocket = MiniRocket(n_kernels=840, random_state=42, n_jobs=-1)
+        rocket = MiniRocket(n_kernels=840, random_state=42)
     elif args.model == 'MultiRocket':
-        rocket = MultiRocket(n_kernels=840, random_state=42, n_jobs=-1)
+        rocket = MultiRocket(n_kernels=840, random_state=42)
     else:
         print(f"Unknown model: {args.model}. Defaulting to MiniRocket.")
-        rocket = MiniRocket(n_kernels=840, random_state=42, n_jobs=-1)
+        rocket = MiniRocket(n_kernels=840, random_state=42)
 
     print(f"Loading and training on dataset: {args.dataset}")
     X_train,  y_train, X_test, y_test = load_real_dataset(args.dataset)
@@ -153,23 +153,36 @@ def main():
 
     classifier = RidgeClassifierCV(alphas=np.logspace(-3, 3, 10))
     classifier.fit(X_train_scaled, y_train)
-    
-    window = np.zeros((128,), dtype=np.float32)  # sliding windo
+    print(X_test.shape)
+    window = np.zeros((X_test.shape[2],), dtype=np.float32)  # sliding window
+    print(f"Initial window shape: {window.shape}")
     window = window.reshape(1, -1)
 
-    while True:
+    stream = X_test.flatten()
+    stream = stream[:X_test.shape[2] * 3] 
+    print(f"Stream length: {len(stream)}")
+    duration = 0
 
-        value = wait_for_reply()
+
+    for i in range(len(stream)):
+
+        value = wait_for_request()
         window = np.roll(window, -1, axis=1)
         window[0, -1] = value
 
+        start = time.time()
         window_transform = rocket.transform(window)
         window_scaled = scaler.transform(window_transform)
         y_pred = classifier.predict(window_scaled)
+        end = time.time()
+        duration += (end - start)
 
         print(f"Predicted class: {y_pred[0]}")
         
         send_to_dpdk(float(y_pred[0]))  # Send predicted class back to DPDK
+
+    print(f"Processed {len(stream)} values in {duration:.2f} seconds (avg {duration/len(stream):.4f} sec/value)")
+
 
 if __name__ == "__main__":
     main()

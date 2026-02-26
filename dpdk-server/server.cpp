@@ -53,14 +53,14 @@ void init_shared_memory() {
 }
 
 float wait_for_python_reply() {
-    // Busy wait until ready_to_python becomes 1
-    while (buf->ready_to_python == 0) {
+    // Busy wait until ready_to_dpdk becomes 1
+    while (buf->ready_to_dpdk == 0) {
         // Optionally, yield CPU to avoid 100% spinning
         std::this_thread::sleep_for(std::chrono::microseconds(50));
     }
 
-    float val = buf->from_dpdk;
-    buf->ready_to_python = 0; // mark read
+    float val = buf->from_python;
+    buf->ready_to_dpdk = 0; // mark read
     return val;
 }
 

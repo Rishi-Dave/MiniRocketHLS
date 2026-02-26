@@ -18,8 +18,8 @@ print(f"Loaded ArrowHead dataset: X shape {X.shape}, y shape {y.shape}")
 
 stream = X.flatten()
 print(f"Stream length: {len(stream)}")
-# stream = stream[:len(X)]
-# print(f"Modified Stream length: {len(stream)}")
+stream = stream[:X.shape[2] * 3]  # Use only first 100 time steps for testing
+print(f"Modified Stream length: {len(stream)}")
 i = 0
 
 start = time.time()
