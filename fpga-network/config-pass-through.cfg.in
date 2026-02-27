@@ -1,0 +1,17 @@
+[connectivity]
+nk=pass_through:1:pass_through_1
+nk=cmac_0:1:cmac_0
+nk=networklayer:1:networklayer_0
+
+slr=cmac_0:SLR2
+slr=networklayer_0:SLR2
+
+sc=cmac_0.M_AXIS:networklayer_0.S_AXIS_eth2nl
+sc=networklayer_0.M_AXIS_nl2eth:cmac_0.S_AXIS
+
+sc=pass_through_1.output_predictions:networklayer_0.S_AXIS_sk2nl
+sc=networklayer_0.M_AXIS_nl2sk:pass_through_1.input_timeseries
+
+[debug]
+chipscope=pass_through_1:OUTPUT_PREDICTIONS
+chipscope=networklayer_0:M_AXIS_nl2sk

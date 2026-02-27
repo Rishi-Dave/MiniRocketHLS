@@ -34,6 +34,8 @@ set design_name "cmac_bd"
 create_bd_design ${design_name}
 open_bd_design ${design_name}
 
+
+report_ip_status -license_status
 ##### Create and configure CMAC IP #####
 
 # Default GT reference frequency
@@ -159,8 +161,6 @@ set_property -dict [ list \
   CONFIG.ENABLE_PIPELINE_REG         {1} \
   CONFIG.INCLUDE_RS_FEC              {1} \
 ] $cmac_ip
-
-
 
 ###### Create interface ports ######
 
@@ -392,7 +392,7 @@ assign_bd_address -target_address_space [get_bd_addr_spaces cmac_sync/s_axi] [ge
 ###### Validate and save the IPI ######
 
 validate_bd_design
-save_bd_design
+#save_bd_design
 
 reset_target all [get_files cmac_bd.bd]
 generate_target all [get_files cmac_bd.bd]

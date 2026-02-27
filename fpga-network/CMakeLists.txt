@@ -17,3 +17,4 @@ if (NOT VITIS_HLS_FOUND)
 endif()
 
 add_subdirectory(minirocket)
+add_subdirectory(pass_through)

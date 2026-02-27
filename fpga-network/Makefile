@@ -26,6 +26,8 @@ DESIGN ?= benchmark
 XCLBIN_NAME ?= vnx_$(DESIGN)_if$(INTERFACE)
 MAX_SOCKETS ?= 16
 
+COMPUTER_KERNL = pass_through
+
 XSA := $(strip $(patsubst %.xpfm, % , $(shell basename $(DEVICE))))
 TEMP_DIR := _x.$(XSA)
 VPP := $(XILINX_VITIS)/bin/v++
@@ -47,7 +49,7 @@ SWITCH_IP_FOLDER ?= $(shell readlink -f ./$(BENCHMARDIR)/packaged_kernel_switch_
 IPREPO = ./build/iprepo
 
 LIST_XO = $(NETLAYERDIR)$(TEMP_DIR)/networklayer.xo
-LIST_XO += $(IPREPO)/minirocket_inference.xo
+LIST_XO += $(IPREPO)/$(COMPUTER_KERNL).xo
 
 CONFIGFLAGS = --config config.cfg
 #CONFIGFLAGS += --kernel_frequency 280
@@ -156,8 +158,12 @@ check-interface:
 
 #Create configuration file for current design and settings
 create-conf-file:
-	cp config.cfg.in config.cfg
-	echo "" >> config.cfg
+	@if [[ $(COMPUTER_KERNL) != "pass_through" ]]; then\
+		cp config.cfg.in config.cfg;\
+	fi
+	@if [[ $(COMPUTER_KERNL) == "pass_through" ]]; then\
+		cp config-pass-through.cfg.in config.cfg;\
+	fi
 	echo "" >> config.cfg
 	echo "[advanced]" >> config.cfg
 	echo "param=compiler.userPostSysLinkOverlayTcl=$(POSTSYSLINKTCL)" >> config.cfg

@@ -69,6 +69,8 @@ add_files -norecurse [glob ${root_dir}/src/rx_sync.v]
 add_files -norecurse [glob ${root_dir}/src/frame_padding.v]
 add_files -fileset constrs_1 -norecurse [glob ${root_dir}/src/cmac_synq_false_path.xdc]
 
+puts "INFO: Test\n"
+
 update_compile_order -fileset sources_1
 
 source ${root_dir}/bd_cmac.tcl
