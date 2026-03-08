@@ -25,6 +25,7 @@ build_*/
 build_dir.*/
 _x/
 _x.*/
+_x_*/
 logs_*/
 .ipcache/
 .run/
@@ -94,7 +95,7 @@ optimized_version_*/_x*
 # Trained models in old locations (can be regenerated)
 *_fpga_model.json
 *_fpga_test.json
-*minirocket_model.json
+*_minirocket_model.json
 minirocket_model_test_data.json
 minirocket_ucr_model.json
 minirocket_ucr_model_test_data.json
@@ -247,9 +248,6 @@ credentials.json
 !**/Makefile
 !*.mk
 !**/xrt.ini
-
-# Keep small model JSON files (not test_data which are too large)
-!**/*_minirocket_model.json
 
 # Documentation
 !*.md
