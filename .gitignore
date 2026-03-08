@@ -94,7 +94,7 @@ optimized_version_*/_x*
 # Trained models in old locations (can be regenerated)
 *_fpga_model.json
 *_fpga_test.json
-minirocket_model.json
+*minirocket_model.json
 minirocket_model_test_data.json
 minirocket_ucr_model.json
 minirocket_ucr_model_test_data.json
