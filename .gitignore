@@ -238,14 +238,18 @@ credentials.json
 
 # Configuration (needed for builds)
 !config.cfg
-!config_4cu.cfg
+!config_*cu.cfg
 !**/config.cfg
-!**/config_4cu.cfg
+!**/config_*cu.cfg
 !CMakeLists.txt
 !**/CMakeLists.txt
 !Makefile
 !**/Makefile
 !*.mk
+!**/xrt.ini
+
+# Keep small model JSON files (not test_data which are too large)
+!**/*_minirocket_model.json
 
 # Documentation
 !*.md
