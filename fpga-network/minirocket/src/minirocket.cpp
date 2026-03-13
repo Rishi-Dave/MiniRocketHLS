@@ -31,7 +31,6 @@ static ap_uint<1> weights[NUM_KERNELS][KERNEL_SIZE] = {
 // Uses ZERO DSPs: XNOR on sign bit + conditional exponent increment
 data_t optimized_fp_multiply(ap_uint<1> x, data_t y) {
     #pragma HLS INLINE
-    #pragma HLS PIPELINE
 
     float_num_t yb;
     yb.fp_num = y;
