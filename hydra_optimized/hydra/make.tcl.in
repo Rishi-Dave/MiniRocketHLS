@@ -8,7 +8,6 @@ set_top hydra_inference
 
 # Add source files
 add_files @CMAKE_CURRENT_SOURCE_DIR@/src/hydra.cpp
-add_files @CMAKE_CURRENT_SOURCE_DIR@/src/hydra_pooling.cpp
 
 # Add testbench files
 add_files -tb @CMAKE_CURRENT_SOURCE_DIR@/test/test_hydra.cpp

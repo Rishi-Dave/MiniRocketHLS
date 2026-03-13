@@ -80,7 +80,7 @@ endif
 # IP synthesis using CMake/Vitis HLS
 ip: check-vitis $(BINARY_CONTAINER_hydra_OBJS)
 
-$(IP_REPO)/hydra_inference.xo: hydra/src/hydra.cpp hydra/src/hydra_pooling.cpp hydra/include/hydra.hpp
+$(IP_REPO)/hydra_inference.xo: hydra/src/hydra.cpp hydra/include/hydra.hpp
 	mkdir -p build
 	cd build && cmake .. && make installip.hydra_inference
 

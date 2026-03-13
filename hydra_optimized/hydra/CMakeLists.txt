@@ -7,7 +7,6 @@ find_package(Vitis REQUIRED)
 
 set(EXAMPLE_HLS_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/hydra.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/hydra_pooling.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/hydra.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_hydra.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/test/hydra_hls_testbench_loader.cpp
@@ -59,7 +58,7 @@ set(IP_REPO ${CMAKE_SOURCE_DIR}/build/iprepo)
 add_custom_target(installip.${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${IP_REPO}
     COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/solution/impl/export.zip
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.xo
             ${IP_REPO}/${PROJECT_NAME}.xo
     DEPENDS ip.${PROJECT_NAME}
     COMMENT "Installing ${PROJECT_NAME}.xo to ${IP_REPO}"
