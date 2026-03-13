@@ -1,0 +1,202 @@
+
+========================================
+  HYDRA FPGA Host Application
+========================================
+
+Configuration:
+  XClbin: build_dir.hw.v2_fixed/krnl.xclbin
+  Model: models/hydra_fruitflies_model.json
+  Test data: models/hydra_fruitflies_test_1000.json
+
+Reading HYDRA model file: models/hydra_fruitflies_model.json
+Parsed HYDRA model parameters:
+  num_kernels: 512
+  num_groups: 8
+  num_features: 1024
+  num_classes: 3
+  time_series_length: 5000
+  kernel_weights size: 4608 (expected: 4608)
+  biases size: 512
+  dilations size: 512
+  scaler_mean size: 1024
+  scaler_scale size: 1024
+  coefficients size (flat): 3072 (expected: 3072)
+  intercept size: 3
+HYDRA model loaded successfully into HLS arrays:
+  Kernels: 512
+  Groups: 8
+  Features: 1024
+  Classes: 3
+
+=== HYDRA Model Info ===
+Kernels: 512
+Groups: 8
+Features: 1024
+Classes: 3
+Time series length: 5000
+========================
+
+Kernels sorted by dilation for FPGA batch processing
+  Dilation distribution: d=1:64 d=2:64 d=4:64 d=8:320 
+Reading HYDRA test data file: models/hydra_fruitflies_test_1000.json
+Parsed test data parameters:
+  num_samples: 1000
+  time_series_length: 5000
+  num_classes: 3
+  time_series size: 1000 x 5000
+  labels size: 1000
+HYDRA test data loaded successfully:
+  Samples: 1000
+  Time series length: 5000
+  Classes: 3
+
+=== Test Data Info ===
+Samples: 1000
+Time series length: 5000
+Classes: 3
+=======================
+
+Found Platform: Xilinx
+
+Device Info:
+  Name: xilinx_u280_gen3x16_xdma_base_1
+  Vendor: Xilinx
+  Max Compute Units: 0
+  Global Memory: 0 GB
+
+Loading XClbin: build_dir.hw.v2_fixed/krnl.xclbin
+Kernel created successfully
+
+Allocating device buffers...
+Device buffers created
+Kernel arguments set
+
+========================================
+Running HYDRA Inference on FPGA
+========================================
+
+Sample   1/1000: predicted=2, actual=0, time=0.750 ms [✗]
+Sample   2/1000: predicted=1, actual=0, time=0.673 ms [✗]
+Sample   3/1000: predicted=2, actual=0, time=0.642 ms [✗]
+Sample   4/1000: predicted=0, actual=0, time=0.698 ms [✓]
+Sample   5/1000: predicted=2, actual=0, time=0.615 ms [✗]
+Sample   6/1000: predicted=0, actual=0, time=0.617 ms [✓]
+Sample   7/1000: predicted=0, actual=0, time=0.611 ms [✓]
+Sample   8/1000: predicted=0, actual=0, time=0.610 ms [✓]
+Sample   9/1000: predicted=0, actual=0, time=0.611 ms [✓]
+Sample  10/1000: predicted=0, actual=0, time=0.611 ms [✓]
+Sample  11/1000: predicted=0, actual=0, time=0.623 ms [✓]
+Sample  21/1000: predicted=0, actual=0, time=0.614 ms [✓]
+Sample  31/1000: predicted=0, actual=0, time=0.637 ms [✓]
+Sample  41/1000: predicted=0, actual=0, time=0.617 ms [✓]
+Sample  51/1000: predicted=2, actual=0, time=0.647 ms [✗]
+Sample  61/1000: predicted=0, actual=0, time=0.650 ms [✓]
+Sample  71/1000: predicted=0, actual=0, time=0.617 ms [✓]
+Sample  81/1000: predicted=2, actual=0, time=0.615 ms [✗]
+Sample  91/1000: predicted=1, actual=0, time=0.616 ms [✗]
+Sample 101/1000: predicted=0, actual=0, time=0.646 ms [✓]
+Sample 111/1000: predicted=2, actual=0, time=0.672 ms [✗]
+Sample 121/1000: predicted=0, actual=0, time=0.678 ms [✓]
+Sample 131/1000: predicted=1, actual=0, time=0.646 ms [✗]
+Sample 141/1000: predicted=0, actual=0, time=0.617 ms [✓]
+Sample 151/1000: predicted=0, actual=0, time=0.620 ms [✓]
+Sample 161/1000: predicted=0, actual=0, time=0.649 ms [✓]
+Sample 171/1000: predicted=0, actual=0, time=0.647 ms [✓]
+Sample 181/1000: predicted=1, actual=1, time=0.649 ms [✓]
+Sample 191/1000: predicted=1, actual=1, time=0.649 ms [✓]
+Sample 201/1000: predicted=1, actual=1, time=0.653 ms [✓]
+Sample 211/1000: predicted=1, actual=1, time=0.646 ms [✓]
+Sample 221/1000: predicted=2, actual=1, time=0.674 ms [✗]
+Sample 231/1000: predicted=1, actual=1, time=0.682 ms [✓]
+Sample 241/1000: predicted=0, actual=1, time=0.639 ms [✗]
+Sample 251/1000: predicted=1, actual=1, time=0.656 ms [✓]
+Sample 261/1000: predicted=1, actual=1, time=0.623 ms [✓]
+Sample 271/1000: predicted=1, actual=1, time=0.646 ms [✓]
+Sample 281/1000: predicted=1, actual=1, time=0.624 ms [✓]
+Sample 291/1000: predicted=1, actual=1, time=0.640 ms [✓]
+Sample 301/1000: predicted=2, actual=1, time=0.688 ms [✗]
+Sample 311/1000: predicted=1, actual=1, time=0.693 ms [✓]
+Sample 321/1000: predicted=1, actual=1, time=0.630 ms [✓]
+Sample 331/1000: predicted=1, actual=1, time=0.661 ms [✓]
+Sample 341/1000: predicted=1, actual=1, time=0.673 ms [✓]
+Sample 351/1000: predicted=2, actual=1, time=0.615 ms [✗]
+Sample 361/1000: predicted=1, actual=1, time=0.649 ms [✓]
+Sample 371/1000: predicted=1, actual=1, time=0.619 ms [✓]
+Sample 381/1000: predicted=1, actual=1, time=0.619 ms [✓]
+Sample 391/1000: predicted=2, actual=1, time=0.615 ms [✗]
+Sample 401/1000: predicted=2, actual=1, time=0.611 ms [✗]
+Sample 411/1000: predicted=2, actual=1, time=0.610 ms [✗]
+Sample 421/1000: predicted=1, actual=1, time=0.617 ms [✓]
+Sample 431/1000: predicted=1, actual=1, time=0.618 ms [✓]
+Sample 441/1000: predicted=1, actual=1, time=0.613 ms [✓]
+Sample 451/1000: predicted=1, actual=1, time=0.643 ms [✓]
+Sample 461/1000: predicted=2, actual=1, time=0.642 ms [✗]
+Sample 471/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 481/1000: predicted=2, actual=2, time=0.612 ms [✓]
+Sample 491/1000: predicted=2, actual=2, time=0.606 ms [✓]
+Sample 501/1000: predicted=2, actual=2, time=0.608 ms [✓]
+Sample 511/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 521/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 531/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 541/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 551/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 561/1000: predicted=2, actual=2, time=0.617 ms [✓]
+Sample 571/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 581/1000: predicted=2, actual=2, time=0.614 ms [✓]
+Sample 591/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 601/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 611/1000: predicted=2, actual=2, time=0.613 ms [✓]
+Sample 621/1000: predicted=2, actual=2, time=0.612 ms [✓]
+Sample 631/1000: predicted=2, actual=2, time=0.614 ms [✓]
+Sample 641/1000: predicted=2, actual=2, time=0.641 ms [✓]
+Sample 651/1000: predicted=2, actual=2, time=0.640 ms [✓]
+Sample 661/1000: predicted=2, actual=2, time=0.633 ms [✓]
+Sample 671/1000: predicted=2, actual=2, time=0.613 ms [✓]
+Sample 681/1000: predicted=2, actual=2, time=0.641 ms [✓]
+Sample 691/1000: predicted=2, actual=2, time=0.623 ms [✓]
+Sample 701/1000: predicted=2, actual=2, time=0.668 ms [✓]
+Sample 711/1000: predicted=2, actual=2, time=0.664 ms [✓]
+Sample 721/1000: predicted=2, actual=2, time=0.639 ms [✓]
+Sample 731/1000: predicted=2, actual=2, time=0.693 ms [✓]
+Sample 741/1000: predicted=2, actual=2, time=0.654 ms [✓]
+Sample 751/1000: predicted=2, actual=2, time=0.639 ms [✓]
+Sample 761/1000: predicted=2, actual=2, time=0.671 ms [✓]
+Sample 771/1000: predicted=2, actual=2, time=0.670 ms [✓]
+Sample 781/1000: predicted=2, actual=2, time=0.646 ms [✓]
+Sample 791/1000: predicted=2, actual=2, time=0.622 ms [✓]
+Sample 801/1000: predicted=2, actual=2, time=0.660 ms [✓]
+Sample 811/1000: predicted=2, actual=2, time=0.638 ms [✓]
+Sample 821/1000: predicted=2, actual=2, time=0.638 ms [✓]
+Sample 831/1000: predicted=2, actual=2, time=0.666 ms [✓]
+Sample 841/1000: predicted=2, actual=2, time=0.637 ms [✓]
+Sample 851/1000: predicted=2, actual=2, time=0.613 ms [✓]
+Sample 861/1000: predicted=2, actual=2, time=0.636 ms [✓]
+Sample 871/1000: predicted=2, actual=2, time=0.669 ms [✓]
+Sample 881/1000: predicted=2, actual=2, time=0.620 ms [✓]
+Sample 891/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 901/1000: predicted=2, actual=2, time=0.611 ms [✓]
+Sample 911/1000: predicted=2, actual=2, time=0.616 ms [✓]
+Sample 921/1000: predicted=2, actual=2, time=0.613 ms [✓]
+Sample 931/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 941/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 951/1000: predicted=2, actual=2, time=0.613 ms [✓]
+Sample 961/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 971/1000: predicted=2, actual=2, time=0.615 ms [✓]
+Sample 981/1000: predicted=2, actual=2, time=0.614 ms [✓]
+Sample 991/1000: predicted=2, actual=2, time=0.638 ms [✓]
+
+========================================
+Results Summary
+========================================
+
+Accuracy: 881/1000 = 88.10%
+
+Performance:
+  Average latency: 0.641 ms
+  Throughput: 1561 inferences/sec
+  Total time: 0.64 s
+
+========================================
+TEST PASSED
+========================================
+
