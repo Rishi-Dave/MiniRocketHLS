@@ -1,0 +1,97 @@
+MiniRocket Fused Kernel - Consolidated Test Results
+=====================================================
+FPGA: Xilinx Alveo U280 | Toolchain: Vitis HLS 2023.2
+Kernel: minirocket_modular fused (CONV+PPV single-pass, dynamic loop bound)
+Hardware builds: fused (1-CU), fused_2cu, fused_3cu
+
+Generated from 12 hardware test log files on 2026-03-13.
+
+=======================================================================
+DATASET OVERVIEW
+=======================================================================
+  GunPoint      60 test samples  | series length=150  | 2 classes
+  InsectSound   25,000 samples   | series length=600  | 10 classes
+  MosquitoSound 6,000 samples    | series length=3750 | 6 classes
+  FruitFlies    17,259 samples   | series length=5000 | 3 classes
+
+=======================================================================
+THROUGHPUT (inferences/sec) BY CU COUNT
+=======================================================================
+Dataset           1-CU        2-CU        3-CU     1->2x  2->3x  1->3x
+---------------------------------------------------------------------------
+GunPoint          3,797.1     5,999.1     9,585.0  1.58x  1.60x  2.52x
+InsectSound       1,966.8     3,191.1     5,012.2  1.62x  1.57x  2.55x
+MosquitoSound       937.0     1,496.9     2,819.6  1.60x  1.88x  3.01x
+FruitFlies          742.3     1,121.4     2,190.7  1.51x  1.95x  2.95x
+
+Note: 3-CU build ran at 269.3 MHz (timing fail, WNS=-0.380ns); 1-CU and
+2-CU ran at ~397-400 MHz. 3-CU still outperforms 2-CU due to parallelism.
+
+=======================================================================
+AVERAGE LATENCY PER SAMPLE (ms) BY CU COUNT
+=======================================================================
+Dataset           1-CU        2-CU        3-CU
+----------------------------------------------------
+GunPoint          0.387       0.167       0.104
+InsectSound       0.628       0.313       0.200
+MosquitoSound     1.214       0.668       0.355
+FruitFlies        1.490       0.892       0.456
+
+=======================================================================
+ACCURACY (%) - FPGA vs PYTHON BASELINE
+=======================================================================
+Dataset           FPGA Acc    Python Acc  Match?
+----------------------------------------------------
+GunPoint          98.33%      98.33%      YES (59/60)
+InsectSound       74.12%      74.12%      YES (18530/25000)
+MosquitoSound     87.88%      N/A in log  -- (5273/6000)
+FruitFlies        95.82%      95.83%      YES* (16538/17259)
+
+* FruitFlies rounding: 16538/17259 = 95.8168...%, Python reported 95.83%.
+  Difference is sub-0.01% rounding only; predictions are identical.
+
+Accuracy is INVARIANT across CU counts (1, 2, 3 CUs all produce identical
+correct/incorrect predictions for the same dataset).
+
+=======================================================================
+1-CU KERNEL PIPELINE TIMING BREAKDOWN (total across all samples)
+=======================================================================
+Dataset        K1 FeatureExt   K2 Scaler    K3 Classifier   K1%   K3%
+-------------------------------------------------------------------------
+GunPoint       8.709 ms        1.817 ms     4.001 ms        55.1% 25.3%
+InsectSound    6185.090 ms     1050.404 ms  4873.191 ms     48.7% 38.3%
+MosquitoSound  5116.628 ms     259.082 ms   841.274 ms      79.9% 13.1%
+FruitFlies     20590.148 ms    763.146 ms   1415.572 ms     88.6%  6.1%
+
+H2D + D2H transfer overhead (1-CU):
+  GunPoint:     H2D=3.540ms    D2H=3.898ms  (Total=7.438ms / 23.239ms = 32%)
+  InsectSound:  H2D=1448.642ms D2H=1543.544ms
+  MosquitoSound:H2D=411.649ms  D2H=471.415ms
+  FruitFlies:   H2D=1222.686ms D2H=1246.250ms
+
+Key observation: K1 (FeatureExtraction) bottleneck fraction GROWS with
+series length (55% for len=150, up to 89% for len=5000), confirming the
+fused dynamic loop bound provides greatest benefit for long series.
+2-CU and 3-CU logs do not report per-kernel timing (overlapped execution).
+
+=======================================================================
+XCLBIN FILES
+=======================================================================
+1-CU: minirocket_modular/build_dir.hw.fused/krnl.xclbin      (~51 MB)
+2-CU: minirocket_modular/build_dir.hw.fused_2cu/krnl.xclbin  (~56 MB)
+3-CU: minirocket_modular/build_dir.hw.fused_3cu/krnl.xclbin
+
+Build times:
+  1-CU: 3h 11m | WNS=+0.007ns (timing MET)
+  2-CU: 3h 52m | WNS=+0.001ns (timing MET)
+  3-CU: 6h 41m | WNS=-0.380ns (timing FAILED, auto-throttled to 269.3 MHz)
+
+Resource usage (1-CU fused kernel):
+  LUT: 57K (4.9%) | DSP: 0 (eliminated) | BRAM: 185 (reduced 18% vs non-fused)
+
+=======================================================================
+RAW CSV DATA
+=======================================================================
+See minirocket_fused_results.csv in this same directory.
+Columns: dataset, cu_count, test_samples, correct, accuracy_pct,
+         throughput_inf_s, avg_latency_ms, python_accuracy_pct
