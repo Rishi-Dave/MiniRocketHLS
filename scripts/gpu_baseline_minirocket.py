@@ -195,31 +195,44 @@ if __name__ == '__main__':
     if device == 'cpu':
         print("WARNING: No GPU found. Running on CPU only.")
 
-    # Try to load real UCR datasets
+    # Try to load real UCR datasets (try multiple aeon API variants)
     datasets = {}
+    dataset_specs = [('InsectSound', 600, 1000), ('MosquitoSound', 3750, 1000), ('FruitFlies', 5000, 1000)]
     try:
         from aeon.datasets import load_classification
 
-        for name, length in [('InsectSound', 600), ('MosquitoSound', 3750), ('FruitFlies', 5000)]:
-            try:
-                X_test, y_test = load_classification(name, split="test")
-                if X_test.ndim == 3:
-                    X_test = X_test.squeeze(1)
-                datasets[name] = {'X': X_test.astype(np.float32), 'y': y_test, 'length': X_test.shape[1]}
-                print(f"  Loaded {name}: {X_test.shape}")
-            except Exception as e:
-                print(f"  Could not load {name}: {e}")
+        for name, length, n_fallback in dataset_specs:
+            loaded = False
+            # Try original name and common UCR variants
+            for try_name in [name, name.upper(), name.lower()]:
+                try:
+                    X_test, y_test = load_classification(try_name, split="test")
+                    if X_test.ndim == 3:
+                        X_test = X_test.squeeze(1)
+                    datasets[name] = {'X': X_test.astype(np.float32), 'y': y_test, 'length': X_test.shape[1]}
+                    print(f"  Loaded {name}: {X_test.shape}")
+                    loaded = True
+                    break
+                except Exception:
+                    continue
+            if not loaded:
+                print(f"  {name} not in aeon registry — using synthetic ({n_fallback} x {length})")
+                X = np.random.randn(n_fallback, length).astype(np.float32)
+                datasets[name] = {'X': X, 'y': np.zeros(n_fallback).astype(str), 'length': length}
     except ImportError:
         print("  aeon not installed — using synthetic data")
 
-    # Fall back to synthetic data if real data unavailable
+    # Fall back to synthetic data if nothing loaded at all
     if not datasets:
         print("\n  Using synthetic datasets:")
-        for name, length, n_test in [('InsectSound', 600, 1000), ('MosquitoSound', 3750, 1000), ('FruitFlies', 5000, 1000)]:
+        for name, length, n_test in dataset_specs:
             X = np.random.randn(n_test, length).astype(np.float32)
             y = np.random.randint(0, 3, n_test).astype(str)
             datasets[name] = {'X': X, 'y': y, 'length': length}
             print(f"    {name}: ({n_test}, {length}) synthetic")
+
+    # NOTE: Synthetic data gives identical throughput numbers as real data —
+    # GPU computation time depends only on tensor dimensions, not values.
 
     # Also add GunPoint-like short series
     datasets['GunPoint_synthetic'] = {
