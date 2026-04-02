@@ -1,0 +1,18 @@
+Attempting to load dataset: InsectSound from UCRArchive
+  Loading from: /home/rdave009/.local/lib/python3.10/site-packages/aeon/datasets/local_data/InsectSound/InsectSound_TRAIN.ts
+Real dataset loaded: InsectSound
+  Classes: 10 ([0 1 2 3 4 5 6 7 8 9])
+  X-train Shape: (25000, 600)
+  y-train Shape: (25000,)
+  X-test Shape: (25000, 600)
+  y-test Shape: (25000,)
+  distribution: [2500 2500 2500 2500 2500 2500 2500 2500 2500 2500]
+Training MiniRocket...
+Evaluating model...
+
+=== MiniRocket CPU Results on InsectSound ===
+Accuracy: 0.788400 (19710/25000)
+Test samples: 25000
+Total test time: 48.0901 seconds
+Throughput: 519.9 inferences/sec
+Avg latency: 1.924 ms/sample

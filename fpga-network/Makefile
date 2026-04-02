@@ -56,7 +56,7 @@ endif
 TEMP_DIR := _x.$(XSA)
 BUILD_DIR := ./build_dir.$(TARGET).$(XSA)
 NETLAYERDIR := ./NetLayers/
-CMACDIR := ./cmac_krnl/
+CMACDIR := ./Ethernet/
 
 MINIROCKET_XO_REPO := ./build/iprepo
 NETLAYER_XO_REPO := $(NETLAYERDIR)$(TEMP_DIR)
@@ -76,8 +76,7 @@ INCLUDES = ./src
 
 MINIROCKET_KRNL := minirocket_inference
 NETLAYER_KRNL := networklayer
-CMAC_KRNL:=cmac_krnl
-include config_cmac.mk
+CMAC_KRNL:=cmac_0
 XOs += $(MINIROCKET_XO_REPO)/$(MINIROCKET_KRNL).xo $(NETLAYER_XO_REPO)/$(NETLAYER_KRNL).xo $(CMAC_XO_REPO)/${CMAC_KRNL}.xo
 
 ############################## Setting up Host Variables ##############################

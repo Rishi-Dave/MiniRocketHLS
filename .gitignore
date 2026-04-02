@@ -15,8 +15,6 @@ ucr_benchmark_4cu
 minirocket_host
 
 *.csv
-
-*.csv
 *.json
 
 # Build directories
@@ -25,12 +23,34 @@ build_*/
 build_dir.*/
 _x/
 _x.*/
+_x_*/
 logs_*/
 .ipcache/
 .run/
 .Xil/
 
 iprepo/
+
+# Compiled CPU/FPGA host binaries (no extension)
+cpu/minirocket_cpu
+cpu/minirocket_cpu_dbg
+cpu/multirocket_cpu
+modular_host
+modular_host_2cu
+modular_host_3cu
+test_hydra_u16
+**/test/test_fe_csim
+**/test/test_fused_u28
+**/test/test_v16_fixed
+**/test/test_hydra_fused
+**/test/test_hydra_optimized
+
+# Large HLS build artifacts (regenerable)
+hydra_optimized/hydra/hydra_inference/
+multirocket_optimized/_x_multirocket/
+
+# Generated test data for scalability sweeps (large, regenerable)
+results/scalability_data/
 
 # HLS validation directories (can be large)
 *_hls_validate/
@@ -67,8 +87,6 @@ tcl_template/include/
 tcl_template/minirocket_hls_testbench_loader.cpp
 tcl_template/minirocket_host.cpp
 tcl_template/_x*
-
-*.json
 
 # Temporary build files in optimized_version_*/
 optimized_version_*/*.cpp
@@ -122,9 +140,10 @@ Thumbs.db
 *.swo
 *~
 
-# IDE
+# IDE & AI assistant
 .vscode/
 .idea/
+.claude/
 *.code-workspace
 
 # Python
@@ -256,3 +275,23 @@ credentials.json
 # Keep cmake modules
 !**/cmake/**/*.cmake
 !**/cmake/Find*.cmake
+
+# ============================================
+# Paper Results & Benchmark Data
+# ============================================
+
+# Allow benchmark results (paper data)
+!results/*.csv
+!results/*.json
+!results/tables/*.tex
+!results/figures/*.pdf
+!results/figures/*.png
+
+# Allow paper-results directory
+!paper-results/**/*.csv
+!paper-results/**/*.log
+!paper-results/**/*.txt
+
+# Allow multi-CU config files
+!**/config_2cu.cfg
+!**/config_3cu.cfg

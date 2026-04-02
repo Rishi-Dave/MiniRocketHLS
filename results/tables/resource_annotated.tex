@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\caption{Resource utilization for MiniRocket accelerator variants. DSP changes between single-node and streaming are due to removal of HBM data mover modules. BRAM increases in streaming are due to CMAC and UDP network stack integration ($\sim$980 BRAM). The fused CONV+PPV kernel achieves 0 DSP by exploiting ternary $\{-1, +2\}$ weights.}
+\label{tab:resource_annotated}
+\begin{tabular}{l l r r r r r l}
+\toprule
+Algorithm & Config & FF & LUTs & DSPs & BRAMs & Freq & Note \\
+\midrule
+MiniRocket & SN Naive+FP & 192,636 & 143,783 & 56 & 277 & 300 MHz &  \\
+MiniRocket & SN Naive+bFP & 192,036 & 143,188 & 32 & 277 & 300 MHz &  \\
+MiniRocket & SN DP-Reuse+bFP & 189,950 & 144,267 & 15 & 304 & 300 MHz &  \\
+MiniRocket & Stream DP-Reuse+bFP & 153,327 & 135,634 & 2 & 1,320 & 300 MHz & +CMAC/UDP \\
+\addlinespace
+MiniRocket & Fused 1CU & 94,283 & 57,090 & 0 & 185 & 300 MHz & 0 DSP (ternary) \\
+MiniRocket & Fused 2CU & 188,566 & 114,180 & 0 & 370 & 300 MHz & 0 DSP (ternary) \\
+MiniRocket & Fused 3CU & 159,086 & 92,703 & 1264 & 428 & 269 MHz & UNROLL=28 \\
+\addlinespace
+MultiRocket & SN Naive+FP & 214,565 & 161,948 & 68 & 1,475 & 300 MHz &  \\
+MultiRocket & SN Naive+bFP & 207,909 & 158,215 & 44 & 1,619 & 300 MHz &  \\
+MultiRocket & SN DP-Reuse+bFP & 200,496 & 151,145 & 30 & 1,103 & 300 MHz &  \\
+MultiRocket & Stream DP-Reuse+bFP & 194,551 & 148,768 & 4 & 1,350 & 300 MHz & +CMAC/UDP \\
+\bottomrule
+\end{tabular}
+\end{table*}

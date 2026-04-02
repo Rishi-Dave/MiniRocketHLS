@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{MiniRocket CU scaling with fused CONV+PPV kernel. 2-CU runs at 300 MHz (timing met), 3-CU at 269 MHz (timing failed, auto-throttled). Scaling efficiency ranges from 75--88\% for 2 CU and 59--94\% for 3 CU.}
+\label{tab:cu_scaling}
+\begin{tabular}{l r r r r r}
+\toprule
+Dataset & 1 CU & 2 CU & 3 CU & 2/1 Scaling & 3/1 Scaling \\
+\midrule
+GunPoint & 3,797.1 & 5,999.1 & 9,585.0 & 1.58$\times$ & 2.52$\times$ \\
+InsectSound & 1,966.8 & 3,191.1 & 5,012.2 & 1.62$\times$ & 2.55$\times$ \\
+MosquitoSound & 937.0 & 1,496.9 & 2,819.6 & 1.60$\times$ & 3.01$\times$ \\
+FruitFlies & 742.3 & 1,121.4 & 2,190.7 & 1.51$\times$ & 2.95$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}

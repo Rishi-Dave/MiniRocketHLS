@@ -1,0 +1,18 @@
+Attempting to load dataset: FruitFlies from UCRArchive
+  Loading from: /home/rdave009/.local/lib/python3.10/site-packages/aeon/datasets/local_data/FruitFlies/FruitFlies_TRAIN.arff
+Real dataset loaded: FruitFlies
+  Classes: 3 ([0 1 2])
+  X-train Shape: (17259, 5000)
+  y-train Shape: (17259,)
+  X-test Shape: (17259, 5000)
+  y-test Shape: (17259,)
+  distribution: [3032 5071 9156]
+Training MiniRocket...
+Evaluating model...
+
+=== MiniRocket CPU Results on FruitFlies ===
+Accuracy: 0.969755 (16737/17259)
+Test samples: 17259
+Total test time: 438.3861 seconds
+Throughput: 39.4 inferences/sec
+Avg latency: 25.400 ms/sample
