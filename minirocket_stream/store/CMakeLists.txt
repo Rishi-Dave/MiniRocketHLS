@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-set (PROJECT_NAME load)
+set (PROJECT_NAME store_kernel)
 project(${PROJECT_NAME})
 
 # Include custom Find<Module>.cmake scripts to enable searching for Vivado HLS
@@ -26,9 +26,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/make.tcl.in make.tcl)
 
 
 set(EXAMPLE_HLS_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/load.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/load.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_load.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/load.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/load.hpp)
 
 
 #Setup HLS custom targets

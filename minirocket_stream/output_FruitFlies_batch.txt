@@ -1,0 +1,86 @@
+Found Platform
+Platform Name: Xilinx
+INFO: Reading build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+Loading: 'build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin'
+Trying to program device[0]: xilinx_u280_gen3x16_xdma_base_1
+Device[0]: program successful!
+Setting up 3-stage streaming pipeline (load → inference → store)...
+All three kernels created successfully!
+Loading MiniRocket model and test data
+Model file: FruitFlies_minirocket_model.json
+Test file: FruitFlies_minirocket_model_test_data.json
+Loading model...
+Reading model file: FruitFlies_minirocket_model.json
+Parsed model parameters:
+  num_dilations: 10
+  num_features: 840
+  num_classes: 3
+  time_series_length: 5000
+Parsed model arrays.
+  dilations size: 10
+  num_features_per_dilation size: 10
+  biases size: 840
+  scaler_mean size: 840
+  scaler_scale size: 840
+  intercept size: 3
+Parsing multi-class classifier coefficients...
+Parsed classifier coefficients.
+  Coefficients size: 3 x 840
+dilations[0] = 1, num_features_per_dilation[0] = 1
+dilations[1] = 2, num_features_per_dilation[1] = 1
+dilations[2] = 4, num_features_per_dilation[2] = 1
+dilations[3] = 8, num_features_per_dilation[3] = 1
+dilations[4] = 17, num_features_per_dilation[4] = 1
+dilations[5] = 35, num_features_per_dilation[5] = 1
+dilations[6] = 73, num_features_per_dilation[6] = 1
+dilations[7] = 149, num_features_per_dilation[7] = 1
+dilations[8] = 305, num_features_per_dilation[8] = 1
+dilations[9] = 624, num_features_per_dilation[9] = 1
+Model loaded successfully into HLS arrays:
+  Features: 840
+  Classes: 3
+  Dilations: 10
+Loading test data...
+Test data loaded: 17259 samples
+WARNING: Limiting samples from 17259 to 5242 due to buffer size limit
+Preparing batch input: 5242 samples x 5000 values = 26210000 total values
+Setting kernel arguments for 3-stage pipeline...
+Loading model weights to FPGA...
+Model weights loaded successfully!
+
+========== BATCH STREAMING MODE ==========
+Total samples: 5242
+Time series length: 5000
+Total input values: 26210000
+Total output values: 15726
+==========================================
+
+Step 1: H2D transfer (all 26210000 values)... Done! (109.045 ms)
+Step 2: Launching 3-stage pipeline (load → inference → store)... Done! (11012.2 ms)
+Step 3: D2H transfer (all 15726 predictions)... Done! (0.218251 ms)
+
+Processing results...
+Sample 0: Predicted=0 Expected=0 (CORRECT)
+Sample 1: Predicted=1 Expected=0 (WRONG)
+Sample 2: Predicted=2 Expected=0 (WRONG)
+Sample 3: Predicted=2 Expected=0 (WRONG)
+Sample 4: Predicted=0 Expected=0 (CORRECT)
+Sample 5241: Predicted=0 Expected=1 (WRONG)
+
+========== FINAL RESULTS ==========
+Model: FruitFlies_minirocket_model.json
+Test data: FruitFlies_minirocket_model_test_data.json
+Total correct predictions: 1746 / 5242
+Overall accuracy: 33.31 %
+Python baseline accuracy: 95.83 %
+
+========== TIMING RESULTS ==========
+H2D transfer:      109.045 ms
+Kernel execution:  11012.195 ms
+D2H transfer:      0.218 ms
+Total latency:     11121.458 ms
+Throughput:        476.0 inferences/sec
+Per-sample latency: 2.101 ms
+====================================
+
+MiniRocket FPGA inference complete!

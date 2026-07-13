@@ -260,14 +260,48 @@ class MiniRocket:
 
 def load_real_dataset(dataset_name='InsectSound'):
     """Load real time series datasets from sktime"""
+    from aeon.datasets import load_classification, load_from_arff_file
+    from aeon.datasets._data_loaders import load_from_ts_file
+    from pathlib import Path
+
+    print(f"Attempting to load dataset: {dataset_name} from UCRArchive")
+
+    base_path = Path.home() / ".local/lib/python3.10/site-packages/aeon/datasets/local_data" / dataset_name
+
+    # Try both flat and nested directory structures, and both .arff and .ts formats
+    path_patterns = [
+        # Flat directory with .arff
+        (base_path / f"{dataset_name}_TRAIN.arff", base_path / f"{dataset_name}_TEST.arff", 'arff'),
+        # Nested directory with .arff
+        (base_path / dataset_name / f"{dataset_name}_TRAIN.arff", base_path / dataset_name / f"{dataset_name}_TEST.arff", 'arff'),
+        # Flat directory with .ts
+        (base_path / f"{dataset_name}_TRAIN.ts", base_path / f"{dataset_name}_TEST.ts", 'ts'),
+        # Nested directory with .ts
+        (base_path / dataset_name / f"{dataset_name}_TRAIN.ts", base_path / dataset_name / f"{dataset_name}_TEST.ts", 'ts'),
+    ]
+
+    train_path = None
+    test_path = None
+    file_format = None
+
+    for train_p, test_p, fmt in path_patterns:
+        if train_p.exists() and test_p.exists():
+            train_path = str(train_p)
+            test_path = str(test_p)
+            file_format = fmt
+            print(f"Found dataset at: {train_path} (format: {fmt})")
+            break
+
+    if train_path is None:
+        raise FileNotFoundError(f"Could not find dataset {dataset_name} in any expected location")
+
     try:
-        print(f"Attempting to load dataset: {dataset_name} from UCRArchive")
-        
-        from aeon.datasets import load_classification, load_from_arff_file
-        from pathlib import Path
-        
-        X_train, y_train = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
-        X_test, y_test = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data/{dataset_name}/{dataset_name}/{dataset_name}_TEST.arff"))
+        if file_format == 'arff':
+            X_train, y_train = load_from_arff_file(train_path)
+            X_test, y_test = load_from_arff_file(test_path)
+        else:  # ts format
+            X_train, y_train = load_from_ts_file(train_path)
+            X_test, y_test = load_from_ts_file(test_path)
 
         X_train = np.squeeze(X_train)
         X_test = np.squeeze(X_test)
@@ -278,7 +312,6 @@ def load_real_dataset(dataset_name='InsectSound'):
         y_numpy_train = np.array([label_to_int_train[label] for label in y_train])
         y_numpy_test = np.array([label_to_int_test[label] for label in y_test])
 
-
         print(f"Real dataset loaded: {dataset_name}")
         print(f"  Classes: {len(np.unique(y_numpy_train))} ({np.unique(y_numpy_train)})")
         print(f"  X-train Shape: {X_train.shape}")
@@ -286,29 +319,12 @@ def load_real_dataset(dataset_name='InsectSound'):
         print(f"  X-test Shape: {X_test.shape}")
         print(f"  y-test Shape: {y_numpy_test.shape}")
         print(f"  distribution: {np.bincount(y_numpy_train.astype(int))}")
-        
+
         return X_train.astype(np.float32), y_numpy_train.astype(int), X_test.astype(np.float32), y_numpy_test.astype(int)
-        
-    except ImportError as e:
-        print(f"sktime import error: {e}")
-        print("falling back to synthetic data")
-        return generate_sample_data()
+
     except Exception as e:
-        print(f"Error loading dataset {dataset_name}: {e}. Using local file instead.")
-        from pathlib import Path
-        X, y = load_from_arff_file(os.path.join(Path.home(), f".local/lib/python3.10/site-packages/aeon/datasets/local_data//{dataset_name}/{dataset_name}/{dataset_name}_TRAIN.arff"))
-        X = np.squeeze(X)
-        unique_labels = sorted(set(y))
-        label_to_int = {label: i for i, label in enumerate(unique_labels)}
-        y_numpy = np.array([label_to_int[label] for label in y])
-
-
-        print(f"Real dataset loaded: {dataset_name}")
-        print(f"  Classes: {len(np.unique(y))} ({np.unique(y)})")
-        print(f"  X Shape: {X.shape}")
-        print(f"  y Shape: {y.shape}")
-        print(f"  distribution: {np.bincount(y_numpy.astype(int))}")
-        return X.astype(np.float32), y_numpy.astype(int)
+        print(f"Error loading dataset {dataset_name}: {e}")
+        raise
 
 def generate_sample_data(n_samples=1000, length=128, n_classes=4):
     """Generate sample time series data for testing"""

@@ -16,5 +16,7 @@ if (NOT VITIS_HLS_FOUND)
    message(FATAL_ERROR "Vitis HLS not found.")
 endif()
 
-add_subdirectory(minirocket)
+# Add all three kernels for 3-stage streaming pipeline
 add_subdirectory(load)
+add_subdirectory(minirocket)
+add_subdirectory(store)

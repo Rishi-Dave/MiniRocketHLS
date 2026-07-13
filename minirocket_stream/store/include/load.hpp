@@ -19,3 +19,4 @@ typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 #define MAX_DILATIONS 16
 #define MAX_CLASSES 16
 
+#endif // MINIROCKET_INFERENCE_HLS_H
