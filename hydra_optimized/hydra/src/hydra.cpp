@@ -1,133 +1,157 @@
 #include "../include/hydra.hpp"
 
 /**
- * Apply single convolutional kernel with dilation to time series
+ * Optimized HYDRA feature extraction — batch-parallel, UNROLL=16
  *
- * Implements sliding window convolution:
- *   output[t] = sum(window[i] * weights[i]) + bias
+ * Loop structure:
+ *   BATCH_LOOP(32) → CONV_POOL_LOOP(conv_length, II=1) → PARALLEL_KERNELS(16, UNROLL)
  *
- * Uses array partitioning and pipelining for optimal throughput.
- */
-void apply_kernel_hls(
-    data_t time_series[MAX_TIME_SERIES_LENGTH],
-    data_t weights[KERNEL_SIZE],
-    data_t bias,
-    int_t dilation,
-    int_t length,
-    data_t output[MAX_TIME_SERIES_LENGTH],
-    int_t& output_length
-) {
-    #pragma HLS INLINE off
-
-    // Effective kernel span with dilation
-    int_t kernel_span = (KERNEL_SIZE - 1) * dilation + 1;
-
-    if (length < kernel_span) {
-        output_length = 0;
-        return;
-    }
-
-    output_length = length - kernel_span + 1;
-
-    // Sliding window buffer - fully partitioned for parallelism
-    data_t sliding_window[KERNEL_SIZE];
-    #pragma HLS ARRAY_PARTITION variable=sliding_window complete
-
-    // Main convolution loop
-    CONV_LOOP: for (int_t t = 0; t < output_length; t++) {
-        #pragma HLS PIPELINE II=1
-
-        // Load sliding window with dilation
-        WINDOW_LOAD: for (int_t w = 0; w < KERNEL_SIZE; w++) {
-            #pragma HLS UNROLL
-            sliding_window[w] = time_series[t + w * dilation];
-        }
-
-        // Compute dot product
-        data_t sum = bias;
-        DOT_PRODUCT: for (int_t w = 0; w < KERNEL_SIZE; w++) {
-            #pragma HLS UNROLL
-            sum += sliding_window[w] * weights[w];
-        }
-
-        output[t] = sum;
-    }
-}
-
-/**
- * Extract HYDRA features from time series
+ * IMPORTANT: Host must sort kernels by dilation so that all 16 kernels
+ * within each batch share the same dilation value. This enables sharing
+ * the sliding window reads across the batch.
  *
- * For each of 512 kernels:
- *   1. Apply convolution with dilation
- *   2. Extract max pooling (maximum value)
- *   3. Extract global mean
- *
- * Total features: 512 kernels × 2 pooling operators = 1,024 features
+ * Key optimizations:
+ * 1. ap_fixed<32,16> → 1-cycle accumulation (vs 7-cycle float)
+ * 2. 5 time series BRAM copies → conflict-free 9-port reads
+ * 3. UNROLL=16 → 16 kernels processed per clock cycle
+ * 4. Shared sliding window across batch (requires uniform dilation per batch)
+ * 5. acc_t<48,32> running_sum → overflow-safe for 5000+ timestep series
+ * 6. Fused conv+pooling in single pass
  */
 void hydra_feature_extraction_hls(
-    data_t time_series[MAX_TIME_SERIES_LENGTH],
+    data_t ts0[MAX_TIME_SERIES_LENGTH],
+    data_t ts1[MAX_TIME_SERIES_LENGTH],
+    data_t ts2[MAX_TIME_SERIES_LENGTH],
+    data_t ts3[MAX_TIME_SERIES_LENGTH],
+    data_t ts4[MAX_TIME_SERIES_LENGTH],
     data_t features[MAX_FEATURES],
-    data_t kernel_weights[NUM_KERNELS * KERNEL_SIZE],
+    data_t local_weights[NUM_KERNELS][KERNEL_SIZE],
     data_t biases[NUM_KERNELS],
-    int_t dilations[NUM_KERNELS],
-    int_t length,
-    int_t& num_features
+    int_t local_dilations[NUM_KERNELS],
+    int_t time_series_length
 ) {
     #pragma HLS INLINE off
 
-    int_t feature_idx = 0;
+    // Weight array partitioning: enable parallel access for UNROLL_FACTOR kernels
+    #pragma HLS ARRAY_PARTITION variable=local_weights complete dim=2
+    #pragma HLS ARRAY_PARTITION variable=local_weights cyclic factor=UNROLL_FACTOR dim=1
 
-    // Buffer for convolution output
-    data_t conv_output[MAX_TIME_SERIES_LENGTH];
+    // Process all kernels in batches of UNROLL_FACTOR
+    // Host sorts kernels by dilation, so all kernels in a batch share the same dilation
+    BATCH_LOOP: for (int_t batch = 0; batch < NUM_BATCHES; batch++) {
+        #pragma HLS LOOP_TRIPCOUNT min=32 max=32
 
-    // Current kernel weights
-    data_t current_weights[KERNEL_SIZE];
-    #pragma HLS ARRAY_PARTITION variable=current_weights complete
+        int_t kg = batch * UNROLL_FACTOR;  // base kernel index for this batch
 
-    // Process each kernel
-    KERNEL_LOOP: for (int_t k = 0; k < NUM_KERNELS; k++) {
-        #pragma HLS LOOP_TRIPCOUNT min=512 max=512
+        // Get dilation from first kernel in batch (all same after host sorting)
+        int_t dilation = local_dilations[kg];
+        int_t kernel_span = (KERNEL_SIZE - 1) * dilation + 1;
+        int_t conv_length = time_series_length - kernel_span + 1;
 
-        // Load kernel weights
-        WEIGHT_LOAD: for (int_t w = 0; w < KERNEL_SIZE; w++) {
+        // Pre-load biases into registers
+        data_t group_biases[UNROLL_FACTOR];
+        #pragma HLS ARRAY_PARTITION variable=group_biases complete
+
+        LOAD_BIASES: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
             #pragma HLS UNROLL
-            current_weights[w] = kernel_weights[k * KERNEL_SIZE + w];
+            group_biases[ki] = biases[kg + ki];
         }
 
-        // Apply convolution
-        int_t conv_length;
-        apply_kernel_hls(
-            time_series,
-            current_weights,
-            biases[k],
-            dilations[k],
-            length,
-            conv_output,
-            conv_length
-        );
+        // Pre-load weights into fully-partitioned register array
+        data_t reg_weights[UNROLL_FACTOR][KERNEL_SIZE];
+        #pragma HLS ARRAY_PARTITION variable=reg_weights complete dim=0
 
-        // Extract pooling features
-        data_t max_val, mean_val;
-        compute_two_pooling_operators(
-            conv_output,
-            conv_length,
-            max_val,
-            mean_val
-        );
+        PRELOAD_WEIGHTS: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+            #pragma HLS UNROLL
+            PRELOAD_W_INNER: for (int_t w = 0; w < KERNEL_SIZE; w++) {
+                #pragma HLS UNROLL
+                reg_weights[ki][w] = local_weights[kg + ki][w];
+            }
+        }
 
-        // Store features
-        features[feature_idx++] = max_val;
-        features[feature_idx++] = mean_val;
+        // Initialize accumulators — fully in registers
+        acc_t running_sum[UNROLL_FACTOR];
+        #pragma HLS ARRAY_PARTITION variable=running_sum complete
+        data_t running_max[UNROLL_FACTOR];
+        #pragma HLS ARRAY_PARTITION variable=running_max complete
+
+        INIT_ACC: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+            #pragma HLS UNROLL
+            running_max[ki] = (data_t)(-32000);
+            running_sum[ki] = 0;
+        }
+
+        // Fused conv + pooling: single pass through time series
+        CONV_POOL_LOOP: for (int_t t = 0; t < conv_length; t++) {
+            #pragma HLS PIPELINE II=1
+            #pragma HLS LOOP_TRIPCOUNT min=6 max=5112
+
+            // Read 9 sliding window values from 5 BRAMs (2 ports each = 10)
+            data_t sw[KERNEL_SIZE];
+            #pragma HLS ARRAY_PARTITION variable=sw complete
+
+            sw[0] = ts0[t];
+            sw[1] = ts0[t + dilation];
+            sw[2] = ts1[t + 2 * dilation];
+            sw[3] = ts1[t + 3 * dilation];
+            sw[4] = ts2[t + 4 * dilation];
+            sw[5] = ts2[t + 5 * dilation];
+            sw[6] = ts3[t + 6 * dilation];
+            sw[7] = ts3[t + 7 * dilation];
+            sw[8] = ts4[t + 8 * dilation];
+
+            // Process UNROLL_FACTOR kernels in parallel
+            PARALLEL_KERNELS: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+                #pragma HLS UNROLL
+
+                // 9-tap dot product (fully unrolled)
+                data_t value = group_biases[ki];
+                DOT_PRODUCT: for (int_t w = 0; w < KERNEL_SIZE; w++) {
+                    #pragma HLS UNROLL
+                    value += sw[w] * reg_weights[ki][w];
+                }
+
+                // Streaming max pooling
+                if (value > running_max[ki]) {
+                    running_max[ki] = value;
+                }
+
+                // Streaming sum for mean
+                running_sum[ki] += (acc_t)value;
+            }
+        }
+
+        // Precompute mean values
+        data_t mean_vals[UNROLL_FACTOR];
+        #pragma HLS ARRAY_PARTITION variable=mean_vals complete
+
+        if (conv_length > 0) {
+            acc_t inv_conv_length = (acc_t)1 / (acc_t)conv_length;
+            COMPUTE_MEAN: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+                #pragma HLS UNROLL
+                mean_vals[ki] = (data_t)(running_sum[ki] * inv_conv_length);
+            }
+        } else {
+            ZERO_MEAN: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+                #pragma HLS UNROLL
+                mean_vals[ki] = (data_t)0;
+            }
+        }
+
+        // Write 2 features per kernel: max and mean
+        WRITE_FEATURES: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+            #pragma HLS PIPELINE II=1
+            int_t abs_k = kg + ki;
+            int_t feat_idx = abs_k * 2;
+
+            features[feat_idx]     = (conv_length > 0) ? running_max[ki] : (data_t)0;
+            features[feat_idx + 1] = mean_vals[ki];
+        }
     }
-
-    num_features = feature_idx;
 }
 
 /**
  * Apply StandardScaler normalization
- *
- * Normalizes features: (x - mean) / scale
- * In-place operation modifies features array
  */
 void apply_scaler_hls(
     data_t features[MAX_FEATURES],
@@ -139,26 +163,17 @@ void apply_scaler_hls(
 
     SCALE_LOOP: for (int_t i = 0; i < num_features; i++) {
         #pragma HLS PIPELINE II=1
+        #pragma HLS LOOP_TRIPCOUNT min=1024 max=2048
 
-        data_t mean = scaler_mean[i];
         data_t scale = scaler_scale[i];
-
-        // Avoid division by zero
-        if (scale > 1e-8 || scale < -1e-8) {
-            features[i] = (features[i] - mean) / scale;
-        } else {
-            features[i] = 0.0;
-        }
+        data_t inv_s = (scale != (data_t)0) ? (data_t)((acc_t)1 / (acc_t)scale) : (data_t)0;
+        features[i] = (features[i] - scaler_mean[i]) * inv_s;
     }
 }
 
 /**
  * Ridge linear classifier prediction
- *
- * Computes: prediction = features @ coefficients.T + intercept
- *
- * For each class:
- *   prediction[c] = sum(features[f] * coefficients[f, c]) + intercept[c]
+ * Coefficients in class-major layout: coefficients[c * num_features + f]
  */
 void linear_classifier_predict_hls(
     data_t features[MAX_FEATURES],
@@ -170,55 +185,50 @@ void linear_classifier_predict_hls(
 ) {
     #pragma HLS INLINE off
 
-    // Compute prediction for each class
     CLASS_LOOP: for (int_t c = 0; c < num_classes; c++) {
-        #pragma HLS PIPELINE II=1
         #pragma HLS LOOP_TRIPCOUNT min=2 max=10
 
-        data_t score = intercept[c];
+        acc_t score = (acc_t)intercept[c];
 
-        // Dot product: features @ coefficients[:, c]
         FEATURE_LOOP: for (int_t f = 0; f < num_features; f++) {
             #pragma HLS PIPELINE II=1
             #pragma HLS LOOP_TRIPCOUNT min=1024 max=2048
 
-            // Coefficients stored in row-major: [num_features][num_classes]
-            score += features[f] * coefficients[f * num_classes + c];
+            // Class-major layout: stride-1 access on coefficients for fixed c
+            score += (acc_t)features[f] * (acc_t)coefficients[c * num_features + f];
         }
 
-        prediction[c] = score;
+        prediction[c] = (data_t)score;
     }
 }
 
 /**
- * Main HYDRA inference kernel
+ * Main HYDRA inference kernel — OpenCL entry point
  *
- * Complete pipeline:
- *   1. Load time series from HBM
- *   2. Extract dictionary-based features
- *   3. Normalize features
- *   4. Classify using Ridge
- *   5. Write predictions to HBM
+ * IMPORTANT: Host must sort kernels by dilation value before sending data.
+ * This ensures all kernels within each UNROLL batch share the same dilation.
+ * The host must also reorder scaler/coefficient arrays to match the sorted
+ * feature order.
  *
- * This is the entry point called by the OpenCL host application.
+ * AXI ports use float* for host compatibility.
+ * Internal computation uses ap_fixed<32,16> with acc_t<48,32> accumulators.
  */
 extern "C" void hydra_inference(
-    data_t* time_series_input,
-    data_t* prediction_output,
-    data_t* coefficients,
-    data_t* intercept,
-    data_t* scaler_mean,
-    data_t* scaler_scale,
-    data_t* kernel_weights,
-    data_t* biases,
-    int_t* dilations,
-    int_t time_series_length,
-    int_t num_features,
-    int_t num_classes,
-    int_t num_groups
+    float* time_series_input,
+    float* prediction_output,
+    float* coefficients,
+    float* intercept,
+    float* scaler_mean,
+    float* scaler_scale,
+    float* kernel_weights,
+    float* biases,
+    int* dilations,
+    int time_series_length,
+    int num_features,
+    int num_classes,
+    int num_groups
 ) {
-    // HLS interface pragmas for AXI ports
-    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 offset=slave depth=512
+    #pragma HLS INTERFACE m_axi port=time_series_input bundle=gmem0 offset=slave depth=5120
     #pragma HLS INTERFACE m_axi port=prediction_output bundle=gmem1 offset=slave depth=10
     #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 offset=slave depth=20480
     #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 offset=slave depth=10
@@ -234,95 +244,105 @@ extern "C" void hydra_inference(
     #pragma HLS INTERFACE s_axilite port=num_groups
     #pragma HLS INTERFACE s_axilite port=return
 
-    // Local buffers for computation
-    data_t local_time_series[MAX_TIME_SERIES_LENGTH];
+    // ---- Local buffers ----
+
+    // 5 time series BRAM copies for conflict-free 9-port reads
+    data_t local_ts0[MAX_TIME_SERIES_LENGTH];
+    data_t local_ts1[MAX_TIME_SERIES_LENGTH];
+    data_t local_ts2[MAX_TIME_SERIES_LENGTH];
+    data_t local_ts3[MAX_TIME_SERIES_LENGTH];
+    data_t local_ts4[MAX_TIME_SERIES_LENGTH];
+
+    data_t local_weights[NUM_KERNELS][KERNEL_SIZE];
+    data_t local_biases[NUM_KERNELS];
     data_t local_features[MAX_FEATURES];
     data_t local_prediction[MAX_CLASSES];
-
-    data_t local_kernel_weights[NUM_KERNELS * KERNEL_SIZE];
-    data_t local_biases[NUM_KERNELS];
-    int_t local_dilations[NUM_KERNELS];
 
     data_t local_scaler_mean[MAX_FEATURES];
     data_t local_scaler_scale[MAX_FEATURES];
     data_t local_coefficients[MAX_FEATURES * MAX_CLASSES];
     data_t local_intercept[MAX_CLASSES];
 
-    // Load time series from HBM to local memory
-    LOAD_TS: for (int_t i = 0; i < time_series_length; i++) {
+    int_t local_dilations[NUM_KERNELS];
+
+    // ---- Load from HBM (float → ap_fixed conversion) ----
+
+    COPY_TS: for (int i = 0; i < time_series_length; i++) {
         #pragma HLS PIPELINE II=1
-        local_time_series[i] = time_series_input[i];
+        data_t val = (data_t)time_series_input[i];
+        local_ts0[i] = val;
+        local_ts1[i] = val;
+        local_ts2[i] = val;
+        local_ts3[i] = val;
+        local_ts4[i] = val;
     }
 
-    // Load model parameters from HBM
-    LOAD_KERNELS: for (int_t i = 0; i < NUM_KERNELS * KERNEL_SIZE; i++) {
+    LOAD_WEIGHTS: for (int i = 0; i < NUM_KERNELS * KERNEL_SIZE; i++) {
         #pragma HLS PIPELINE II=1
-        local_kernel_weights[i] = kernel_weights[i];
+        local_weights[i / KERNEL_SIZE][i % KERNEL_SIZE] = (data_t)kernel_weights[i];
     }
 
-    LOAD_BIASES: for (int_t i = 0; i < NUM_KERNELS; i++) {
+    LOAD_BIASES: for (int i = 0; i < NUM_KERNELS; i++) {
         #pragma HLS PIPELINE II=1
-        local_biases[i] = biases[i];
+        local_biases[i] = (data_t)biases[i];
     }
 
-    LOAD_DILATIONS: for (int_t i = 0; i < NUM_KERNELS; i++) {
+    LOAD_DILATIONS: for (int i = 0; i < NUM_KERNELS; i++) {
         #pragma HLS PIPELINE II=1
-        local_dilations[i] = dilations[i];
+        local_dilations[i] = (int_t)dilations[i];
     }
 
-    LOAD_SCALER_MEAN: for (int_t i = 0; i < num_features; i++) {
+    LOAD_SCALER_MEAN: for (int i = 0; i < num_features; i++) {
         #pragma HLS PIPELINE II=1
-        local_scaler_mean[i] = scaler_mean[i];
+        local_scaler_mean[i] = (data_t)scaler_mean[i];
     }
 
-    LOAD_SCALER_SCALE: for (int_t i = 0; i < num_features; i++) {
+    LOAD_SCALER_SCALE: for (int i = 0; i < num_features; i++) {
         #pragma HLS PIPELINE II=1
-        local_scaler_scale[i] = scaler_scale[i];
+        local_scaler_scale[i] = (data_t)scaler_scale[i];
     }
 
-    LOAD_COEF: for (int_t i = 0; i < num_features * num_classes; i++) {
+    LOAD_COEF: for (int i = 0; i < num_features * num_classes; i++) {
         #pragma HLS PIPELINE II=1
-        local_coefficients[i] = coefficients[i];
+        local_coefficients[i] = (data_t)coefficients[i];
     }
 
-    LOAD_INTERCEPT: for (int_t i = 0; i < num_classes; i++) {
+    LOAD_INTERCEPT: for (int i = 0; i < num_classes; i++) {
         #pragma HLS PIPELINE II=1
-        local_intercept[i] = intercept[i];
+        local_intercept[i] = (data_t)intercept[i];
     }
 
-    // Feature extraction
-    int_t extracted_features;
+    // ---- Feature extraction (UNROLL=16, II=1) ----
     hydra_feature_extraction_hls(
-        local_time_series,
+        local_ts0, local_ts1, local_ts2, local_ts3, local_ts4,
         local_features,
-        local_kernel_weights,
+        local_weights,
         local_biases,
         local_dilations,
-        time_series_length,
-        extracted_features
+        (int_t)time_series_length
     );
 
-    // Feature normalization
+    // ---- Feature normalization ----
     apply_scaler_hls(
         local_features,
         local_scaler_mean,
         local_scaler_scale,
-        num_features
+        (int_t)num_features
     );
 
-    // Classification
+    // ---- Classification ----
     linear_classifier_predict_hls(
         local_features,
         local_coefficients,
         local_intercept,
-        num_features,
-        num_classes,
+        (int_t)num_features,
+        (int_t)num_classes,
         local_prediction
     );
 
-    // Write predictions to HBM
-    WRITE_PRED: for (int_t i = 0; i < num_classes; i++) {
+    // ---- Write predictions ----
+    WRITE_PRED: for (int i = 0; i < num_classes; i++) {
         #pragma HLS PIPELINE II=1
-        prediction_output[i] = local_prediction[i];
+        prediction_output[i] = (float)local_prediction[i];
     }
 }
