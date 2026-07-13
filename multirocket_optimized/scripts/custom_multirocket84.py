@@ -19,6 +19,78 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import RidgeClassifierCV
 from sklearn.metrics import accuracy_score
 import json
+import numba
+from numba import njit, prange
+
+
+@njit(parallel=True, cache=True)
+def _numba_extract_features(X, weights, dilations, biases, num_kernels):
+    """
+    Numba-accelerated feature extraction: convolution + 4 pooling ops.
+    Parallelized across samples using all available cores.
+
+    Args:
+        X: (n_samples, n_timepoints) float32
+        weights: (num_kernels, 9) float32
+        dilations: (num_dilations,) int32
+        biases: (num_kernels * num_dilations,) float32
+        num_kernels: int
+
+    Returns:
+        features: (n_samples, num_kernels * num_dilations * 4) float32
+    """
+    n_samples, n_timepoints = X.shape
+    num_dilations = len(dilations)
+    num_features = num_kernels * num_dilations * 4
+    features = np.zeros((n_samples, num_features), dtype=np.float32)
+
+    for si in prange(n_samples):
+        sample = X[si]
+        for di in range(num_dilations):
+            dilation = dilations[di]
+            for ki in range(num_kernels):
+                w = weights[ki]
+                bias = biases[di * num_kernels + ki]
+
+                # Convolution with zero-padding
+                ppv_count = 0
+                mpv_sum = np.float32(0.0)
+                mipv_sum = np.float32(0.0)
+                longest = 0
+                current_streak = 0
+
+                for j in range(n_timepoints):
+                    conv_val = np.float32(0.0)
+                    for k in range(9):
+                        idx = j + (k - 4) * dilation
+                        if 0 <= idx < n_timepoints:
+                            conv_val += sample[idx] * w[k]
+
+                    if conv_val > bias:
+                        ppv_count += 1
+                        mpv_sum += conv_val
+                        mipv_sum += np.float32(j)
+                        current_streak += 1
+                        if current_streak > longest:
+                            longest = current_streak
+                    else:
+                        current_streak = 0
+
+                fi = (di * num_kernels + ki) * 4
+                inv_t = np.float32(1.0 / n_timepoints)
+
+                # PPV
+                features[si, fi] = np.float32(ppv_count) * inv_t
+                # MPV
+                if ppv_count > 0:
+                    features[si, fi + 1] = mpv_sum / np.float32(ppv_count)
+                # MIPV
+                if ppv_count > 0:
+                    features[si, fi + 2] = mipv_sum / np.float32(ppv_count) * inv_t
+                # LSPV
+                features[si, fi + 3] = np.float32(longest) * inv_t
+
+    return features
 
 
 class MultiRocket84:
@@ -206,45 +278,25 @@ class MultiRocket84:
 
     def _extract_features_single_repr(self, X, dilations, biases):
         """
-        Extract features from a single representation
+        Extract features using numba JIT-compiled parallel code.
+
+        Runs convolution + 4 pooling ops at native speed across all CPU cores.
 
         Args:
-            X: Time series data (n_samples, n_timepoints)
+            X: Time series data (n_samples, n_timepoints) float32
             dilations: Array of dilation values
             biases: Bias thresholds
 
         Returns:
             Features (n_samples, num_kernels × num_dilations × 4)
         """
-        n_samples, n_timepoints = X.shape
-        num_dilations = len(dilations)
-        num_features_per_sample = self.num_kernels * num_dilations * 4
+        # Ensure correct dtypes for numba
+        X_f = np.ascontiguousarray(X, dtype=np.float32)
+        w_f = np.ascontiguousarray(self.weights, dtype=np.float32)
+        d_i = np.ascontiguousarray(dilations, dtype=np.int32)
+        b_f = np.ascontiguousarray(biases, dtype=np.float32)
 
-        features = np.zeros((n_samples, num_features_per_sample), dtype=np.float32)
-
-        for sample_idx in range(n_samples):
-            sample = X[sample_idx]
-            feature_idx = 0
-
-            for d_idx, dilation in enumerate(dilations):
-                for k_idx in range(self.num_kernels):
-                    # Apply convolution
-                    C = self._apply_kernel(sample, k_idx, dilation)
-
-                    # Get bias
-                    bias = biases[d_idx * self.num_kernels + k_idx]
-
-                    # Compute 4 pooling features
-                    ppv, mpv, mipv, lspv = self._compute_four_pooling(C, bias)
-
-                    features[sample_idx, feature_idx] = ppv
-                    features[sample_idx, feature_idx + 1] = mpv
-                    features[sample_idx, feature_idx + 2] = mipv
-                    features[sample_idx, feature_idx + 3] = lspv
-
-                    feature_idx += 4
-
-        return features
+        return _numba_extract_features(X_f, w_f, d_i, b_f, self.num_kernels)
 
     def fit(self, X):
         """

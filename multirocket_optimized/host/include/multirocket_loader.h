@@ -6,9 +6,11 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include "ap_fixed.h"
+#include "ap_int.h"
 
-typedef float data_t;
-typedef int32_t int_t;
+typedef ap_fixed<32,16> data_t;
+typedef ap_int<32> int_t;
 
 #define MAX_TIME_SERIES_LENGTH 8192  // Updated for UCR datasets (matches HYDRA)
 #define MAX_FEATURES 50000  // Increased for 4 pooling operators × 2 representations

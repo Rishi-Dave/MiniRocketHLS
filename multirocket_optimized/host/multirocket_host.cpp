@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <iomanip>
 #include <cstring>
+#include <map>
+#include <string>
 
 // JSON parsing
 #include "json.hpp"
@@ -31,12 +33,11 @@ using json = nlohmann::json;
 #include <CL/cl2.hpp>
 #include <CL/cl_ext_xilinx.h>
 
-// Constants (match hardware configuration)
-const int MAX_TIME_SERIES_LENGTH = 512;
-const int MAX_MULTIROCKET_FEATURES = 8000;
-const int MAX_CLASSES = 4;
-const int MAX_DILATIONS = 8;
-const int MAX_FEATURES_PER_REPR = 4000;
+// Constants (must match kernel m_axi depth pragmas in multirocket.cpp)
+const int MAX_TIME_SERIES_LENGTH = 8192;
+const int MAX_FEATURES = 50000;
+const int MAX_CLASSES = 16;
+const int MAX_DILATIONS = 32;
 
 // Helper function to read binary file
 std::vector<char> read_binary_file(const std::string& xclbin_file_name) {
@@ -76,9 +77,16 @@ private:
     cl::Buffer scaler_mean_buf;
     cl::Buffer scaler_scale_buf;
     cl::Buffer dilations_orig_buf;
+    cl::Buffer nfpd_orig_buf;
     cl::Buffer biases_orig_buf;
     cl::Buffer dilations_diff_buf;
+    cl::Buffer nfpd_diff_buf;
     cl::Buffer biases_diff_buf;
+    std::vector<int> nfpd_orig_vec;
+    std::vector<int> nfpd_diff_vec;
+    int num_features_0 = 0;
+    int num_features_1 = 0;
+    int n_feature_per_kernel = 4;
 
     // Model parameters (host side)
     std::vector<float> coefficients_flat;
@@ -227,6 +235,13 @@ public:
         // Create device buffers
         std::cout << "\nAllocating device buffers..." << std::endl;
 
+        // Pad all buffers to MAX sizes declared in kernel m_axi depth pragmas
+        // (XRT reports "offset+size > mem size" when buffer < kernel declared depth).
+        coefficients_flat.resize(MAX_CLASSES * MAX_FEATURES, 0.0f);
+        intercept_vec.resize(MAX_CLASSES, 0.0f);
+        scaler_mean_vec.resize(MAX_FEATURES, 0.0f);
+        scaler_scale_vec.resize(MAX_FEATURES, 1.0f);
+
         input_buf = cl::Buffer(context, CL_MEM_READ_ONLY, MAX_TIME_SERIES_LENGTH * sizeof(float));
         output_buf = cl::Buffer(context, CL_MEM_WRITE_ONLY, MAX_CLASSES * sizeof(float));
 
@@ -246,9 +261,34 @@ public:
                                      scaler_scale_vec.size() * sizeof(float),
                                      scaler_scale_vec.data());
 
+        // Build num_features_per_dilation arrays. custom_multirocket84 lays out biases as
+        // one per (kernel, dilation) => features_per_dilation = biases.size() / num_kernels / num_dilations
+        // For MultiRocket84 this is 1 bias slot per kernel per dilation.
+        int num_kernels = 84;  // MultiRocket84
+        int slots_orig = (int)biases_orig_vec.size() / (num_kernels * num_dilations_orig);
+        int slots_diff = (int)biases_diff_vec.size() / (num_kernels * num_dilations_diff);
+        if (slots_orig < 1) slots_orig = 1;
+        if (slots_diff < 1) slots_diff = 1;
+        nfpd_orig_vec.assign(num_dilations_orig, slots_orig);
+        nfpd_diff_vec.assign(num_dilations_diff, slots_diff);
+        num_features_0 = (int)biases_orig_vec.size();   // 84 * num_dilations_orig * slots
+        num_features_1 = (int)biases_diff_vec.size();
+
+        // Pad dilation/nfpd/biases to MAX sizes to satisfy kernel m_axi depth pragmas
+        dilations_orig_vec.resize(MAX_DILATIONS, 0);
+        dilations_diff_vec.resize(MAX_DILATIONS, 0);
+        nfpd_orig_vec.resize(MAX_DILATIONS, 0);
+        nfpd_diff_vec.resize(MAX_DILATIONS, 0);
+        biases_orig_vec.resize(MAX_FEATURES, 0.0f);
+        biases_diff_vec.resize(MAX_FEATURES, 0.0f);
+
         dilations_orig_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                                        dilations_orig_vec.size() * sizeof(int),
                                        dilations_orig_vec.data());
+
+        nfpd_orig_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                   nfpd_orig_vec.size() * sizeof(int),
+                                   nfpd_orig_vec.data());
 
         biases_orig_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                                     biases_orig_vec.size() * sizeof(float),
@@ -258,26 +298,37 @@ public:
                                        dilations_diff_vec.size() * sizeof(int),
                                        dilations_diff_vec.data());
 
+        nfpd_diff_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                                   nfpd_diff_vec.size() * sizeof(int),
+                                   nfpd_diff_vec.data());
+
         biases_diff_buf = cl::Buffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                                     biases_diff_vec.size() * sizeof(float),
                                     biases_diff_vec.data());
 
-        // Set kernel arguments (one-time setup for model parameters)
+        // Set kernel arguments — must match kernel signature exactly (20 args).
+        // Kernel uses int_t (int32) for all scalar ints.
         int arg = 0;
-        kernel.setArg(arg++, input_buf);              // time_series_input
-        kernel.setArg(arg++, output_buf);             // prediction_output
-        kernel.setArg(arg++, coefficients_buf);       // coefficients
-        kernel.setArg(arg++, intercept_buf);          // intercept
-        kernel.setArg(arg++, scaler_mean_buf);        // scaler_mean
-        kernel.setArg(arg++, scaler_scale_buf);       // scaler_scale
-        kernel.setArg(arg++, dilations_orig_buf);     // dilations_orig
-        kernel.setArg(arg++, biases_orig_buf);        // biases_orig
-        kernel.setArg(arg++, dilations_diff_buf);     // dilations_diff
-        kernel.setArg(arg++, biases_diff_buf);        // biases_diff
-        kernel.setArg(arg++, time_series_length);     // time_series_length
-        kernel.setArg(arg++, num_features);           // num_features
-        kernel.setArg(arg++, num_classes);            // num_classes
-        kernel.setArg(arg++, num_dilations_orig);     // num_dilations
+        kernel.setArg(arg++, input_buf);                          // 0 time_series_input
+        kernel.setArg(arg++, output_buf);                         // 1 prediction_output
+        kernel.setArg(arg++, coefficients_buf);                   // 2 coefficients
+        kernel.setArg(arg++, intercept_buf);                      // 3 intercept
+        kernel.setArg(arg++, scaler_mean_buf);                    // 4 scaler_mean
+        kernel.setArg(arg++, scaler_scale_buf);                   // 5 scaler_scale
+        kernel.setArg(arg++, dilations_orig_buf);                 // 6 dilations_0
+        kernel.setArg(arg++, nfpd_orig_buf);                      // 7 num_features_per_dilation_0
+        kernel.setArg(arg++, biases_orig_buf);                    // 8 biases_0
+        kernel.setArg(arg++, (int)num_dilations_orig);            // 9 num_dilations_0
+        kernel.setArg(arg++, (int)num_features_0);                // 10 num_features_0
+        kernel.setArg(arg++, dilations_diff_buf);                 // 11 dilations_1
+        kernel.setArg(arg++, nfpd_diff_buf);                      // 12 num_features_per_dilation_1
+        kernel.setArg(arg++, biases_diff_buf);                    // 13 biases_1
+        kernel.setArg(arg++, (int)num_dilations_diff);            // 14 num_dilations_1
+        kernel.setArg(arg++, (int)num_features_1);                // 15 num_features_1
+        kernel.setArg(arg++, (int)time_series_length);            // 16 time_series_length
+        kernel.setArg(arg++, (int)num_features);                  // 17 num_features
+        kernel.setArg(arg++, (int)num_classes);                   // 18 num_classes
+        kernel.setArg(arg++, (int)n_feature_per_kernel);          // 19 n_feature_per_kernel
 
         std::cout << "✓ Model loaded and device buffers allocated\n" << std::endl;
         return true;
@@ -357,6 +408,18 @@ int main(int argc, char** argv) {
         int num_samples = test_json["num_samples"];
         std::cout << "Loaded " << num_samples << " test samples\n" << std::endl;
 
+        // Build label->index map from model's class list (labels may be strings like "aedes_female")
+        std::ifstream model_file_for_classes(model_path);
+        json model_json_for_classes;
+        model_file_for_classes >> model_json_for_classes;
+        std::map<std::string, int> label_to_idx;
+        if (model_json_for_classes.contains("classes")) {
+            const auto& classes_arr = model_json_for_classes["classes"];
+            for (size_t ci = 0; ci < classes_arr.size(); ci++) {
+                label_to_idx[classes_arr[ci].get<std::string>()] = (int)ci;
+            }
+        }
+
         // Run predictions
         std::cout << "================================================================================\n";
         std::cout << "Running FPGA Inference\n";
@@ -367,7 +430,14 @@ int main(int argc, char** argv) {
 
         for (int i = 0; i < num_samples; i++) {
             std::string label_str = test_json["labels"][i];
-            int true_label = std::stoi(label_str) - 1;  // Convert "1"/"2" to 0/1
+            int true_label;
+            auto it = label_to_idx.find(label_str);
+            if (it != label_to_idx.end()) {
+                true_label = it->second;
+            } else {
+                try { true_label = std::stoi(label_str) - 1; }
+                catch (...) { true_label = -1; }
+            }
 
             std::vector<float> time_series = test_json["time_series"][i];
 

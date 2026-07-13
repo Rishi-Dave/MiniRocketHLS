@@ -21,7 +21,7 @@ from sklearn.preprocessing import StandardScaler
 from aeon.datasets import load_classification
 
 DATASETS = ['InsectSound', 'MosquitoSound', 'FruitFlies']
-DATA_PATH = "../../hydra_optimized/datasets/ucr_data"
+DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../hydra_optimized/datasets/ucr_data")
 MODEL_DIR = "../models"
 
 
@@ -30,8 +30,17 @@ def train_and_export(dataset_name):
     print(f"Training MultiRocket84 on {dataset_name}")
     print(f"{'='*70}")
 
-    X_train, y_train = load_classification(dataset_name, split="train", extract_path=DATA_PATH)
-    X_test, y_test = load_classification(dataset_name, split="test", extract_path=DATA_PATH)
+    try:
+        X_train, y_train = load_classification(dataset_name, split="train", extract_path=DATA_PATH)
+        X_test, y_test = load_classification(dataset_name, split="test", extract_path=DATA_PATH)
+    except FileNotFoundError:
+        # Fallback: .ts files missing, load .arff directly
+        from aeon.datasets._data_loaders import load_from_arff_file
+        train_path = os.path.join(DATA_PATH, dataset_name, f"{dataset_name}_TRAIN.arff")
+        test_path = os.path.join(DATA_PATH, dataset_name, f"{dataset_name}_TEST.arff")
+        print(f"  .ts files not found, loading from .arff: {train_path}")
+        X_train, y_train = load_from_arff_file(train_path)
+        X_test, y_test = load_from_arff_file(test_path)
 
     if X_train.ndim == 3:
         X_train = X_train.squeeze(1)
