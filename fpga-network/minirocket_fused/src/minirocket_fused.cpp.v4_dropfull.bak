@@ -1,0 +1,634 @@
+/*
+ * MiniRocket Fused CONV+PPV — Network AXI-Stream wrapper (buffer-then-classify)
+ *
+ * Structural sibling of fpga-network/minirocket_dpr/src/minirocket.cpp (same
+ * AXIS-in/AXIS-out + m_axi model-param top shape, same Bug-B output sideband,
+ * same #if BUILD==1 free-run gate), but the compute core is swapped from
+ * DP-Reuse (incremental, classify-every-packet) to the Fused CONV+PPV
+ * full-recompute core from minirocket_modular/_recovered_src_b2b4089
+ * (feature_extraction_v16_fixed.cpp + scaler.cpp + classifier.cpp), collapsed
+ * from 3 separate AXI-stream kernels into one top, called inline like
+ * minirocket_dpr does conv -> scaler -> classifier.
+ *
+ * ============================================================================
+ * v4 (2026-07-06) -- TRUE on-chip free-run + packed emit, combining THREE
+ * previously separately-validated pieces:
+ *
+ *   1. v2's `#pragma HLS DATAFLOW` producer/consumer decouple (this file's
+ *      structure below, preserved verbatim from
+ *      minirocket_fused.cpp.v2_dataflow.bak): `minirocket_fused_ingest`
+ *      drains `input_timeseries` into the internal `raw_samples` stream and
+ *      NEVER touches the compute chain or `output_predictions`, so it can
+ *      never be blocked by a downstream stall or by compute latency.
+ *
+ *   2. v3's packed single-packet emit (`minirocket_fused.cpp.v3_singleshot.bak`,
+ *      FIX 1: hydra_axis.cpp's PACK_PRED idiom) -- REPLACES v2's original
+ *      per-class `for` loop of `num_classes` separate single-beat packets
+ *      with ONE 512-bit packet holding all `num_classes` float32 logits
+ *      packed into `out_data` bit ranges, `keep = (1 << (num_classes*4)) - 1`,
+ *      and exactly ONE guarded non-blocking
+ *      `if (!output_predictions.full()) output_predictions.write(out_pkt)`
+ *      per completed window (see `minirocket_fused_compute_emit` below).
+ *      This is the fix that independently stopped the NetLayer-TX wedge in
+ *      v3 (single-shot); the theory for v4 is that reducing "10 separate
+ *      per-class writes contending with downstream backpressure" down to
+ *      "1 write per window" is what lets the on-chip free-run loop actually
+ *      work here, where it previously deadlocked (see history below).
+ *
+ *   3. `#if BUILD == 1 while (true) { ... }` TRUE on-chip free-run, compiled
+ *      in via `-DBUILD=1` for synthesis/ip exports only (see make.tcl.in) --
+ *      the kernel self-loops in hardware and drains `input_timeseries` at
+ *      fabric rate with no host re-trigger and no XRT/loader autorestart
+ *      gap between invocations, unlike v3's single-shot-per-ap_start model.
+ *
+ * HISTORY -- why this was not simply "flip BUILD=1 back on" for v2:
+ *
+ *   FREE-RUN DEADLOCK (2026-07-05, see debugging.md "fused free-run
+ *   deadlock"): confirmed on hardware TWICE -- both the ORIGINAL single
+ *   monolithic `while(true)` FSM (unguarded blocking `output_predictions.write()`,
+ *   10 separate per-class packets) AND the v2 DATAFLOW producer/consumer
+ *   split with a GUARDED non-blocking write but STILL 10 separate per-class
+ *   packets -- the output counter (`app_out`) froze at exactly 22 (~2
+ *   windows x 10 classes for InsectSound), permanently. Identical freeze
+ *   point under two structurally different fixes ruled OUT the compute-loop/
+ *   DATAFLOW structure as the sole cause and implicated the multi-packet
+ *   per-window emit pattern itself (matches the independently-observed
+ *   hydra_axis.cpp NetLayer udp_out stall on 10-separate-packet emission).
+ *   Isolated HLS cosim (bounded free-run repro, COSIM_MAX_WINDOWS=4) passed
+ *   clean in both of those cases -- expected, since it can't model
+ *   NetLayer/CMAC and therefore never exercises the real downstream
+ *   interaction that actually wedges; the same limitation applies to this
+ *   v4's bounded-cosim check below (it validates liveness/correctness of
+ *   the free-run RTL control flow, NOT real NetLayer/CMAC backpressure
+ *   behavior -- that remains a hardware-only risk, see report).
+ *
+ *   v3 (single-shot, packed emit, BUILT WITHOUT -DBUILD=1) was then proven
+ *   on hardware to sustain continuous TX, but XRT/loader ap_start
+ *   autorestart between invocations caps host-driven drain at ~35-40k pps
+ *   before CMAC backpressures and wedges -- the motivation for this v4
+ *   attempt: keep v3's packed emit (which fixed the wedge) but restore v2's
+ *   DATAFLOW decouple AND the TRUE on-chip free-run loop, so the kernel
+ *   drains the input stream at fabric rate instead of host-spin rate.
+ *
+ * Two `#pragma HLS DATAFLOW` processes connected by exactly one internal
+ * `hls::stream<data_t> raw_samples` channel (canonical single-producer/
+ * single-consumer DATAFLOW form, no arrays shared between the two
+ * processes):
+ *   - `minirocket_fused_ingest`: packet -> float -> `raw_samples` only.
+ *     Never touches the compute chain or `output_predictions`, so it can
+ *     never be blocked by a downstream stall.
+ *   - `minirocket_fused_compute_emit`: buffers `raw_samples` into a window,
+ *     runs the compute chain once per full window, and writes ONE packed
+ *     prediction packet with a GUARDED, non-blocking
+ *     `if (!output_predictions.full()) write()` (drop-on-full, same idiom
+ *     as pktDropper.cpp) so it can never block forever either.
+ * Together this makes packet ingestion structurally independent of
+ * compute/emit, while the guarded write means the process can always make
+ * forward progress and the packed single-write means there is only ONE
+ * emit-side handshake per window (not `num_classes`) for downstream
+ * backpressure to ever catch mid-window.
+ * `raw_samples` is sized (`depth=MAX_TIME_SERIES_LENGTH`) to hold a full
+ * window -- this doubles as the "producer races ahead while consumer
+ * computes" buffering the task asked for (an explicit ping-pong
+ * `local_ts0..4` double-buffer was considered but not implemented: the
+ * ingest process is already fully decoupled and non-blocking, and the
+ * full-window-deep `raw_samples` FIFO already lets it buffer an entire next
+ * window's worth of samples while `minirocket_fused_compute_emit` is busy
+ * computing on the current window, without ingest ever stalling -- adding a
+ * second BRAM-resident ping-pong buffer would double `local_ts0..4` BRAM
+ * usage for no additional decoupling this design does not already have, so
+ * a single buffer inside `minirocket_fused_compute_emit` is kept, per the
+ * task's "single buffer is acceptable for a first free-run test" fallback).
+ * External interface (top name, arg order, AXIS ports) is unchanged -- this
+ * is purely an internal restructuring.
+ *
+ * OPERATING MODEL DIFFERENCE FROM minirocket_dpr:
+ *   minirocket_dpr shifts a sliding window and re-classifies on EVERY packet
+ *   (DP-Reuse only recomputes convolution boundary dot-products, so it's
+ *   cheap to do every sample). The Fused core has no incremental algorithm:
+ *   every classification requires a full conv+PPV pass over the whole time
+ *   series. So this wrapper counts incoming samples into a buffer and only
+ *   classifies once, when the `time_series_length`-th sample of a series has
+ *   arrived, then resets and starts buffering the next series. One UDP
+ *   packet == one sample; ONE packed prediction packet (all num_classes
+ *   float32 logits in one 512-bit beat, see v4 FIX 1 above) is emitted once
+ *   per full series, not once per packet.
+ *
+ * MODEL-PARAMETER RELOAD DEVIATION (documented, see report):
+ *   minirocket_dpr reloads all model parameters (coefficients/biases/scaler/
+ *   dilations) from HBM on EVERY packet, which is affordable there because
+ *   every packet also triggers a full classify. Here, most packets are just
+ *   buffer writes; reloading ~1024-deep model arrays from HBM on every one of
+ *   up to 8192 packets per series would dominate latency (~8192 x ~1000
+ *   cycles just for reload, before any compute). So the big parameter arrays
+ *   (coefficients/biases/scaler_mean/scaler_scale/dilations/nfpd) are cached
+ *   in `static` BRAM and loaded exactly once, guarded by `params_loaded`.
+ *   Per the CLAUDE.md "static + ARRAY_PARTITION" gotcha (register inference
+ *   fails / II>1), this guard is only applied to arrays that are NOT
+ *   `type=complete` partitioned (block/cyclic BRAM partitioning is fine with
+ *   static). `local_intercept` is small (<=16 elements) and IS complete-
+ *   partitioned, so it is deliberately kept non-static and reloaded every
+ *   call instead (cheap, avoids the gotcha entirely).
+ */
+
+#include "../include/minirocket_fused.hpp"
+#include <cstring>
+
+// ---------------------------------------------------------------------------
+// Fused CONV+PPV weights: plain {-1,+2} float multiply pattern (NOT the
+// bFP XNOR/exponent trick minirocket_dpr uses) — matches
+// minirocket_modular/_recovered_src_b2b4089/feature_extraction/src/feature_extraction_v16_fixed.cpp
+// ---------------------------------------------------------------------------
+static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
+    #include "../include/weights.txt"
+};
+
+// ---------------------------------------------------------------------------
+// Fused CONV+PPV feature extraction (full re-compute every call).
+// Ported verbatim (loop structure + pragmas) from
+// feature_extraction_v16_fixed.cpp's minirocket_feature_extraction_hls(),
+// operating on 5 duplicate copies of the time series for conflict-free
+// 9-tap sliding-window reads (2 read ports/BRAM x 5 BRAMs = 10 >= 9 needed).
+// ---------------------------------------------------------------------------
+void minirocket_feature_extraction_hls(
+    data_t ts0[MAX_TIME_SERIES_LENGTH],
+    data_t ts1[MAX_TIME_SERIES_LENGTH],
+    data_t ts2[MAX_TIME_SERIES_LENGTH],
+    data_t ts3[MAX_TIME_SERIES_LENGTH],
+    data_t ts4[MAX_TIME_SERIES_LENGTH],
+    data_t features[MAX_FEATURES],
+    int_t dilations[MAX_DILATIONS],
+    int_t num_features_per_dilation[MAX_DILATIONS],
+    data_t biases[MAX_FEATURES],
+    int_t time_series_length,
+    int_t num_dilations,
+    int_t num_features
+) {
+    #pragma HLS INLINE off
+
+    #pragma HLS BIND_STORAGE variable=weights type=rom_1p impl=bram
+    #pragma HLS ARRAY_PARTITION variable=weights complete dim=2
+    #pragma HLS ARRAY_PARTITION variable=weights cyclic factor=28 dim=1
+
+    int_t feature_idx = 0;
+
+    DILATION_LOOP: for (int_t dil_idx = 0; dil_idx < num_dilations; dil_idx++) {
+        #pragma HLS LOOP_TRIPCOUNT min=1 max=16
+
+        int_t dilation = dilations[dil_idx];
+        int_t features_this_dilation = num_features_per_dilation[dil_idx];
+        int_t _padding0 = dil_idx % 2;
+        int_t padding = ((9 - 1) * dilation) / 2;
+
+        KERNEL_GROUP_LOOP: for (int_t kg = 0; kg < NUM_KERNELS; kg += UNROLL_FACTOR) {
+            #pragma HLS LOOP_TRIPCOUNT min=3 max=3
+
+            data_t group_biases[UNROLL_FACTOR][MAX_FEATURES_PER_DILATION];
+            #pragma HLS ARRAY_PARTITION variable=group_biases complete dim=0
+            int_t ppv_counts[UNROLL_FACTOR][MAX_FEATURES_PER_DILATION];
+            #pragma HLS ARRAY_PARTITION variable=ppv_counts complete dim=0
+            int_t padding_flag[UNROLL_FACTOR];
+            #pragma HLS ARRAY_PARTITION variable=padding_flag complete
+
+            LOAD_BIASES: for (int_t bi = 0; bi < UNROLL_FACTOR * MAX_FEATURES_PER_DILATION; bi++) {
+                #pragma HLS PIPELINE II=1
+                #pragma HLS LOOP_TRIPCOUNT min=84 max=84
+                int_t ki = bi / MAX_FEATURES_PER_DILATION;
+                int_t f = bi % MAX_FEATURES_PER_DILATION;
+                int_t kernel_idx = kg + ki;
+                int_t base = feature_idx + kernel_idx * features_this_dilation;
+                group_biases[ki][f] = (f < features_this_dilation && kernel_idx < NUM_KERNELS && base + f < num_features)
+                                      ? biases[base + f] : (data_t)0.0;
+                ppv_counts[ki][f] = 0;
+                if (f == 0) {
+                    padding_flag[ki] = (_padding0 + kernel_idx) % 2;
+                }
+            }
+
+            CONV_LOOP: for (int_t j = 0; j < time_series_length; j++) {
+                #pragma HLS PIPELINE II=1
+                #pragma HLS LOOP_TRIPCOUNT min=150 max=8192
+
+                data_t sw[KERNEL_SIZE];
+                #pragma HLS ARRAY_PARTITION variable=sw complete
+
+                int_t idx0 = j + (-4) * dilation;
+                int_t idx1 = j + (-3) * dilation;
+                int_t idx2 = j + (-2) * dilation;
+                int_t idx3 = j + (-1) * dilation;
+                int_t idx4 = j;
+                int_t idx5 = j + (1) * dilation;
+                int_t idx6 = j + (2) * dilation;
+                int_t idx7 = j + (3) * dilation;
+                int_t idx8 = j + (4) * dilation;
+
+                sw[0] = (idx0 < 0 || idx0 >= time_series_length) ? (data_t)0.0 : ts0[idx0];
+                sw[1] = (idx1 < 0 || idx1 >= time_series_length) ? (data_t)0.0 : ts0[idx1];
+                sw[2] = (idx2 < 0 || idx2 >= time_series_length) ? (data_t)0.0 : ts1[idx2];
+                sw[3] = (idx3 < 0 || idx3 >= time_series_length) ? (data_t)0.0 : ts1[idx3];
+                sw[4] = (idx4 < 0 || idx4 >= time_series_length) ? (data_t)0.0 : ts2[idx4];
+                sw[5] = (idx5 < 0 || idx5 >= time_series_length) ? (data_t)0.0 : ts2[idx5];
+                sw[6] = (idx6 < 0 || idx6 >= time_series_length) ? (data_t)0.0 : ts3[idx6];
+                sw[7] = (idx7 < 0 || idx7 >= time_series_length) ? (data_t)0.0 : ts3[idx7];
+                sw[8] = (idx8 < 0 || idx8 >= time_series_length) ? (data_t)0.0 : ts4[idx8];
+
+                bool in_padded_range = (j >= padding && j < time_series_length - padding);
+
+                PARALLEL_KERNELS: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
+                    #pragma HLS UNROLL
+                    data_t value = 0.0;
+                    DOT_PRODUCT: for (int_t k = 0; k < KERNEL_SIZE; k++) {
+                        #pragma HLS UNROLL
+                        value += sw[k] * weights[kg + ki][k];
+                    }
+
+                    bool use_position = (padding_flag[ki] == 0) || in_padded_range;
+                    PPV_FEATURES: for (int_t f = 0; f < MAX_FEATURES_PER_DILATION; f++) {
+                        #pragma HLS UNROLL
+                        if (f < features_this_dilation && use_position && value > group_biases[ki][f]) {
+                            ppv_counts[ki][f]++;
+                        }
+                    }
+                }
+            }
+
+            int_t padded_len = time_series_length - (int_t)(2 * padding);
+            data_t inv_denom_full = (data_t)1.0 / (data_t)time_series_length;
+            data_t inv_denom_padded = (padded_len > 0) ? (data_t)1.0 / (data_t)padded_len : (data_t)0.0;
+
+            WRITE_PPV: for (int_t wi = 0; wi < UNROLL_FACTOR * MAX_FEATURES_PER_DILATION; wi++) {
+                #pragma HLS PIPELINE II=1
+                #pragma HLS LOOP_TRIPCOUNT min=28 max=84
+                int_t ki = wi / MAX_FEATURES_PER_DILATION;
+                int_t f = wi % MAX_FEATURES_PER_DILATION;
+                int_t kernel_idx = kg + ki;
+                if (kernel_idx < NUM_KERNELS && f < features_this_dilation) {
+                    int_t base = feature_idx + kernel_idx * features_this_dilation;
+                    if (base + f < num_features) {
+                        data_t inv_denom = (padding_flag[ki] == 0) ? inv_denom_full : inv_denom_padded;
+                        features[base + f] = (data_t)ppv_counts[ki][f] * inv_denom;
+                    }
+                }
+            }
+        }
+        feature_idx += features_this_dilation * NUM_KERNELS;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Z-normalization scaler. Ported from minirocket_dpr's apply_scaler_hls
+// (divide by scaler_scale directly), NOT scaler.cpp's multiply-by-inv_scale
+// form, because this top's interface (matching minirocket_dpr) is handed
+// scaler_scale, not a precomputed reciprocal. Mathematically identical to
+// Python's sklearn StandardScaler.transform().
+// ---------------------------------------------------------------------------
+void apply_scaler_hls(
+    data_t features[MAX_FEATURES],
+    data_t scaled_features[MAX_FEATURES],
+    data_t scaler_mean[MAX_FEATURES],
+    data_t scaler_scale[MAX_FEATURES],
+    int_t num_features
+) {
+    #pragma HLS INLINE off
+    SCALE_LOOP: for (int_t i = 0; i < num_features; i++) {
+        #pragma HLS PIPELINE II=1
+        #pragma HLS LOOP_TRIPCOUNT min=100 max=1024
+        scaled_features[i] = (features[i] - scaler_mean[i]) / scaler_scale[i];
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Ridge classifier. Ported from classifier.cpp's linear_classifier_predict_hls,
+// with the FEATURE_LOOP bound changed from MAX_FEATURES+conditional to the
+// runtime num_features (matches the variable-bound + LOOP_TRIPCOUNT idiom
+// already used throughout minirocket_dpr; avoids MAX_FEATURES-1024 wasted
+// cycles per class when num_features < 1024, e.g. 840 for all 3 datasets
+// evaluated here). Binary-flip special case (lines 29-33 of classifier.cpp)
+// kept verbatim: only coefficients[0]/intercept[0] are meaningful for
+// num_classes==2, the loader zero-fills row 1.
+// ---------------------------------------------------------------------------
+void linear_classifier_predict_hls(
+    data_t scaled_features[MAX_FEATURES],
+    data_t predictions[MAX_CLASSES],
+    data_t coefficients[MAX_CLASSES][MAX_FEATURES],
+    data_t intercept[MAX_CLASSES],
+    int_t num_features,
+    int_t num_classes
+) {
+    #pragma HLS INLINE off
+
+    if (num_classes == 2) {
+        data_t score = intercept[0];
+        BINARY_FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
+            #pragma HLS PIPELINE II=1
+            #pragma HLS LOOP_TRIPCOUNT min=100 max=1024
+            score += coefficients[0][j] * scaled_features[j];
+        }
+        predictions[0] = (data_t)0.0 - score;
+        predictions[1] = score;
+    } else {
+        CLASS_LOOP: for (int_t i = 0; i < num_classes; i++) {
+            #pragma HLS PIPELINE off
+            #pragma HLS LOOP_TRIPCOUNT min=2 max=16
+            data_t score = intercept[i];
+            FEATURE_LOOP: for (int_t j = 0; j < num_features; j++) {
+                #pragma HLS PIPELINE II=1
+                #pragma HLS LOOP_TRIPCOUNT min=100 max=1024
+                score += coefficients[i][j] * scaled_features[j];
+            }
+            predictions[i] = score;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// DATAFLOW producer: packet -> float -> `raw_samples` ONLY. Never touches
+// the compute chain or `output_predictions`, so nothing downstream can ever
+// block this process -- packet ingestion is now structurally independent of
+// compute/emit (see file header "HISTORY"). Non-blocking: only acts when a
+// packet is actually available.
+// ---------------------------------------------------------------------------
+void minirocket_fused_ingest(
+    hls::stream<pkt> &input_timeseries,
+    hls::stream<data_t> &raw_samples,
+    int_t time_series_length
+) {
+    #pragma HLS INLINE off
+
+#if defined(COSIM_MAX_WINDOWS)
+    // TEST-ONLY bounded free-run loop -- see file header and
+    // minirocket_fused_compute_emit's identical guard below. Never active
+    // for synthesis/ip/hw builds.
+    for (int __it = 0; __it < (COSIM_MAX_WINDOWS) * (int)time_series_length + 64; __it++) {
+#elif BUILD == 1
+    while (true) {
+#endif
+        if (!input_timeseries.empty()) {
+            // ALWAYS drain the NetLayer app-in stream when a packet is
+            // available -- this read must never depend on raw_samples state,
+            // or the AXI-stream handshake with NetLayer stalls and the whole
+            // RX path wedges (observed >~2.24M pps FPGA-to-FPGA).
+            pkt v = input_timeseries.read();
+            ap_uint< DWIDTH > tmp = v.data;
+            data_t new_val = *((data_t*) &tmp);
+            // DROP-ON-FULL: forward to the compute FIFO only if there is room;
+            // otherwise discard this sample rather than block the read above.
+            // Same guarded idiom as output_predictions (below) / pktDropper.cpp.
+            // Converts the high-rate wedge into a graceful saturation knee:
+            // throughput plateaus at the compute ceiling, loss rises smoothly.
+            if (!raw_samples.full()) {
+                raw_samples.write(new_val);
+            }
+        }
+#if defined(COSIM_MAX_WINDOWS) || BUILD == 1
+    }
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// DATAFLOW consumer: buffers `raw_samples` into a window (5 duplicate
+// copies, conflict-free 9-tap reads, same as before), runs the fused
+// compute chain once per full window, and emits ONE packed prediction
+// packet (v4 FIX 1, see file header) with a GUARDED, non-blocking write --
+// `if (!output_predictions.full())` -- mirroring pktDropper.cpp's
+// `if (!output.full()) write()` idiom instead of the original unguarded
+// blocking write. This process can therefore never stall forever waiting
+// on a downstream consumer, which is what fixes the hardware free-run
+// deadlock (see file header "HISTORY").
+// ---------------------------------------------------------------------------
+void minirocket_fused_compute_emit(
+    hls::stream<data_t> &raw_samples,
+    hls::stream<pkt> &output_predictions,
+    data_t* coefficients,
+    data_t* intercept,
+    data_t* scaler_mean,
+    data_t* scaler_scale,
+    int_t* dilations,
+    int_t* num_features_per_dilation,
+    data_t* biases,
+    int_t time_series_length,
+    int_t num_features,
+    int_t num_classes,
+    int_t num_dilations
+) {
+    #pragma HLS INLINE off
+
+    // 5 duplicate copies of the buffered series (conflict-free 9-tap reads),
+    // persisted across per-packet calls -- this IS the buffer. No
+    // ARRAY_PARTITION applied (bandwidth comes from the 5x duplication, not
+    // partitioning), so `static` here does not trip the "static +
+    // ARRAY_PARTITION" gotcha.
+    static data_t local_ts0[MAX_TIME_SERIES_LENGTH];
+    static data_t local_ts1[MAX_TIME_SERIES_LENGTH];
+    static data_t local_ts2[MAX_TIME_SERIES_LENGTH];
+    static data_t local_ts3[MAX_TIME_SERIES_LENGTH];
+    static data_t local_ts4[MAX_TIME_SERIES_LENGTH];
+    static int_t sample_count = 0;
+
+    // Model parameters: cached once (see file header comment on the reload
+    // deviation from minirocket_dpr). Only block/cyclic (BRAM) partitioned
+    // arrays are made static; the complete-partitioned intercept is not.
+    static bool params_loaded = false;
+    static data_t local_coefficients[MAX_CLASSES][MAX_FEATURES];
+    #pragma HLS ARRAY_PARTITION variable=local_coefficients type=block factor=4 dim=1
+    static data_t local_scaler_mean[MAX_FEATURES];
+    static data_t local_scaler_scale[MAX_FEATURES];
+    static data_t local_biases[MAX_FEATURES];
+    static int_t local_dilations[MAX_DILATIONS];
+    static int_t local_num_features_per_dilation[MAX_DILATIONS];
+
+    data_t local_intercept[MAX_CLASSES];
+    #pragma HLS ARRAY_PARTITION variable=local_intercept type=complete
+
+    // Transient per-series scratch (not persisted, no need to be static).
+    data_t local_features[MAX_FEATURES];
+    data_t local_scaled_features[MAX_FEATURES];
+    data_t local_predictions[MAX_CLASSES];
+    #pragma HLS ARRAY_PARTITION variable=local_features type=cyclic factor=8
+    #pragma HLS ARRAY_PARTITION variable=local_scaled_features type=cyclic factor=8
+
+    // One-time copy of the bulk model parameters from global memory.
+    if (!params_loaded) {
+        COPY_DILATIONS: for (int_t i = 0; i < num_dilations; i++) {
+            #pragma HLS PIPELINE II=1
+            local_dilations[i] = dilations[i];
+            local_num_features_per_dilation[i] = num_features_per_dilation[i];
+        }
+
+        COPY_BIASES: for (int_t i = 0; i < num_features; i++) {
+            #pragma HLS PIPELINE II=1
+            local_biases[i] = biases[i];
+            local_scaler_mean[i] = scaler_mean[i];
+            local_scaler_scale[i] = scaler_scale[i];
+        }
+
+        COPY_COEF: for (int_t i = 0; i < num_classes; i++) {
+            for (int_t j = 0; j < num_features; j++) {
+                #pragma HLS PIPELINE II=1
+                local_coefficients[i][j] = coefficients[i * num_features + j];
+            }
+        }
+
+        params_loaded = true;
+    }
+
+#if defined(COSIM_MAX_WINDOWS)
+    // TEST-ONLY bounded free-run loop -- see file header and
+    // minirocket_fused_ingest's identical guard above. Never active for
+    // synthesis/ip/hw builds.
+    for (int __it = 0; __it < (COSIM_MAX_WINDOWS) * (int)time_series_length + 64; __it++) {
+#elif BUILD == 1
+    while (true) {
+#endif
+        if (!raw_samples.empty()) {
+            data_t new_val = raw_samples.read();
+
+            // Ingest one sample into the buffer-so-far (5 duplicate copies).
+            if (sample_count >= 0 && sample_count < time_series_length &&
+                sample_count < MAX_TIME_SERIES_LENGTH) {
+                local_ts0[sample_count] = new_val;
+                local_ts1[sample_count] = new_val;
+                local_ts2[sample_count] = new_val;
+                local_ts3[sample_count] = new_val;
+                local_ts4[sample_count] = new_val;
+                sample_count++;
+            }
+
+            // Full series buffered -> run ONE fused compute + emit once.
+            if (time_series_length > 0 && sample_count == time_series_length) {
+
+                // Intercept is small (<=16 elements): cheap enough to reload
+                // every window unconditionally rather than risk
+                // static+complete-partition register inference issues.
+                COPY_INTERCEPT: for (int_t i = 0; i < num_classes; i++) {
+                    #pragma HLS PIPELINE II=1
+                    local_intercept[i] = intercept[i];
+                }
+
+                minirocket_feature_extraction_hls(
+                    local_ts0, local_ts1, local_ts2, local_ts3, local_ts4,
+                    local_features,
+                    local_dilations,
+                    local_num_features_per_dilation,
+                    local_biases,
+                    time_series_length,
+                    num_dilations,
+                    num_features
+                );
+
+                apply_scaler_hls(
+                    local_features, local_scaled_features,
+                    local_scaler_mean, local_scaler_scale, num_features
+                );
+
+                linear_classifier_predict_hls(
+                    local_scaled_features, local_predictions,
+                    local_coefficients, local_intercept,
+                    num_features, num_classes
+                );
+
+                // v4 FIX 1 -- packed single-packet emit (mirrors
+                // hydra_axis.cpp PACK_PRED and v3's
+                // minirocket_fused.cpp.v3_singleshot.bak, ~lines 455-479):
+                // pack all num_classes float32 logits into the low
+                // num_classes*4 bytes of ONE 512-bit packet instead of
+                // num_classes separate single-beat packets, then ONE
+                // GUARDED, non-blocking write (fix for candidate (a)): if
+                // downstream (NetLayer TX) is backpressuring, drop this
+                // whole prediction packet instead of blocking forever --
+                // same idiom as pktDropper.cpp's `if (!output.full())
+                // write()`. Bug-B sideband kept (dest=0/user=0/id=0/strb=-1).
+                {
+                    pkt out_pkt;
+                    ap_uint<DWIDTH> out_data = 0;
+                    PACK_PRED: for (int_t c = 0; c < MAX_CLASSES; c++) {
+                        #pragma HLS UNROLL
+                        if (c < num_classes) {
+                            ap_uint<32> bits = *((ap_uint<32>*)&local_predictions[c]);
+                            out_data.range(32 * c + 31, 32 * c) = bits;
+                        }
+                    }
+                    out_pkt.data = out_data;
+                    // Mark only the num_classes*4 payload bytes as valid; rest zero.
+                    out_pkt.keep = (ap_uint<DWIDTH/8>(1) << (num_classes * 4)) - 1;
+                    out_pkt.strb = -1;
+                    out_pkt.last = 1;
+                    out_pkt.dest = 0;
+                    out_pkt.user = 0;
+                    out_pkt.id   = 0;
+                    if (!output_predictions.full()) {
+                        output_predictions.write(out_pkt);
+                    }
+                    // else: downstream is backpressuring -- drop this
+                    // prediction packet rather than stall the compute
+                    // process (and, by extension via the raw_samples
+                    // handshake, ingestion) forever.
+                }
+
+                // Reset for the next series.
+                sample_count = 0;
+            }
+        }
+#if defined(COSIM_MAX_WINDOWS) || BUILD == 1
+    }
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// Top-level network AXIS kernel: buffer-then-classify, v4 (DATAFLOW split +
+// packed emit + TRUE on-chip free-run, see file header). The ingest and
+// compute/emit processes below communicate through exactly one internal
+// `hls::stream<data_t> raw_samples` channel (canonical single-producer/
+// single-consumer DATAFLOW form -- no arrays are shared between the two
+// processes). External interface (top name, arg order, AXIS ports)
+// unchanged from v2/v3.
+// ---------------------------------------------------------------------------
+extern "C" void minirocket_fused_inference(
+    hls::stream<pkt> &input_timeseries,
+    hls::stream<pkt> &output_predictions,
+    data_t* coefficients,
+    data_t* intercept,
+    data_t* scaler_mean,
+    data_t* scaler_scale,
+    int_t* dilations,
+    int_t* num_features_per_dilation,
+    data_t* biases,
+    int_t time_series_length,
+    int_t num_features,
+    int_t num_classes,
+    int_t num_dilations
+) {
+
+    #pragma HLS INTERFACE axis port = input_timeseries
+    #pragma HLS INTERFACE axis port = output_predictions
+    #pragma HLS INTERFACE m_axi port=coefficients bundle=gmem2 depth=16384
+    #pragma HLS INTERFACE m_axi port=intercept bundle=gmem3 depth=16
+    #pragma HLS INTERFACE m_axi port=scaler_mean bundle=gmem4 depth=1024
+    #pragma HLS INTERFACE m_axi port=scaler_scale bundle=gmem5 depth=1024
+    #pragma HLS INTERFACE m_axi port=dilations bundle=gmem6 depth=16
+    #pragma HLS INTERFACE m_axi port=num_features_per_dilation bundle=gmem7 depth=16
+    #pragma HLS INTERFACE m_axi port=biases bundle=gmem8 depth=1024
+
+    #pragma HLS INTERFACE s_axilite port=time_series_length bundle=control
+    #pragma HLS INTERFACE s_axilite port=num_features bundle=control
+    #pragma HLS INTERFACE s_axilite port=num_classes bundle=control
+    #pragma HLS INTERFACE s_axilite port=num_dilations bundle=control
+    #pragma HLS INTERFACE s_axilite port=return bundle=control
+
+    #pragma HLS DATAFLOW
+
+    // Internal ingest -> compute/emit channel. Depth = a full window so
+    // normal one-window producer/consumer skew never blocks ingest either
+    // (the guarded emit write above is what bounds compute/emit itself).
+    hls::stream<data_t> raw_samples("raw_samples");
+    #pragma HLS STREAM variable=raw_samples depth=MAX_TIME_SERIES_LENGTH
+
+    minirocket_fused_ingest(input_timeseries, raw_samples, time_series_length);
+
+    minirocket_fused_compute_emit(
+        raw_samples, output_predictions,
+        coefficients, intercept, scaler_mean, scaler_scale,
+        dilations, num_features_per_dilation, biases,
+        time_series_length, num_features, num_classes, num_dilations
+    );
+}
