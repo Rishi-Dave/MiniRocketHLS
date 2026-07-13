@@ -1,5 +1,9 @@
 # Session Prompt — MiniRocket Network Bandwidth Chart (FCCM resubmission)
 
+> **SUPERSEDED — work completed and superseded by the F2F knee sweeps; see
+> `docs/NETWORK_RESULTS.md`.** Kept for historical record of the original
+> Phase-0 orchestration prompt only.
+
 > Paste this whole file as the first message of a new Claude Code session in
 > `/home/rdave009/minirocket-hls`. Run the orchestrator on **Claude Fable**.
 

@@ -1,5 +1,8 @@
 # OCT / CloudLab re-cabling request — FPGA-to-FPGA 100G link (pc160 ↔ pc161)
 
+> **SUPERSEDED — completed.** The F2F link is working; see
+> `docs/NETWORK_RESULTS.md`. Kept for historical record only.
+
 **Project:** octfpga-PG0   **User:** rdave009   **Date:** 2026-07-06
 
 ## Request (one cable move)

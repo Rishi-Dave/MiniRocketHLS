@@ -1,5 +1,9 @@
 # HANDOFF — Debug the FPGA-to-FPGA CMAC link (pc161 → pc160 not forwarding)
 
+> **SUPERSEDED — incident resolved.** Root cause was stale socket-table
+> offsets; the recovery recipe is in `FCCM_network_result_SUMMARY.md` (see
+> also `docs/NETWORK_RESULTS.md`). Kept for historical debugging context only.
+
 You are a fresh Claude Code session (Fable). Read this whole prompt, then solve ONE problem:
 **restore the FPGA-to-FPGA 100G link so pc161's in-fabric UDP generator packets reach
 pc160's fused-MiniRocket DUT.** It worked this morning (2026-07-09) and stopped working this

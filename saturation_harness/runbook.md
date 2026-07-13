@@ -1,5 +1,7 @@
 # Saturation experiment runbook
 
+> Phase-1 vintage (2026-04); current state: `docs/NETWORK_RESULTS.md`.
+
 This is the operational runbook for the network-saturation experiments
 introduced by the April 23, 2026 paper-revisions meeting. The goal is to
 produce throughput-vs-injection-rate curves comparing CPU and FPGA

@@ -1,5 +1,9 @@
 # FPGA-to-FPGA (pc161-FPGA → pc160-FPGA) — plan & blocker
 
+> **SUPERSEDED:** F2F was achieved 2026-07-09; see `docs/NETWORK_RESULTS.md`.
+> This file is kept for historical context (the cabling/blocker investigation)
+> only.
+
 ## Goal
 Drive the DUT (pc160 fused v4 kernel) at true line rate from an FPGA packet
 generator (pc161's U280), removing the host/NIC sender bottleneck entirely —
