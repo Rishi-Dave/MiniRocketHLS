@@ -24,8 +24,12 @@ This implementation provides a complete FPGA-accelerated version of HYDRA, a sta
 | Pooling Operators | 2 (Max + Mean) |
 | Features per Sample | 1,024 |
 | Max Time Series Length | 512 timesteps |
-| Estimated Latency | <0.5 ms |
-| Estimated Throughput | 2,000-3,000 inf/sec (1 CU) |
+| Validated Latency (v2_fixed, 1-CU, InsectSound) | 0.158 ms |
+| Validated Throughput (v2_fixed, 1-CU, InsectSound) | 6,326 inf/sec |
+
+Numbers above are hardware-validated (2026-04), not estimates — see
+[Performance Benchmarking](#performance-benchmarking) below and
+`results/hydra_v2_fixed_benchmarks.json`.
 
 ## Directory Structure
 
@@ -292,13 +296,38 @@ cd scripts
 python benchmark_hydra.py --num-kernels 512 --samples 100
 ```
 
-### Compare with MiniRocket/MultiRocket
+### Validated hardware results (v2_fixed, `ap_fixed<32,16>`, UNROLL=16)
 
-| Algorithm | Kernels | Features | Latency (ms) | Throughput (inf/s) | Accuracy (avg) |
-|-----------|---------|----------|--------------|-------------------|----------------|
-| MiniRocket | 84 | 840-2,688 | 0.20 | 15,000 | 94% |
-| MultiRocket | 84 | 2,688-5,376 | 0.35 | 8,000 | 96% |
-| HYDRA | 512 | 1,024 | 0.40 | 2,500 | 95-96% |
+Hardware-validated 2026-04-02, single U280, 300 MHz. Source:
+`results/hydra_v2_fixed_benchmarks.json`, `results/all_data_for_sheets.csv`.
+
+| Dataset | 1-CU (inf/s) | 2-CU (inf/s) | 3-CU (inf/s)† | Accuracy | vs. CPU (1-CU) |
+|---|---|---|---|---|---|
+| InsectSound (L=600) | 6,326 | 8,028 | 10,573 | 69.41% | 70.2x |
+| MosquitoSound (L=3750) | 1,937 | 2,757 | 3,516 | 70.05% | 49.4x |
+| FruitFlies (L=5000) | 1,507 | 2,148 | 2,972 | 87.61% | 44.8x |
+
+† 3-CU builds **failed timing** and were auto-throttled off the 300 MHz
+target — report as timing-failed, not a closed configuration. 1-CU and 2-CU
+both closed timing at 300 MHz.
+
+Compare with MiniRocket (fused CONV+PPV, current lead): 3,797-9,585 inf/s
+depending on dataset and CU count (GunPoint, 1-3 CU; 3-CU timing-failed at
+269 MHz) — see [../docs/RESULTS.md](../docs/RESULTS.md) for the full,
+sourced comparison table. Earlier reports on this page citing "MiniRocket
+15,000 inf/s" / "MultiRocket 8,000 inf/s" were unsourced estimates and have
+been removed; MultiRocket was subsequently dropped entirely (2026-04-08,
+invalid results — see `../multirocket_optimized/README.md`).
+
+### Network-attached variant
+
+`hydra_axis/` is a network-attached port of this v2_fixed core (dilation-
+sorted kernels, permuted features for a batched compute layout) used in the
+FPGA-to-FPGA saturation thread — up to 13.4M samples/s (~6.85 Gbps) on
+FruitFlies at 200 MHz (300/250 MHz failed routed timing on the wide
+`ap_fixed` MAC arrays). See
+[../docs/NETWORK_RESULTS.md](../docs/NETWORK_RESULTS.md) — a different
+measurement regime (in-fabric, no host) from the inf/s table above.
 
 ## Optimization Strategies
 
@@ -410,6 +439,6 @@ For issues or questions, please open an issue in the main repository.
 
 ---
 
-**Last Updated:** 2026-01-05
-**Version:** 1.0.0
-**Status:** Complete implementation ready for testing
+**Last Updated:** 2026-07-13
+**Version:** 2.0.0 (v2_fixed)
+**Status:** Hardware-validated 2026-04 (`ap_fixed<32,16>`, 1/2-CU timing met at 300 MHz, 3-CU timing failed); network-attached port (`hydra_axis/`) validated 2026-07 — see [../docs/NETWORK_RESULTS.md](../docs/NETWORK_RESULTS.md)
