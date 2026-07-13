@@ -1,0 +1,52 @@
+{
+  "variant": "hydra_stream",
+  "description": "HYDRA 3-kernel streaming pipeline: load -> hydra_inference -> store via AXI-Stream",
+  "fpga": "Xilinx Alveo U280",
+  "clock_mhz": 300,
+  "compute_units": 1,
+  "date": "2026-04-08",
+  "xclbin": "hydra_stream/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin",
+  "host_binary": "hydra_stream/hydra_stream_host",
+  "notes": "Per-sample dispatch (no inter-sample pipelining). Throughput scales inversely with series length.",
+  "datasets": [
+    {
+      "dataset": "InsectSound",
+      "num_samples": 25000,
+      "time_series_length": 600,
+      "num_classes": 10,
+      "accuracy_pct": 69.41,
+      "correct": 17353,
+      "throughput_inf_per_s": 193,
+      "avg_latency_ms": 5.187,
+      "total_time_s": 129.68,
+      "python_reference_accuracy_pct": 69.41,
+      "accuracy_delta_pct": 0.00
+    },
+    {
+      "dataset": "MosquitoSound",
+      "num_samples": 139786,
+      "time_series_length": 3750,
+      "num_classes": 6,
+      "accuracy_pct": 70.05,
+      "correct": 97925,
+      "throughput_inf_per_s": 31,
+      "avg_latency_ms": 32.049,
+      "total_time_s": 4479.98,
+      "python_reference_accuracy_pct": 70.05,
+      "accuracy_delta_pct": 0.00
+    },
+    {
+      "dataset": "FruitFlies",
+      "num_samples": 17259,
+      "time_series_length": 5000,
+      "num_classes": 3,
+      "accuracy_pct": 87.61,
+      "correct": 15121,
+      "throughput_inf_per_s": 23,
+      "avg_latency_ms": 42.716,
+      "total_time_s": 737.23,
+      "python_reference_accuracy_pct": 87.61,
+      "accuracy_delta_pct": 0.00
+    }
+  ]
+}

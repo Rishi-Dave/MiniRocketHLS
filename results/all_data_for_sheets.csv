@@ -1,0 +1,190 @@
+### SECTION 1: MiniRocket - Modular Fused CONV+PPV (UNROLL=28 kernel group loop)
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,Latency_P50_ms,Latency_P95_ms,Latency_P99_ms,Speedup_vs_CPU_Cpp,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,Notes
+MiniRocket,Modular Fused,fused_1cu,28,1,300,Yes,GunPoint,150,60,98.33,3797.1,0.388,0.361,0.482,0.812,,,57090,4%,94283,3%,185,4%,0,0%,0 DSP - ternary weights eliminate multiply
+MiniRocket,Modular Fused,fused_1cu,28,1,300,Yes,InsectSound,600,25000,74.12,1966.8,0.630,0.619,0.763,0.823,6.8x,,57090,4%,94283,3%,185,4%,0,0%,
+MiniRocket,Modular Fused,fused_1cu,28,1,300,Yes,MosquitoSound,3750,6000,87.88,937.0,1.214,1.206,1.357,1.441,19.5x,,57090,4%,94283,3%,185,4%,0,0%,
+MiniRocket,Modular Fused,fused_1cu,28,1,300,Yes,FruitFlies,5000,17259,95.82,742.3,1.491,1.488,1.607,1.655,2.9x,,57090,4%,94283,3%,185,4%,0,0%,
+MiniRocket,Modular Fused,fused_2cu,28,2,300,Yes,GunPoint,150,60,98.33,5999.1,0.167,,,,,,,,,,,,,SLR0+SLR1 placement
+MiniRocket,Modular Fused,fused_2cu,28,2,300,Yes,InsectSound,600,25000,74.12,3191.1,0.313,,,,11.0x,,,,,,,,,1.62x scaling over 1CU
+MiniRocket,Modular Fused,fused_2cu,28,2,300,Yes,MosquitoSound,3750,6000,87.88,1496.9,0.668,,,,31.2x,,,,,,,,,1.60x scaling over 1CU
+MiniRocket,Modular Fused,fused_2cu,28,2,300,Yes,FruitFlies,5000,17259,95.82,1121.4,0.892,,,,4.3x,,,,,,,,,1.51x scaling over 1CU
+MiniRocket,Modular Fused,fused_3cu,28,3,269,No (WNS=-0.380ns),GunPoint,150,60,98.33,9585.0,0.104,,,,,,,92703,7%,159086,6%,428,10%,1264,14%,Auto-throttled from 300 to 269 MHz; UNROLL=28 caused DSP explosion 0->1262/CU
+MiniRocket,Modular Fused,fused_3cu,28,3,269,No (WNS=-0.380ns),InsectSound,600,25000,74.12,5012.2,0.200,,,,17.3x,,92703,7%,159086,6%,428,10%,1264,14%,2.55x scaling over 1CU
+MiniRocket,Modular Fused,fused_3cu,28,3,269,No (WNS=-0.380ns),MosquitoSound,3750,6000,87.88,2819.6,0.355,,,,58.7x,,92703,7%,159086,6%,428,10%,1264,14%,3.01x scaling over 1CU
+MiniRocket,Modular Fused,fused_3cu,28,3,269,No (WNS=-0.380ns),FruitFlies,5000,17259,95.82,2190.7,0.456,,,,8.5x,,92703,7%,159086,6%,428,10%,1264,14%,2.95x scaling over 1CU
+MiniRocket,Modular v16_fixed (pre-fusion),v16_fixed_1cu,16 (v16 vectorization),1,300,Yes,GunPoint,150,60,98.33,507.5,2.104,2.098,2.166,2.224,,,48812,3%,88492,3%,576,14%,724,8%,Separate CONV+PPV; K1 dominates at 93% of pipeline
+MiniRocket,Modular v16_fixed (pre-fusion),v16_fixed_1cu,16 (v16 vectorization),1,300,Yes,InsectSound,600,25000,74.12,295.9,,,,,,,,,,,,,,6.6x slower than fused
+MiniRocket,Modular v16_fixed (pre-fusion),v16_fixed_1cu,16 (v16 vectorization),1,300,Yes,MosquitoSound,3750,6000,87.88,88.1,,,,,,,,,,,,,,10.6x slower than fused
+MiniRocket,Modular v16_fixed (pre-fusion),v16_fixed_1cu,16 (v16 vectorization),1,300,Yes,FruitFlies,5000,17259,95.82,67.9,,,,,,,,,,,,,,10.9x slower than fused
+
+### SECTION 2: MiniRocket - Reference & Optimized HBM-Direct (no kernel fusion)
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,Speedup_vs_CPU_Cpp,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,Notes
+MiniRocket,Reference HBM,reference_1to1,None (PIPELINE only),1,242,Yes,,,,45,,,,27713,2%,20822,0%,231,5%,17,0%,Paper-faithful implementation; 9 HBM ports
+MiniRocket,Optimized HBM,optimized_version,512 (CONV_LOOP + 2 inner loops),4,404,Yes,,,,3468,,,77x,,,,,,,,,4 CUs; simplified kernels; 9 HBM ports per CU (36 total)
+MiniRocket,Modular Baseline (un-optimized),modular_baseline,None (single monolithic kernel),1,300,Yes,GunPoint,150,60,98.33,10.8,92.8,,2459419,188%,2381999,91%,28,0%,18,0%,Un-pipelined; K1 = 93ms/sample; LUT > 100% = not routable as single kernel
+MiniRocket,Modular Baseline (un-optimized),modular_baseline,None (single monolithic kernel),1,300,Yes,InsectSound,600,25000,74.12,9.5,105.5,,,,,,,,,,
+MiniRocket,Modular Baseline (un-optimized),modular_baseline,None (single monolithic kernel),1,300,Yes,MosquitoSound,3750,6000,87.88,8.8,113.4,,,,,,,,,,
+MiniRocket,Modular Baseline (un-optimized),modular_baseline,None (single monolithic kernel),1,300,Yes,FruitFlies,5000,17259,95.82,7.8,128.2,,,,,,,,,,
+
+### SECTION 3: MiniRocket - AXI-Stream Streaming Pipeline (UNROLL=512 load/store)
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,Notes
+MiniRocket,AXI-Stream,minirocket_stream,512 (load/store) + PIPELINE-only (compute),3 kernels,404.86,Yes,InsectSound,600,25000,,193,5.19,245534,18%,569066,21%,184,4%,19,0%,Per-sample dispatch bound; not kernel-compute bound
+MiniRocket,AXI-Stream,minirocket_stream,512 (load/store) + PIPELINE-only (compute),3 kernels,404.86,Yes,MosquitoSound,3750,,,31,32.1,,,,,,,,,
+MiniRocket,AXI-Stream,minirocket_stream,512 (load/store) + PIPELINE-only (compute),3 kernels,404.86,Yes,FruitFlies,5000,,,23,42.7,,,,,,,,,
+
+### SECTION 4: HYDRA - Monolithic v2_fixed ap_fixed<32_16> (full UNROLL on size-9 inner loops; UNROLL=16 batch grouping)
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,Speedup_vs_CPU_Python,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,Notes
+HYDRA,Monolithic v2_fixed,v2_fixed_1cu,Full (size-9 inner) + 16 (batch grouping),1,300,Yes,InsectSound,600,25000,69.41,6326,0.158,70.2x,29758,2.28%,38055,1.46%,84.5,4.19%,684,7.58%,Vivado routed utilization; ap_fixed<32,16> internal
+HYDRA,Monolithic v2_fixed,v2_fixed_1cu,Full (size-9 inner) + 16 (batch grouping),1,300,Yes,MosquitoSound,3750,139786,70.05,1937,0.516,49.4x,,,,,,,,,Corrected accuracy (was 69.81% with wrong num_classes)
+HYDRA,Monolithic v2_fixed,v2_fixed_1cu,Full (size-9 inner) + 16 (batch grouping),1,300,Yes,FruitFlies,5000,17259,87.61,1507,0.663,44.8x,,,,,,,,,Corrected accuracy (was 88.21% stale value)
+HYDRA,Monolithic v2_fixed,v2_fixed_2cu,Full (size-9 inner) + 16 (batch grouping),2,300,Yes,InsectSound,600,25000,69.41,8028,,,,,,,,,,,,1.27x scaling over 1CU; SLR0+SLR1
+HYDRA,Monolithic v2_fixed,v2_fixed_2cu,Full (size-9 inner) + 16 (batch grouping),2,300,Yes,MosquitoSound,3750,139786,70.05,2757,,,,,,,,,,,,1.42x scaling over 1CU
+HYDRA,Monolithic v2_fixed,v2_fixed_2cu,Full (size-9 inner) + 16 (batch grouping),2,300,Yes,FruitFlies,5000,17259,87.61,2148,,,,,,,,,,,,1.43x scaling over 1CU
+HYDRA,Monolithic v2_fixed,v2_fixed_3cu,Full (size-9 inner) + 16 (batch grouping),3,Throttled,No (timing failed),InsectSound,600,25000,69.41,10573,,117.5x,,,,,,,,,,1.67x over 1CU; auto-throttled
+HYDRA,Monolithic v2_fixed,v2_fixed_3cu,Full (size-9 inner) + 16 (batch grouping),3,Throttled,No (timing failed),MosquitoSound,3750,139786,70.05,3516,,89.7x,,,,,,,,,,1.82x over 1CU
+HYDRA,Monolithic v2_fixed,v2_fixed_3cu,Full (size-9 inner) + 16 (batch grouping),3,Throttled,No (timing failed),FruitFlies,5000,17259,87.61,2972,,87.4x,,,,,,,,,,1.97x over 1CU
+
+### SECTION 5: HYDRA - Dataflow/Streaming AXI-Stream Pipeline (PIPELINE-only compute)
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,Accuracy_Delta_vs_Python,Notes
+HYDRA,AXI-Stream Dataflow,hydra_stream,PIPELINE-only (no explicit UNROLL),3 kernels (load+hydra+store),404.86,Yes (WNS=+0.375ns),InsectSound,600,25000,69.41,193,5.187,0.00%,Per-sample dispatch bound; not compute-bound
+HYDRA,AXI-Stream Dataflow,hydra_stream,PIPELINE-only (no explicit UNROLL),3 kernels (load+hydra+store),404.86,Yes (WNS=+0.375ns),MosquitoSound,3750,139786,70.05,31,32.049,0.00%,
+HYDRA,AXI-Stream Dataflow,hydra_stream,PIPELINE-only (no explicit UNROLL),3 kernels (load+hydra+store),404.86,Yes (WNS=+0.375ns),FruitFlies,5000,17259,87.61,23,42.716,0.00%,
+
+### SECTION 6: HYDRA - Original Float Baseline
+Algorithm,Category,Variant,Unroll_Factor,Compute_Units,Clock_MHz,Timing_Met,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,Notes
+HYDRA,Float Baseline,v1_float,PIPELINE-only,1,300,Yes,GunPoint,150,14,14.29,786.3,1.272,52939,4.06%,66483,2.55%,86,4.27%,1163,12.89%,Vivado routed; float arithmetic; GunPoint only tested
+HYDRA,Float HLS csynth,hydra_optimized_hls,PIPELINE-only,1,300,,,,,,,,,,101221,7%,161117,6%,236,5%,1163,12%,HLS csynth estimate (larger than routed)
+
+### SECTION 7: CPU Baselines
+Algorithm,Category,Platform,Config,Dataset,TS_Length,Test_Samples,Accuracy_Pct,Throughput_InfPerSec,Latency_Mean_ms,Latency_P50_ms,Latency_P95_ms,Latency_P99_ms,Latency_Min_ms,Latency_Max_ms,Notes
+MiniRocket,CPU Baseline,Python (aeon/sklearn),single-thread batch,InsectSound,600,25000,78.84,519.9,1.924,,,,,,Batch throughput (total_time/N); NOT per-sample
+MiniRocket,CPU Baseline,Python (aeon/sklearn),single-thread batch,MosquitoSound,3750,139786,87.59,82.1,12.181,,,,,,
+MiniRocket,CPU Baseline,Python (aeon/sklearn),single-thread batch,FruitFlies,5000,17259,96.98,39.4,25.400,,,,,,
+MiniRocket,CPU Baseline,C++ -O3 -march=native,per-sample,InsectSound,600,25000,74.12,288.9,3.461,3.399,3.909,4.005,3.292,12.301,Uses exported model; accuracy matches FPGA not Python
+MiniRocket,CPU Baseline,C++ -O3 -march=native,per-sample,MosquitoSound,3750,6000,87.87,48.0,20.835,20.588,22.099,24.224,19.659,42.147,
+MiniRocket,CPU Baseline,C++ -O3 -march=native,per-sample,FruitFlies,5000,17259,95.83,258.2,3.874,3.916,4.281,4.514,3.489,26.959,
+HYDRA,CPU Baseline,Python (custom_hydra),single-thread,InsectSound,600,25000,,90.1,10.924,,,,,,Authoritative from cpu_benchmark_results.json
+HYDRA,CPU Baseline,Python (custom_hydra),single-thread,MosquitoSound,3750,139786,,39.2,23.191,,,,,,
+HYDRA,CPU Baseline,Python (custom_hydra),single-thread,FruitFlies,5000,17259,,33.6,28.597,,,,,,
+
+### SECTION 8: GPU Baselines (Tesla T4 - PyTorch 2.10.0 + CUDA 12.8)
+Algorithm,Category,GPU_Batch_Size,Dataset,TS_Length,Throughput_InfPerSec,GPU_vs_FPGA_3CU_Ratio,Notes
+MiniRocket,GPU T4,256,InsectSound,600,30469,6.1x,GPU batch=256 / FPGA 3CU
+MiniRocket,GPU T4,256,MosquitoSound,3750,4198,1.5x,
+MiniRocket,GPU T4,256,FruitFlies,5000,3227,1.5x,
+MiniRocket,GPU T4,1,InsectSound,600,1091,,Single-inference (no batching)
+MiniRocket,GPU T4,1,MosquitoSound,3750,661,,
+MiniRocket,GPU T4,1,FruitFlies,5000,539,,
+HYDRA,GPU T4,256,InsectSound,600,13895,1.3x,GPU batch=256 / FPGA 3CU
+HYDRA,GPU T4,256,MosquitoSound,3750,5139,1.5x,
+HYDRA,GPU T4,256,FruitFlies,5000,4267,1.4x,
+HYDRA,GPU T4,1,InsectSound,600,2711,,
+HYDRA,GPU T4,1,MosquitoSound,3750,2805,,
+HYDRA,GPU T4,1,FruitFlies,5000,1934,,
+
+### SECTION 9: Energy / Power Efficiency
+Algorithm,Dataset,Platform,Throughput_InfPerSec,Power_W,Energy_mJ_per_Inf,Energy_Efficiency_vs_CPU,Notes
+MiniRocket,InsectSound,CPU C++ -O3,289,52.8,182.7,1x,
+MiniRocket,InsectSound,GPU T4 (batch=256),30469,68,2.2,83x,
+MiniRocket,InsectSound,FPGA 3-CU (269MHz),5012,25.7,5.1,36x,FPGA 25.7W is static-dominated at <5% utilization
+MiniRocket,MosquitoSound,CPU C++ -O3,48,40.0,833.3,1x,
+MiniRocket,MosquitoSound,GPU T4 (batch=256),4198,54,12.9,65x,
+MiniRocket,MosquitoSound,FPGA 3-CU (269MHz),2820,25.7,9.1,92x,
+MiniRocket,FruitFlies,CPU C++ -O3,258,49.9,193.4,1x,
+MiniRocket,FruitFlies,GPU T4 (batch=256),3227,54,16.7,12x,
+MiniRocket,FruitFlies,FPGA 3-CU (269MHz),2191,25.7,11.7,17x,
+
+### SECTION 10: MiniRocket Scalability Sweep (Fused 1CU 300MHz vs GPU T4 - varying TS length)
+TS_Length,Num_Dilations,FPGA_1CU_Throughput_InfPerSec,FPGA_K1_FeatureExt_ms,FPGA_Total_Latency_ms,GPU_Batch256_InfPerSec,GPU_Batch1_InfPerSec,GPU_Batch256_vs_FPGA,GPU_Batch1_vs_FPGA,Notes
+64,3,2681,0.225,0.744,174912,1204,65.2x,0.45x,
+128,4,2458,0.260,0.901,115308,1091,46.9x,0.44x,
+256,5,2512,0.263,0.745,65826,950,26.2x,0.38x,
+512,6,2204,0.278,0.735,33826,798,15.4x,0.36x,
+1024,7,1745,0.387,0.866,20178,692,11.6x,0.40x,
+2048,8,1303,0.587,1.117,9331,661,7.2x,0.51x,
+4096,9,794,1.123,1.736,4249,606,5.4x,0.76x,
+8192,10,511,1.692,2.180,1919,539,3.8x,1.05x,FPGA exceeds GPU batch=1 at this length
+
+### SECTION 11: MiniRocket Latency Breakdown (Fused 1CU 300MHz - per component)
+Variant,Dataset,Component,Mean_ms,P50_ms,P95_ms,P99_ms,Min_ms,Max_ms
+fused_1cu,GunPoint,H2D,0.059,0.050,0.103,0.107,0.025,0.110
+fused_1cu,GunPoint,K1_FeatureExt,0.145,0.143,0.148,0.195,0.141,0.240
+fused_1cu,GunPoint,K2_Scaler,0.030,0.029,0.037,0.045,0.027,0.050
+fused_1cu,GunPoint,K3_Classifier,0.067,0.055,0.061,0.339,0.053,0.711
+fused_1cu,GunPoint,D2H,0.066,0.051,0.122,0.165,0.027,0.208
+fused_1cu,GunPoint,Total,0.388,0.361,0.482,0.812,0.311,0.995
+fused_1cu,InsectSound,H2D,0.058,0.047,0.111,0.136,0.023,1.885
+fused_1cu,InsectSound,K1_FeatureExt,0.248,0.243,0.281,0.288,0.230,0.972
+fused_1cu,InsectSound,K2_Scaler,0.042,0.035,0.074,0.087,0.024,0.234
+fused_1cu,InsectSound,K3_Classifier,0.195,0.191,0.232,0.236,0.182,0.857
+fused_1cu,InsectSound,D2H,0.063,0.054,0.109,0.126,0.024,1.195
+fused_1cu,InsectSound,Total,0.630,0.619,0.763,0.823,0.504,2.515
+fused_1cu,MosquitoSound,H2D,0.069,0.059,0.119,0.139,0.025,2.596
+fused_1cu,MosquitoSound,K1_FeatureExt,0.853,0.837,0.908,0.947,0.815,1.613
+fused_1cu,MosquitoSound,K2_Scaler,0.043,0.037,0.075,0.082,0.024,0.114
+fused_1cu,MosquitoSound,K3_Classifier,0.140,0.132,0.167,0.172,0.117,0.231
+fused_1cu,MosquitoSound,D2H,0.079,0.073,0.119,0.143,0.028,0.166
+fused_1cu,MosquitoSound,Total,1.214,1.206,1.357,1.441,1.041,4.097
+fused_1cu,FruitFlies,H2D,0.071,0.067,0.114,0.136,0.027,1.682
+fused_1cu,FruitFlies,K1_FeatureExt,1.193,1.176,1.247,1.270,1.155,1.937
+fused_1cu,FruitFlies,K2_Scaler,0.044,0.037,0.074,0.081,0.023,0.123
+fused_1cu,FruitFlies,K3_Classifier,0.082,0.078,0.113,0.117,0.067,0.570
+fused_1cu,FruitFlies,D2H,0.072,0.068,0.120,0.128,0.023,0.777
+fused_1cu,FruitFlies,Total,1.491,1.488,1.607,1.655,1.311,3.156
+v16_fixed_1cu,GunPoint,H2D,0.054,0.055,0.070,0.080,0.040,0.081
+v16_fixed_1cu,GunPoint,K1_FeatureExt,1.837,1.832,1.873,1.912,1.797,1.951
+v16_fixed_1cu,GunPoint,K2_Scaler,0.044,0.038,0.063,0.074,0.027,0.078
+v16_fixed_1cu,GunPoint,K3_Classifier,0.056,0.056,0.061,0.062,0.054,0.063
+v16_fixed_1cu,GunPoint,D2H,0.079,0.075,0.125,0.135,0.038,0.140
+v16_fixed_1cu,GunPoint,Total,2.104,2.098,2.166,2.224,1.992,2.290
+
+### SECTION 12: Resource Utilization (All Variants)
+Variant,Report_Type,LUT_Used,LUT_Avail,LUT_Pct,FF_Used,FF_Avail,FF_Pct,BRAM_Used,BRAM_Avail,BRAM_Pct,DSP_Used,DSP_Avail,DSP_Pct,URAM_Used,URAM_Avail,URAM_Pct,Notes
+modular_fused_1cu,HLS csynth,57090,1303680,4%,94283,2607360,3%,185,2016,4%,724,9024,8%,0,960,0%,Fused CONV+PPV; 0 DSP in kernel (724 from infrastructure)
+modular_fused_3cu,HLS csynth,92703,1303680,7%,159086,2607360,6%,428,2016,10%,1264,9024,14%,0,960,0%,3CU; UNROLL=28 caused DSP explosion
+modular_v16_fixed,HLS csynth,48812,1303680,3%,88492,2607360,3%,576,2016,14%,724,9024,8%,0,960,0%,Pre-fusion; separate CONV+PPV arrays
+modular_v16,HLS csynth,94866,1303680,7%,60112,2607360,2%,60,2016,1%,16,9024,0%,0,960,0%,v16 float version
+modular_baseline_fe,HLS csynth,2459419,1303680,188%,2381999,2607360,91%,28,2016,0%,18,9024,0%,0,960,0%,Un-optimized feature extraction; NOT ROUTABLE (>100% LUT)
+modular_baseline_scaler,HLS csynth,5338,1303680,0%,4324,2607360,0%,4,2016,0%,5,9024,0%,0,960,0%,Scaler kernel (small)
+modular_baseline_classifier,HLS csynth,9592,1303680,0%,10553,2607360,0%,78,2016,1%,10,9024,0%,0,960,0%,Classifier kernel (small)
+hydra_v2_apfixed,Vivado routed,29758,1303680,2.28%,38055,2607360,1.46%,84.5,2016,4.19%,684,9024,7.58%,0,960,0%,Post-P&R (authoritative for v2_fixed)
+hydra_v2_apfixed,HLS csynth,59572,1303680,4%,89833,2607360,3%,236,2016,5%,683,9024,7%,0,960,0%,HLS estimate (larger than routed)
+hydra_optimized,Vivado routed,52939,1303680,4.06%,66483,2607360,2.55%,86,2016,4.27%,1163,9024,12.89%,0,960,0%,Original float version; Vivado routed
+hydra_optimized,HLS csynth,101221,1303680,7%,161117,2607360,6%,236,2016,5%,1163,9024,12%,0,960,0%,Original float; HLS csynth
+hydra_280mhz_fixed,HLS csynth,89414,1303680,6%,147911,2607360,5%,236,2016,5%,1355,9024,15%,0,960,0%,280MHz fixed-point build
+stream_inference,HLS csynth,245534,1303680,18%,569066,2607360,21%,184,2016,4%,19,9024,0%,0,960,0%,AXI-Stream minirocket compute kernel
+reference_1to1,HLS csynth,27713,1303680,2%,20822,2607360,0%,231,2016,5%,17,9024,0%,0,960,0%,Paper-faithful baseline
+multirocket_optimized,HLS csynth,26386,1303680,2%,20382,2607360,0%,177,2016,4%,25,9024,0%,2,960,0%,DROPPED - results invalid
+fpga_network,HLS csynth,90217,1303680,6%,119438,2607360,4%,487,2016,12%,518,9024,5%,0,960,0%,Network streaming kernel (includes CMAC/NetLayer overhead)
+MiniRocket fused 1CU,Post-P&R (paper),57090,,4.4%,94283,,3.6%,185,,9.2%,0,,0%,,,,"Paper Table 4 (resource_annotated.tex)"
+MiniRocket fused 2CU,Post-P&R (paper),114180,,8.8%,188566,,7.2%,370,,18.4%,0,,0%,,,,"Paper Table 4"
+MiniRocket fused 3CU,Post-P&R (paper),92703,,7.1%,159086,,6.1%,428,,21.2%,1264,,14%,,,,"Paper Table 4; timing failed"
+MiniRocket DP-Reuse 1CU,Post-P&R (paper),135634,,10.4%,153327,,5.9%,1320,,65.5%,2,,0%,,,,"Paper Table 4; data-path reuse variant"
+HYDRA v2_fixed 1CU,Post-P&R (paper),41746,,3.2%,58537,,2.2%,86,,4.3%,1355,,15%,,,,"Paper Table 4"
+HYDRA Dataflow 1CU,Post-P&R (paper),15866,,1.2%,20823,,0.8%,115,,5.7%,55,,0.6%,,,,"Paper Table 4; streaming variant"
+
+### SECTION 13: Network Streaming / SmartNIC (ArrowHead dataset)
+Platform,Computation_ms,Communication_ms,Total_RTT_ms,Speedup_vs_CPU_Python,Notes
+FPGA (CMAC 100G + NetLayer + MiniRocket),1.25,2.87,4.12,,ArrowHead dataset; single FPGA
+CPU with Python sockets,,,11.0,,2.65x slower than FPGA
+CPU with DPDK kernel bypass,2.31,3.35,5.66,,1.37x slower than FPGA overall
+FPGA vs CPU DPDK (computation only),1.25 vs 2.31,,,,1.85x FPGA advantage
+FPGA vs CPU DPDK (communication only),,2.87 vs 3.35,,,1.17x FPGA advantage
+
+### SECTION 14: Fused vs Separate Kernel Comparison (MiniRocket 1CU 300MHz)
+Metric,Separate (v16_fixed),Fused,Change,Notes
+LUT_Used,48812,57090,+17%,
+FF_Used,88492,94283,+7%,
+BRAM_18K,576,185,-68%,Eliminated intermediate convolutions[16][8192] array
+DSP48E2,724,0,-100%,Ternary weights: multiply eliminated entirely
+Intermediate_Array,16x8192 floats,Eliminated,-100%,Key optimization: CONV+PPV single pass
+Throughput_GunPoint_InfPerSec,507.5,3797.1,7.5x,
+Throughput_InsectSound_InfPerSec,295.9,1966.8,6.6x,
+Throughput_MosquitoSound_InfPerSec,88.1,937.0,10.6x,Longer series benefit more from dynamic loop bound
+Throughput_FruitFlies_InfPerSec,67.9,742.3,10.9x,
+Fmax_MHz,397.6,397.6,No regression,Same clock floor
+
+### SECTION 15: MultiRocket (DROPPED 2026-04-08 - ALL NUMBERS INVALID)
+Algorithm,Category,Variant,Status,LUT_Used,LUT_Pct,FF_Used,FF_Pct,BRAM_Used,BRAM_Pct,DSP_Used,DSP_Pct,HBM_Ports,Notes
+MultiRocket,DROPPED,multirocket_optimized,INVALID - removed from ICCAD resubmission,26386,2%,20382,0%,177,4%,25,0%,12,Host used wrong JSON field names -> all-zero model arrays; data_t float vs kernel ap_fixed mismatch; Round 3 accuracy collapsed to 28.6%
+MultiRocket,DROPPED,multirocket_optimized,INVALID,,,,,,,,,,"Prior reported accuracies (74.60/86.60/97.80%) are NOT real; ran with all-zero weights"

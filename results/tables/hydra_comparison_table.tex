@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{HYDRA FPGA throughput comparison: monolithic kernel (v2\_fixed, single m\_axi dispatch) vs. 3-kernel streaming pipeline (hydra\_stream: load $\to$ hydra\_inference $\to$ store via AXI-Stream). Both use ap\_fixed$\langle$32,16$\rangle$, UNROLL=16, 300\,MHz on Alveo U280 (1\,CU). Accuracy matches Python reference exactly for all datasets.}
+\label{tab:hydra_comparison}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l r r r r r r r r}
+\toprule
+ & & & \multicolumn{3}{c}{v2\_fixed (monolithic)} & \multicolumn{3}{c}{hydra\_stream (pipeline)} \\
+\cmidrule(lr){4-6} \cmidrule(lr){7-9}
+Dataset & TS Len & Samples & Acc (\%) & Lat (ms) & Tput (inf/s) & Acc (\%) & Lat (ms) & Tput (inf/s) \\
+\midrule
+InsectSound  & 600   & 25,000  & 69.41 & 0.158 & 6,326 & 69.41 & 5.187 & 193$^{\dagger}$ \\
+MosquitoSound & 3,750 & 139,786 & 70.05$^{*}$ & 0.516 & 1,937 & 70.05 & 32.05 &  31$^{\dagger}$ \\
+FruitFlies   & 5,000 & 17,259  & 87.61$^{*}$ & 0.663 & 1,507 & 87.61 & 42.72 &  23$^{\dagger}$ \\
+\bottomrule
+\end{tabular}}
+\vspace{1pt}
+{\footnotesize $^{*}$Corrected 2026-04-08: prior v2\_fixed JSON recorded MosquitoSound as 2-class (69.81\%) and FruitFlies as 88.21\%; values shown match the Python reference model JSON and are validated by hydra\_stream ($\Delta$=0.00\%). \\
+$^{\dagger}$hydra\_stream throughput is limited by per-sample OpenCL dispatch, not kernel compute; see Section~\ref{sec:streaming_dataflow}. Monolithic v2\_fixed is preferred for batch throughput workloads.}
+\end{table}
