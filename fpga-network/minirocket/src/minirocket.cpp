@@ -20,10 +20,18 @@
 #include "../include/minirocket.hpp"
 #include <cstring>
 
-// Binary weights: ap_uint<1> where 0 maps to weight -1, 1 maps to weight +2
+// Weights: bFP variant uses ap_uint<1> (0 -> -1, 1 -> +2) with optimized_fp_multiply.
+// NAIVE_FP variant stores the {-1, +2} values directly as data_t and uses standard *.
+// Compile with -DNAIVE_FP to select the FP variant (FCCM 2026 paper §4, "Naïve + FP").
+#ifdef NAIVE_FP
+static data_t weights[NUM_KERNELS][KERNEL_SIZE] = {
+    #include "../include/weights.txt"
+};
+#else
 static ap_uint<1> weights[NUM_KERNELS][KERNEL_SIZE] = {
     #include "../include/weights01.txt"
 };
+#endif
 
 // Binary floating-point multiply for {-1, +2} weights
 // weight=0 → multiply by -1 (flip sign)
@@ -132,14 +140,18 @@ void minirocket_feature_extraction_fused(
 
                 bool in_padded_range = (j >= padding && j < time_series_length - padding);
 
-                // Compute 28 dot products + accumulate PPV counts in parallel
-                // Uses optimized_fp_multiply for DSP=0 binary weight multiplication
+                // Compute 28 dot products + accumulate PPV counts in parallel.
+                // NAIVE_FP: standard FP multiply (uses DSPs). Default: bFP (DSP=0, XNOR+ADD).
                 PARALLEL_KERNELS: for (int_t ki = 0; ki < UNROLL_FACTOR; ki++) {
                     #pragma HLS UNROLL
                     data_t value = 0.0;
                     DOT_PRODUCT: for (int_t k = 0; k < KERNEL_SIZE; k++) {
                         #pragma HLS UNROLL
+                        #ifdef NAIVE_FP
+                        value += weights[kg + ki][k] * sw[k];
+                        #else
                         value += optimized_fp_multiply(weights[kg + ki][k], sw[k]);
+                        #endif
                     }
 
                     // Inline PPV: compare conv output against biases
@@ -386,6 +398,17 @@ extern "C" void minirocket_inference(
                 out_pkt.data = out_data;
                 out_pkt.keep = -1;
                 out_pkt.last = 1;
+                // Bug B full fix (2026-05-25): pkt = ap_axiu<512,1,1,16> has
+                // user/id/dest/strb sideband fields that are X by default.
+                // First attempt set only dest=0 -> packets get past
+                // SocketTable lookup (app_in goes 0->N) but udp_out stays 0
+                // because user/id/strb were still poisoning later NetLayer
+                // stages. Same fix Prith applied to hydra_axis/multirocket_axis
+                // 2026-05-05 (see saturation_pivot memory).
+                out_pkt.dest = 0;
+                out_pkt.user = 0;
+                out_pkt.id   = 0;
+                out_pkt.strb = -1;
                 output_predictions.write(out_pkt);
             }
 

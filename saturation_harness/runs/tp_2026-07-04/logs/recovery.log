@@ -1,0 +1,352 @@
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         9
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program v3-dpr
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31, f8:f2:1e:d3:26:b0)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway -> .31 + fill 16 slots (single batched tweak2, opens device once)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (len-150 model -> HBM, per-packet spin)
+[8] verify
+--- loader log ---
+[hbm ] arg2 coefficients               size=6720       group=2
+[hbm ] arg3 intercept                  size=8          group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=32         group=6
+[hbm ] arg7 num_features_per_dilation  size=32         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+--- counters (baseline) ---
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] v3-dpr on pc160, SocketTable->pc161. Thermal:
+  FPGA           39       
+  FPGA HBM       34       

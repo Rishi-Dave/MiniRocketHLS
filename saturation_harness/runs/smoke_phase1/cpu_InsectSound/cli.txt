@@ -1,0 +1,1 @@
+rate_sweep.py --adapter cpu-minirocket --dataset InsectSound --model-dir ../minirocket_modular --rate-min 2 --rate-max 50 --rate-steps 3 --rate-mode log --duration-s 2 --warmup-s 0.5 --cooldown-s 0.5 --cpu-server-port 5550 --cpu-listen-port 5551 --limit 50 --out runs/smoke_phase1/cpu_InsectSound

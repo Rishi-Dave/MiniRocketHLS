@@ -1,0 +1,1168 @@
+=== ENV ===
+XILINXD_LICENSE_FILE=/home/rdave009/.Xilinx/Xilinx.lic:/opt/Xilinx.lic
+/home/Xilinx/Vitis/2023.2/bin/v++
+/home/Xilinx/Vitis_HLS/2023.2/bin/vitis_hls
+
+****** v++ v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+=== patch verify ===
+                out_pkt.dest = 0;
+                out_pkt.user = 0;
+                out_pkt.id   = 0;
+                out_pkt.strb = -1;
+                output_predictions.write(out_pkt);
+=== HLS synthesis Mon May 25 01:17:03 PM PDT 2026 ===
+
+****** Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2023.2 (64-bit)
+  **** SW Build 4023990 on Oct 11 2023
+  **** IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+  **** SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source /home/Xilinx/Vitis_HLS/2023.2/scripts/vitis_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/home/Xilinx/Vitis_HLS/2023.2/bin/unwrapped/lnx64.o/vitis_hls'
+INFO: [HLS 200-10] For user 'rdave009' on host 'wolverine.cs.ucr.edu' (Linux_x86_64 version 5.15.0-174-generic) on Mon May 25 13:17:06 PDT 2026
+INFO: [HLS 200-10] On os Ubuntu 22.04.5 LTS
+INFO: [HLS 200-10] In directory '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth'
+INFO: [HLS 200-2053] The vitis_hls executable is being deprecated. Consider using vitis-run --mode hls --tcl
+Sourcing Tcl script 'make.tcl'
+INFO: [HLS 200-1510] Running: open_project minirocket_inference_prj 
+INFO: [HLS 200-10] Creating and opening project '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj'.
+INFO: [HLS 200-1510] Running: open_solution solution1 
+INFO: [HLS 200-10] Creating and opening solution '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1'.
+INFO: [HLS 200-1505] Using default flow_target 'vivado'
+Resolution: For help on HLS 200-1505 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1505.html
+INFO: [HLS 200-1510] Running: set_part xcu280-fsvh2892-2L-e 
+INFO: [HLS 200-1611] Setting target device to 'xcu280-fsvh2892-2L-e'
+INFO: [HLS 200-1510] Running: create_clock -period 300.000000MHz -name default 
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 3.333ns.
+INFO: [HLS 200-1510] Running: set_top minirocket_inference 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_latency=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_alignment_byte_size=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_max_widen_bitwidth=512 
+INFO: [HLS 200-1510] Running: config_rtl -register_reset_num=3 
+INFO: [HLS 200-1510] Running: config_export -format xo 
+INFO: [HLS 200-1510] Running: add_files /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp -cflags -I/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/include 
+INFO: [HLS 200-10] Adding design file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp' to the project
+INFO: [HLS 200-1510] Running: csynth_design 
+INFO: [HLS 200-111] Finished File checks and directory preparation: CPU user time: 0.09 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.12 seconds; current allocated memory: 272.777 MB.
+INFO: [HLS 200-10] Analyzing design file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp' ... 
+INFO: [HLS 200-111] Finished Source Code Analysis and Preprocessing: CPU user time: 5.46 seconds. CPU system time: 0.68 seconds. Elapsed time: 6.31 seconds; current allocated memory: 275.887 MB.
+INFO: [HLS 200-777] Using interface defaults for 'Vivado' flow target.
+INFO: [HLS 200-1995] There were 9,440 instructions in the design after the 'Compile/Link' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 9,946 instructions in the design after the 'Unroll/Inline (step 1)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,103 instructions in the design after the 'Unroll/Inline (step 2)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 6,698 instructions in the design after the 'Unroll/Inline (step 3)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 5,942 instructions in the design after the 'Unroll/Inline (step 4)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 73,575 instructions in the design after the 'Array/Struct' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,357 instructions in the design after the 'Array/Struct (step 2)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,357 instructions in the design after the 'Array/Struct (step 3)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,355 instructions in the design after the 'Array/Struct (step 4)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,714 instructions in the design after the 'Array/Struct (step 5)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,386 instructions in the design after the 'Performance (step 1)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,375 instructions in the design after the 'Performance (step 2)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,350 instructions in the design after the 'Performance (step 3)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,426 instructions in the design after the 'Performance (step 4)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,443 instructions in the design after the 'HW Transforms (step 1)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 200-1995] There were 7,371 instructions in the design after the 'HW Transforms (step 2)' phase of compilation. See the Design Size Report for more details: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/csynth_design_size.rpt
+INFO: [HLS 214-131] Inlining function 'optimized_fp_multiply(ap_uint<1>, float)' into 'minirocket_feature_extraction_fused(float*, float*, float*, float*, float*, float*, ap_int<32>*, ap_int<32>*, float*, ap_int<32>, ap_int<32>, ap_int<32>)' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:142:11)
+INFO: [HLS 214-291] Loop 'PARALLEL_KERNELS' is marked as complete unroll implied by the pipeline pragma (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:137:35)
+INFO: [HLS 214-291] Loop 'DOT_PRODUCT' is marked as complete unroll implied by the pipeline pragma (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:140:34)
+INFO: [HLS 214-291] Loop 'PPV_FEATURES' is marked as complete unroll implied by the pipeline pragma (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:147:35)
+WARNING: [HLS 214-398] Updating loop lower bound from 28 to 84 for loop 'WRITE_PPV' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:162:24) in function 'minirocket_feature_extraction_fused'. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:58:0)
+INFO: [HLS 214-186] Unrolling loop 'PARALLEL_KERNELS' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:137:35) in function 'minirocket_feature_extraction_fused' completely with a factor of 28 (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:58:0)
+INFO: [HLS 214-186] Unrolling loop 'PPV_FEATURES' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:147:35) in function 'minirocket_feature_extraction_fused' completely with a factor of 3 (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:58:0)
+INFO: [HLS 214-186] Unrolling loop 'DOT_PRODUCT' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:140:34) in function 'minirocket_feature_extraction_fused' completely with a factor of 9 (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:58:0)
+INFO: [HLS 214-248] Applying array_partition to '_ZL7weights': Cyclic partitioning with factor 28 on dimension 1. Complete partitioning on dimension 2. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:24:0)
+INFO: [HLS 214-248] Applying array_partition to 'group_biases': Complete partitioning on dimension 1. Complete partitioning on dimension 2. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:80:9)
+INFO: [HLS 214-248] Applying array_partition to 'ppv_counts': Complete partitioning on dimension 1. Complete partitioning on dimension 2. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:82:8)
+INFO: [HLS 214-248] Applying array_partition to 'padding_flag': Complete partitioning on dimension 1. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:84:8)
+WARNING: [HLS 214-358] Array transformation on index using bit extension logic may lead to poor performance. Please use int or long for array index computation to benefit from optimizations.
+INFO: [HLS 214-248] Applying array_partition to 'local_features': Cyclic partitioning with factor 8 on dimension 1. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:282:12)
+INFO: [HLS 214-248] Applying array_partition to 'local_scaled_features': Cyclic partitioning with factor 8 on dimension 1. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:283:12)
+INFO: [HLS 214-248] Applying array_partition to 'local_coefficients': Complete partitioning on dimension 1. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:285:12)
+INFO: [HLS 214-248] Applying array_partition to 'local_intercept': Complete partitioning on dimension 1. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:288:12)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_DILATIONS'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:299:18) has been inferred on bundle 'gmem6'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:299:18)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_DILATIONS'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:299:18) has been inferred on bundle 'gmem7'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:299:18)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_BIASES'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18) has been inferred on bundle 'gmem8'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_BIASES'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18) has been inferred on bundle 'gmem4'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_BIASES'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18) has been inferred on bundle 'gmem5'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:305:18)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 in loop 'COPY_INTERCEPT'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:312:21) has been inferred on bundle 'gmem3'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:312:21)
+INFO: [HLS 214-115] Multiple burst reads of variable length and bit width 32 has been inferred on bundle 'gmem2'. These burst requests might be further partitioned into multiple requests during RTL generation, based on max_read_burst_length or max_write_burst_length settings. (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:317:16)
+INFO: [HLS 200-111] Finished Compiling Optimization and Transform: CPU user time: 10.86 seconds. CPU system time: 0.88 seconds. Elapsed time: 15.07 seconds; current allocated memory: 279.305 MB.
+INFO: [HLS 200-111] Finished Checking Pragmas: CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 0 seconds; current allocated memory: 279.305 MB.
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms: CPU user time: 0.62 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.66 seconds; current allocated memory: 288.344 MB.
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability: CPU user time: 0.51 seconds. CPU system time: 0 seconds. Elapsed time: 0.55 seconds; current allocated memory: 293.094 MB.
+INFO: [XFORM 203-102] Automatically partitioning small array 'local_predictions' completely based on array size.
+INFO: [XFORM 203-101] Partitioning array 'local_predictions' in dimension 1 completely.
+INFO: [XFORM 203-401] Performing if-conversion on hyperblock from (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:89:9) to (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:95:37) in function 'minirocket_feature_extraction_fused'... converting 5 basic blocks.
+INFO: [XFORM 203-401] Performing if-conversion on hyperblock from (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:106:9) to (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:105:24) in function 'minirocket_feature_extraction_fused'... converting 17 basic blocks.
+INFO: [HLS 200-111] Finished Loop, function and other optimizations: CPU user time: 2.62 seconds. CPU system time: 0.03 seconds. Elapsed time: 2.77 seconds; current allocated memory: 327.168 MB.
+INFO: [HLS 200-2061] Successfully converted nested loops 'COPY_COEF'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:317:16) and 'VITIS_LOOP_318_1'(/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:318:27) in function 'minirocket_inference' into perfectly nested loops.
+INFO: [XFORM 203-541] Flattening a loop nest 'COPY_COEF' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:317:16) in function 'minirocket_inference'.
+WARNING: [HLS 200-960] Cannot flatten loop 'DILATION_LOOP' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:67:20) in function 'minirocket_feature_extraction_fused' the outer loop is not a perfect loop.
+Resolution: For help on HLS 200-960 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-960.html
+WARNING: [HLS 200-960] Cannot flatten loop 'CLASS_LOOP' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:237:9) in function 'linear_classifier_predict_hls' the outer loop is not a perfect loop because there is nontrivial logic before entering the inner loop.
+Resolution: For help on HLS 200-960 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-960.html
+INFO: [HLS 200-111] Finished Architecture Synthesis: CPU user time: 2.21 seconds. CPU system time: 0.06 seconds. Elapsed time: 2.29 seconds; current allocated memory: 482.805 MB.
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'minirocket_inference' ...
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_27_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_27_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_27_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_26_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_26_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_25_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_25_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_24_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_24_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_23_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_22_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_22_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_21_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_21_1' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_20_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_20_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_20_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_19_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_19_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_18_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_18_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_18_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_17_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_17_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_17_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_16_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_16_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_15_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_15_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_15_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_14_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_14_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_14_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_13_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_13_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_13_2' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_12_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_11_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_10_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_9_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_8_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_8_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_7_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_7_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_6_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_6_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_5_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_5_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_5_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_4_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_4_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_3_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_3_4' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_3_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_2_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_2_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_2_3' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_1_7' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_1_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_1_5' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_0_8' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_0_6' does not exist or is optimized away.
+WARNING: [SYN 201-303] Cannot apply memory assignment of 'ROM_1P_BRAM' (/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:61): 'p_ZL7weights_0_5' does not exist or is optimized away.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_COPY_DILATIONS' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'COPY_DILATIONS'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 3, loop 'COPY_DILATIONS'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 1.02 seconds. CPU system time: 0.06 seconds. Elapsed time: 2.43 seconds; current allocated memory: 485.363 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.09 seconds; current allocated memory: 485.363 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_COPY_BIASES' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'COPY_BIASES'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 3, loop 'COPY_BIASES'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 485.703 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 485.703 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_COPY_INTERCEPT' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'COPY_INTERCEPT'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 2, loop 'COPY_INTERCEPT'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.23 seconds; current allocated memory: 486.168 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.13 seconds; current allocated memory: 486.168 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'COPY_COEF_VITIS_LOOP_318_1'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 4, loop 'COPY_COEF_VITIS_LOOP_318_1'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.13 seconds. CPU system time: 0 seconds. Elapsed time: 0.23 seconds; current allocated memory: 486.730 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 486.730 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_SHIFT_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'SHIFT_LOOP'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 3, loop 'SHIFT_LOOP'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 487.195 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.02 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 487.195 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_feature_extraction_fused_Pipeline_LOAD_BIASES' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'LOAD_BIASES'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 6, loop 'LOAD_BIASES'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.62 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.67 seconds; current allocated memory: 494.328 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.17 seconds. CPU system time: 0 seconds. Elapsed time: 0.19 seconds; current allocated memory: 494.328 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'CONV_LOOP'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 67, loop 'CONV_LOOP'
+WARNING: [HLS 200-871] Estimated clock period (2.515 ns) exceeds the target (target clock period: 3.333 ns, clock uncertainty: 0.900 ns, effective delay budget: 2.433 ns).
+Resolution: For help on HLS 200-871 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-871.html
+WARNING: [HLS 200-1016] The critical path in module 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP' consists of the following:
+	'store' operation 0 bit ('idx4_write_ln117', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:117) of constant 0 on local variable 'idx4', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:117 [1948]  (0.387 ns)
+	'load' operation 31 bit ('j', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:105) on local variable 'idx4', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:117 [1951]  (0.000 ns)
+	'sub' operation 32 bit ('idx0', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:113) [2045]  (0.880 ns)
+	'getelementptr' operation 13 bit ('local_ts0_addr', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:123) [2058]  (0.000 ns)
+	'load' operation 32 bit ('local_ts0_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:123) on array 'local_ts0' [2059]  (1.248 ns)
+
+Resolution: For help on HLS 200-1016 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1016.html
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 4.98 seconds. CPU system time: 0.03 seconds. Elapsed time: 5.01 seconds; current allocated memory: 532.504 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.97 seconds. CPU system time: 0.04 seconds. Elapsed time: 1.01 seconds; current allocated memory: 545.277 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_feature_extraction_fused_Pipeline_WRITE_PPV' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'WRITE_PPV'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 15, loop 'WRITE_PPV'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.89 seconds. CPU system time: 0.02 seconds. Elapsed time: 1.07 seconds; current allocated memory: 545.277 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.05 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.09 seconds; current allocated memory: 545.277 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_feature_extraction_fused' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 1.31 seconds. CPU system time: 0 seconds. Elapsed time: 1.33 seconds; current allocated memory: 553.523 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.5 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.6 seconds; current allocated memory: 553.523 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'apply_scaler_hls' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'SCALE_LOOP'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 22, loop 'SCALE_LOOP'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.35 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.42 seconds; current allocated memory: 554.992 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 554.992 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'FEATURE_LOOP'.
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' (loop 'FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 1, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln227', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' (loop 'FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 2, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln227', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' (loop 'FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 3, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln227', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 4, Depth = 11, loop 'FEATURE_LOOP'
+WARNING: [HLS 200-871] Estimated clock period (2.470 ns) exceeds the target (target clock period: 3.333 ns, clock uncertainty: 0.900 ns, effective delay budget: 2.433 ns).
+Resolution: For help on HLS 200-871 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-871.html
+WARNING: [HLS 200-1016] The critical path in module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' consists of the following:
+	'fadd' operation 32 bit ('score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233) [67]  (2.083 ns)
+	'store' operation 0 bit ('score_write_ln227', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:233 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:227 [69]  (0.387 ns)
+
+Resolution: For help on HLS 200-1016 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1016.html
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.13 seconds. CPU system time: 0 seconds. Elapsed time: 0.23 seconds; current allocated memory: 555.684 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.04 seconds. CPU system time: 0 seconds. Elapsed time: 0.27 seconds; current allocated memory: 555.684 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'BINARY_FEATURE_LOOP'.
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' (loop 'BINARY_FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 1, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln211', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' (loop 'BINARY_FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 2, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln211', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+WARNING: [HLS 200-880] The II Violation in module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' (loop 'BINARY_FEATURE_LOOP'): Unable to enforce a carried dependence constraint (II = 3, distance = 1, offset = 0) between 'store' operation 0 bit ('score_write_ln211', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211 and 'load' operation 32 bit ('score_load', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217) on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211.
+Resolution: For help on HLS 200-880 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-880.html
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 4, Depth = 11, loop 'BINARY_FEATURE_LOOP'
+WARNING: [HLS 200-871] Estimated clock period (2.470 ns) exceeds the target (target clock period: 3.333 ns, clock uncertainty: 0.900 ns, effective delay budget: 2.433 ns).
+Resolution: For help on HLS 200-871 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-871.html
+WARNING: [HLS 200-1016] The critical path in module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' consists of the following:
+	'fadd' operation 32 bit ('score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217) [55]  (2.083 ns)
+	'store' operation 0 bit ('score_write_ln211', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211) of variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:217 on local variable 'score', /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp:211 [57]  (0.387 ns)
+
+Resolution: For help on HLS 200-1016 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1016.html
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.17 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.71 seconds; current allocated memory: 556.312 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 556.312 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'linear_classifier_predict_hls' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.07 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 556.930 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.09 seconds; current allocated memory: 556.930 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference_Pipeline_VITIS_LOOP_382_2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'VITIS_LOOP_382_2'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 2, loop 'VITIS_LOOP_382_2'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.07 seconds; current allocated memory: 557.523 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.05 seconds; current allocated memory: 557.523 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'minirocket_inference' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.14 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 558.684 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.56 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.79 seconds; current allocated memory: 560.730 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_COPY_DILATIONS' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_COPY_DILATIONS' pipeline 'COPY_DILATIONS' pipeline type 'loop pipeline'
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem6_ARUSER' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_DILATIONS/m_axi_gmem7_ARUSER' to 0.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_COPY_DILATIONS'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.37 seconds. CPU system time: 0 seconds. Elapsed time: 0.71 seconds; current allocated memory: 561.488 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_COPY_BIASES' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_COPY_BIASES' pipeline 'COPY_BIASES' pipeline type 'loop pipeline'
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem8_ARUSER' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem4_ARUSER' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_BIASES/m_axi_gmem5_ARUSER' to 0.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_COPY_BIASES'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.28 seconds. CPU system time: 0.04 seconds. Elapsed time: 0.71 seconds; current allocated memory: 562.906 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_COPY_INTERCEPT' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_COPY_INTERCEPT' pipeline 'COPY_INTERCEPT' pipeline type 'loop pipeline'
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_INTERCEPT/m_axi_gmem3_ARUSER' to 0.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_COPY_INTERCEPT'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.2 seconds. CPU system time: 0 seconds. Elapsed time: 0.5 seconds; current allocated memory: 564.121 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1' pipeline 'COPY_COEF_VITIS_LOOP_318_1' pipeline type 'loop pipeline'
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARVALID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARADDR' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARID' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARLEN' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARSIZE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARBURST' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARLOCK' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARCACHE' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARPROT' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARQOS' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARREGION' to 0.
+WARNING: [RTGEN 206-101] Setting dangling out port 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1/m_axi_gmem2_ARUSER' to 0.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_COPY_COEF_VITIS_LOOP_318_1'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.19 seconds. CPU system time: 0 seconds. Elapsed time: 0.53 seconds; current allocated memory: 565.398 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_SHIFT_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_SHIFT_LOOP' pipeline 'SHIFT_LOOP' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_SHIFT_LOOP'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.29 seconds; current allocated memory: 566.746 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_feature_extraction_fused_Pipeline_LOAD_BIASES' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_feature_extraction_fused_Pipeline_LOAD_BIASES' pipeline 'LOAD_BIASES' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-104] Estimated max fanout for 'minirocket_feature_extraction_fused_Pipeline_LOAD_BIASES' is 6272 from HDL expression: ((1'b0 == ap_block_pp0_stage0_01001) & (icmp_ln88_reg_5993_pp0_iter3_reg == 1'd1))
+INFO: [RTGEN 206-100] Generating core module 'mul_32s_7ns_32_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_feature_extraction_fused_Pipeline_LOAD_BIASES'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.31 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.41 seconds; current allocated memory: 573.457 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP' pipeline 'CONV_LOOP' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-104] Estimated max fanout for 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP' is 31130 from HDL expression: (1'b0 == ap_block_pp0_stage0_11001)
+INFO: [RTGEN 206-100] Generating core module 'fadd_32ns_32ns_32_7_full_dsp_1': 251 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'faddfsub_32ns_32ns_32_7_full_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fcmp_32ns_32ns_1_2_no_dsp_1': 84 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_feature_extraction_fused_Pipeline_CONV_LOOP'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 5.28 seconds. CPU system time: 0.07 seconds. Elapsed time: 5.47 seconds; current allocated memory: 702.480 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_feature_extraction_fused_Pipeline_WRITE_PPV' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_feature_extraction_fused_Pipeline_WRITE_PPV' pipeline 'WRITE_PPV' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'mul_32s_7ns_32_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sitofp_32ns_32_5_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_57_5_32_1_1': 2 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_7_2_32_1_1': 28 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_feature_extraction_fused_Pipeline_WRITE_PPV'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 2.68 seconds. CPU system time: 0.15 seconds. Elapsed time: 3.21 seconds; current allocated memory: 759.949 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_feature_extraction_fused' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Generating core module 'faddfsub_32ns_32ns_32_7_full_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fdiv_32ns_32ns_32_12_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'mul_32s_7ns_32_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'mul_32s_8ns_32_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sitofp_32ns_32_5_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_feature_extraction_fused'.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_0_0_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_0_1_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_0_2_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_0_3_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_0_4_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_1_2_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'minirocket_inference_minirocket_feature_extraction_fused_p_ZL7weights_3_5_ROM_1P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.55 seconds. CPU system time: 0 seconds. Elapsed time: 0.68 seconds; current allocated memory: 761.105 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'apply_scaler_hls' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'apply_scaler_hls' pipeline 'SCALE_LOOP' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'faddfsub_32ns_32ns_32_7_full_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fdiv_32ns_32ns_32_12_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_17_3_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'apply_scaler_hls'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.15 seconds. CPU system time: 0.08 seconds. Elapsed time: 1.51 seconds; current allocated memory: 787.500 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP' pipeline 'FEATURE_LOOP' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'fadd_32ns_32ns_32_5_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_17_3_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_9_2_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'linear_classifier_predict_hls_Pipeline_FEATURE_LOOP'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.18 seconds. CPU system time: 0 seconds. Elapsed time: 0.22 seconds; current allocated memory: 803.066 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP' pipeline 'BINARY_FEATURE_LOOP' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'fadd_32ns_32ns_32_5_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_17_3_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'linear_classifier_predict_hls_Pipeline_BINARY_FEATURE_LOOP'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.17 seconds; current allocated memory: 805.262 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'linear_classifier_predict_hls' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Generating core module 'fadd_32ns_32ns_32_5_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'sparsemux_9_2_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'linear_classifier_predict_hls'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 807.031 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference_Pipeline_VITIS_LOOP_382_2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'minirocket_inference_Pipeline_VITIS_LOOP_382_2' pipeline 'VITIS_LOOP_382_2' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'mux_4_2_32_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference_Pipeline_VITIS_LOOP_382_2'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.14 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.2 seconds; current allocated memory: 809.043 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'minirocket_inference' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+WARNING: [RTGEN 206-101] Design contains AXI ports. Reset is fixed to synchronous and active low.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem2' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem3' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem4' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem5' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem6' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem7' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/gmem8' to 'm_axi'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_data_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_keep_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_strb_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_user_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_last_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_id_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/input_timeseries_V_dest_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_data_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_keep_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_strb_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_user_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_last_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_id_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/output_predictions_V_dest_V' to 'axis' (register, both mode).
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/coefficients' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/intercept' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/scaler_mean' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/scaler_scale' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/dilations' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/num_features_per_dilation' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/biases' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/time_series_length' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/num_features' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/num_classes' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'minirocket_inference/num_dilations' to 's_axilite & ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'minirocket_inference' to 's_axilite & ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Bundling port 'coefficients', 'intercept', 'scaler_mean', 'scaler_scale', 'dilations', 'num_features_per_dilation', 'biases', 'time_series_length', 'num_features', 'num_classes', 'num_dilations' and 'return' to AXI-Lite port control.
+INFO: [RTGEN 206-100] Generating core module 'faddfsub_32ns_32ns_32_7_full_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fdiv_32ns_32ns_32_12_no_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'fmul_32ns_32ns_32_4_max_dsp_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'mul_32ns_32ns_64_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Generating core module 'mul_32s_32s_32_2_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'minirocket_inference'.
+INFO: [RTMG 210-278] Implementing memory 'minirocket_inference_local_ts0_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'minirocket_inference_local_features_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'minirocket_inference_local_coefficients_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'minirocket_inference_local_dilations_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.64 seconds. CPU system time: 0.04 seconds. Elapsed time: 1.67 seconds; current allocated memory: 810.617 MB.
+INFO: [HLS 200-111] Finished Generating all RTL models: CPU user time: 1.04 seconds. CPU system time: 0.11 seconds. Elapsed time: 1.81 seconds; current allocated memory: 820.465 MB.
+INFO: [HLS 200-1603] Design has inferred MAXI bursts and missed bursts, see Vitis HLS GUI synthesis summary report for detailed information.
+INFO: [HLS 200-111] Finished Updating report files: CPU user time: 6.96 seconds. CPU system time: 0.07 seconds. Elapsed time: 7.02 seconds; current allocated memory: 844.691 MB.
+INFO: [VHDL 208-304] Generating VHDL RTL for minirocket_inference.
+INFO: [VLOG 209-307] Generating Verilog RTL for minirocket_inference.
+INFO: [HLS 200-790] **** Loop Constraint Status: All loop constraints were NOT satisfied.
+INFO: [HLS 200-789] **** Estimated Fmax: 397.61 MHz
+INFO: [HLS 200-111] Finished Command csynth_design CPU user time: 55.71 seconds. CPU system time: 2.58 seconds. Elapsed time: 70.79 seconds; current allocated memory: 572.203 MB.
+INFO: [HLS 200-112] Total CPU user time: 58.51 seconds. Total CPU system time: 2.89 seconds. Total elapsed time: 73.85 seconds; peak allocated memory: 844.789 MB.
+INFO: [Common 17-206] Exiting vitis_hls at Mon May 25 13:18:19 2026...
+=== HLS export ip Mon May 25 01:18:19 PM PDT 2026 ===
+
+****** Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2023.2 (64-bit)
+  **** SW Build 4023990 on Oct 11 2023
+  **** IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+  **** SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source /home/Xilinx/Vitis_HLS/2023.2/scripts/vitis_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/home/Xilinx/Vitis_HLS/2023.2/bin/unwrapped/lnx64.o/vitis_hls'
+INFO: [HLS 200-10] For user 'rdave009' on host 'wolverine.cs.ucr.edu' (Linux_x86_64 version 5.15.0-174-generic) on Mon May 25 13:18:22 PDT 2026
+INFO: [HLS 200-10] On os Ubuntu 22.04.5 LTS
+INFO: [HLS 200-10] In directory '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth'
+INFO: [HLS 200-2053] The vitis_hls executable is being deprecated. Consider using vitis-run --mode hls --tcl
+Sourcing Tcl script 'make.tcl'
+INFO: [HLS 200-1510] Running: open_project minirocket_inference_prj 
+INFO: [HLS 200-10] Opening project '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj'.
+INFO: [HLS 200-1510] Running: open_solution solution1 
+INFO: [HLS 200-10] Opening solution '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1'.
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 3.333ns.
+INFO: [HLS 200-1611] Setting target device to 'xcu280-fsvh2892-2L-e'
+INFO: [HLS 200-1505] Using flow_target 'vivado'
+Resolution: For help on HLS 200-1505 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1505.html
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_latency=0
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_alignment_byte_size=1
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_max_widen_bitwidth=0
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_rtl -register_reset_num=0
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_latency=64
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_alignment_byte_size=64
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_max_widen_bitwidth=512
+INFO: [HLS 200-1464] Running solution command: config_rtl -register_reset_num=3
+INFO: [HLS 200-1464] Running solution command: config_export -format=xo
+INFO: [HLS 200-1510] Running: set_part xcu280-fsvh2892-2L-e 
+INFO: [HLS 200-1510] Running: create_clock -period 300.000000MHz -name default 
+INFO: [HLS 200-1510] Running: set_top minirocket_inference 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_latency=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_alignment_byte_size=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_max_widen_bitwidth=512 
+INFO: [HLS 200-1510] Running: config_rtl -register_reset_num=3 
+INFO: [HLS 200-1510] Running: config_export -format xo 
+INFO: [HLS 200-1510] Running: add_files /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp -cflags -I/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/include 
+INFO: [HLS 200-10] Adding design file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp' to the project
+INFO: [HLS 200-1510] Running: export_design -format xo 
+INFO: [IMPL 213-8] Exporting RTL as a Vivado IP.
+
+****** Vivado v2023.2 (64-bit)
+  **** SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
+  **** IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+  **** SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source run_ippack.tcl -notrace
+create_project: Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 1362.672 ; gain = 0.023 ; free physical = 617 ; free virtual = 108795
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/Xilinx/Vivado/2023.2/data/ip'.
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_fadd_32ns_32ns_32_5_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_fadd_32ns_32ns_32_5_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_fadd_32ns_32ns_32_7_full_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_fadd_32ns_32ns_32_7_full_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_faddfsub_32ns_32ns_32_7_full_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_faddfsub_32ns_32ns_32_7_full_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_fcmp_32ns_32ns_1_2_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_fcmp_32ns_32ns_1_2_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_fdiv_32ns_32ns_32_12_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_fdiv_32ns_32ns_32_12_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_fmul_32ns_32ns_32_4_max_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_fmul_32ns_32ns_32_4_max_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'minirocket_inference_sitofp_32ns_32_5_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'minirocket_inference_sitofp_32ns_32_5_no_dsp_1_ip'...
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/home/Xilinx/Vivado/2023.2/data/ip'.
+Running package_xo -xo_path /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/impl/export.xo -kernel_name minirocket_inference -kernel_xml /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/impl/ip/../kernel/kernel.xml -kernel_files /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp -ip_directory /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/impl/ip/ip_unzip_dir -design_xml /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/.autopilot/db/minirocket_inference.design.xml -debug_directory /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/.debug -hls_directory /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/impl/ip/hls_files -kernel_json /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/solution1_data.json
+INFO: [Common 17-206] Exiting Vivado at Mon May 25 13:19:05 2026...
+INFO: [HLS 200-802] Generated output file minirocket_inference_prj/solution1/impl/export.xo
+INFO: [HLS 200-111] Finished Command export_design CPU user time: 35.7 seconds. CPU system time: 1.51 seconds. Elapsed time: 40.89 seconds; current allocated memory: 21.625 MB.
+INFO: [HLS 200-112] Total CPU user time: 38.41 seconds. Total CPU system time: 1.85 seconds. Total elapsed time: 44.31 seconds; peak allocated memory: 324.055 MB.
+INFO: [Common 17-206] Exiting vitis_hls at Mon May 25 13:19:06 2026...
+=== HLS installip Mon May 25 01:19:06 PM PDT 2026 ===
+
+****** Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2023.2 (64-bit)
+  **** SW Build 4023990 on Oct 11 2023
+  **** IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+  **** SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source /home/Xilinx/Vitis_HLS/2023.2/scripts/vitis_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/home/Xilinx/Vitis_HLS/2023.2/bin/unwrapped/lnx64.o/vitis_hls'
+INFO: [HLS 200-10] For user 'rdave009' on host 'wolverine.cs.ucr.edu' (Linux_x86_64 version 5.15.0-174-generic) on Mon May 25 13:19:09 PDT 2026
+INFO: [HLS 200-10] On os Ubuntu 22.04.5 LTS
+INFO: [HLS 200-10] In directory '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth'
+INFO: [HLS 200-2053] The vitis_hls executable is being deprecated. Consider using vitis-run --mode hls --tcl
+Sourcing Tcl script 'make.tcl'
+INFO: [HLS 200-1510] Running: open_project minirocket_inference_prj 
+INFO: [HLS 200-10] Opening project '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj'.
+INFO: [HLS 200-1510] Running: open_solution solution1 
+INFO: [HLS 200-10] Opening solution '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1'.
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 3.333ns.
+INFO: [HLS 200-1611] Setting target device to 'xcu280-fsvh2892-2L-e'
+INFO: [HLS 200-1505] Using flow_target 'vivado'
+Resolution: For help on HLS 200-1505 see docs.xilinx.com/access/sources/dita/topic?Doc_Version=2023.2%20English&url=ug1448-hls-guidance&resourceid=200-1505.html
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_latency=0
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_alignment_byte_size=1
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_max_widen_bitwidth=0
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_rtl -register_reset_num=0
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_latency=64
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_alignment_byte_size=64
+INFO: [HLS 200-1464] Running solution command: config_interface -m_axi_max_widen_bitwidth=512
+INFO: [HLS 200-1464] Running solution command: config_rtl -register_reset_num=3
+INFO: [HLS 200-1464] Running solution command: config_export -format=xo
+INFO: [HLS 200-1510] Running: set_part xcu280-fsvh2892-2L-e 
+INFO: [HLS 200-1510] Running: create_clock -period 300.000000MHz -name default 
+INFO: [HLS 200-1510] Running: set_top minirocket_inference 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_latency=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_alignment_byte_size=64 
+INFO: [HLS 200-1510] Running: config_interface -m_axi_max_widen_bitwidth=512 
+INFO: [HLS 200-1510] Running: config_rtl -register_reset_num=3 
+INFO: [HLS 200-1510] Running: config_export -format xo 
+INFO: [HLS 200-1510] Running: add_files /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp -cflags -I/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/include 
+INFO: [HLS 200-10] Adding design file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/minirocket/src/minirocket.cpp' to the project
+INFO: [HLS 200-112] Total CPU user time: 3.27 seconds. Total CPU system time: 0.39 seconds. Total elapsed time: 4.12 seconds; peak allocated memory: 302.648 MB.
+INFO: [Common 17-206] Exiting vitis_hls at Mon May 25 13:19:12 2026...
+-rw------- 1 rdave009 rdave009 2391528 May 25 13:19 /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo
+=== make build Mon May 25 01:19:12 PM PDT 2026 ===
+mkdir -p ./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1
+v++ -t hw --platform xilinx_u280_gen3x16_xdma_1_202211_1 --save-temps -I./src --config config.cfg -l  --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/100G-fpga-network-stack-core/synthesis_results_HBM --user_ip_repo_paths ./iprepo --temp_dir _x.xilinx_u280_gen3x16_xdma_1_202211_1 -o'./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin' build/iprepo/minirocket_inference.xo NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo
+Option Map File Used: '/home/Xilinx/Vitis/2023.2/data/vitis/vpp/optMap.xml'
+
+****** v++ v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: [v++ 60-1306] Additional information associated with this v++ link can be found at:
+	Reports: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link
+	Log files: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link
+Running Dispatch Server on port: 33865
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.link_summary, at Mon May 25 13:19:18 2026
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/v++_link_krnl_guidance.html', at Mon May 25 13:19:18 2026
+INFO: [v++ 60-895]   Target platform: /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2023.2
+INFO: [v++ 60-629] Linking for hardware target
+INFO: [v++ 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [v++ 60-1332] Run 'run_link' status: Not started
+INFO: [v++ 60-1443] [13:19:29] Run run_link: Step system_link: Started
+INFO: [v++ 60-1453] Command Line: system_link --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo -keep --config /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/syslinkConfig.ini --xpfm /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm --target hw --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo
+INFO: [SYSTEM_LINK 82-53] Creating IP database /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-38] [13:19:31] build_xd_ip_db started: /home/Xilinx/Vitis/2023.2/bin/build_xd_ip_db -ip_search 0  -sds-pf /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/hw.hpfm -clkid 0 -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_kernel_networklayer_1_0,networklayer -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_hls_minirocket_inference_1_0,minirocket_inference -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_kernel_cmac_0_1_0,cmac_0 -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-37] [13:19:39] build_xd_ip_db finished successfully
+Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 462.969 ; gain = 0.000 ; free physical = 522 ; free virtual = 109304
+INFO: [SYSTEM_LINK 82-51] Create system connectivity graph
+INFO: [SYSTEM_LINK 82-102] Applying explicit connections to the system connectivity graph: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [SYSTEM_LINK 82-38] [13:19:39] cfgen started: /home/Xilinx/Vitis/2023.2/bin/cfgen  -nk minirocket_inference:1:minirocket_inference_1 -nk cmac_0:1:cmac_0_1 -nk networklayer:1:networklayer_1 -sc cmac_0_1.M_AXIS:networklayer_1.S_AXIS_eth2nl -sc networklayer_1.M_AXIS_nl2eth:cmac_0_1.S_AXIS -sc minirocket_inference_1.output_predictions:networklayer_1.S_AXIS_sk2nl -sc networklayer_1.M_AXIS_nl2sk:minirocket_inference_1.input_timeseries -slr cmac_0_1:SLR2 -sp minirocket_inference_1.coefficients:HBM[2] -sp minirocket_inference_1.intercept:HBM[3] -sp minirocket_inference_1.scaler_mean:HBM[4] -sp minirocket_inference_1.scaler_scale:HBM[5] -sp minirocket_inference_1.dilations:HBM[6] -sp minirocket_inference_1.num_features_per_dilation:HBM[7] -sp minirocket_inference_1.biases:HBM[8] -dpa_mem_offload false -dmclkid 0 -r /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [CFGEN 83-0] Kernel Specs: 
+INFO: [CFGEN 83-0]   kernel: minirocket_inference, num: 1  {minirocket_inference_1}
+INFO: [CFGEN 83-0]   kernel: cmac_0, num: 1  {cmac_0_1}
+INFO: [CFGEN 83-0]   kernel: networklayer, num: 1  {networklayer_1}
+INFO: [CFGEN 83-0] Port Specs: 
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: coefficients, sptag: HBM[2]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: intercept, sptag: HBM[3]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: scaler_mean, sptag: HBM[4]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: scaler_scale, sptag: HBM[5]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: dilations, sptag: HBM[6]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: num_features_per_dilation, sptag: HBM[7]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: biases, sptag: HBM[8]
+INFO: [CFGEN 83-0] Stream Specs: 
+INFO: [CFGEN 83-0]   cmac_0_1.M_AXIS => networklayer_1.S_AXIS_eth2nl
+INFO: [CFGEN 83-0]   networklayer_1.M_AXIS_nl2eth => cmac_0_1.S_AXIS
+INFO: [CFGEN 83-0]   minirocket_inference_1.output_predictions => networklayer_1.S_AXIS_sk2nl
+INFO: [CFGEN 83-0]   networklayer_1.M_AXIS_nl2sk => minirocket_inference_1.input_timeseries
+INFO: [CFGEN 83-0] SLR Specs: 
+INFO: [CFGEN 83-0]   instance: cmac_0_1, SLR: SLR2
+INFO: [SYSTEM_LINK 82-37] [13:19:51] cfgen finished successfully
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:12 . Memory (MB): peak = 462.969 ; gain = 0.000 ; free physical = 630 ; free virtual = 109227
+INFO: [SYSTEM_LINK 82-52] Create top-level block diagram
+INFO: [SYSTEM_LINK 82-38] [13:19:51] cf2bd started: /home/Xilinx/Vitis/2023.2/bin/cf2bd  --linux --trace_buffer 1024 --input_file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml --ip_db /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml --cf_name dr --working_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.xsd --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --target_bd ulp.bd
+INFO: [CF2BD 82-31] Launching cf2xd: cf2xd -linux -trace-buffer 1024 -i /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml -r /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o dr.xml
+INFO: [CF2BD 82-28] cf2xd finished successfully
+INFO: [CF2BD 82-31] Launching cf_xsd: cf_xsd -disable-address-gen -bd ulp.bd -dn dr -dp /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.xsd
+INFO: [CF2BD 82-28] cf_xsd finished successfully
+INFO: [SYSTEM_LINK 82-37] [13:20:01] cf2bd finished successfully
+Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 462.969 ; gain = 0.000 ; free physical = 553 ; free virtual = 108874
+INFO: [v++ 60-1441] [13:20:01] Run run_link: Step system_link: Completed
+Time (s): cpu = 00:00:32 ; elapsed = 00:00:33 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 619 ; free virtual = 108940
+INFO: [v++ 60-1443] [13:20:01] Run run_link: Step cf2sw: Started
+INFO: [v++ 60-1453] Command Line: cf2sw -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/sdsl.dat -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/cf2sw.rtd -nofilter /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/cf2sw_full.rtd -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.1.xml
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [13:20:22] Run run_link: Step cf2sw: Completed
+Time (s): cpu = 00:00:21 ; elapsed = 00:00:21 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 530 ; free virtual = 108776
+INFO: [v++ 60-1443] [13:20:22] Run run_link: Step rtd2_system_diagram: Started
+INFO: [v++ 60-1453] Command Line: rtd2SystemDiagram
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [13:20:23] Run run_link: Step rtd2_system_diagram: Completed
+Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.46 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 667 ; free virtual = 108746
+INFO: [v++ 60-1443] [13:20:23] Run run_link: Step vpl: Started
+INFO: [v++ 60-1453] Command Line: vpl -t hw -f xilinx_u280_gen3x16_xdma_1_202211_1 -s --remote_ip_cache /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/.ipcache --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/100G-fpga-network-stack-core/synthesis_results_HBM --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./iprepo --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --log_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link --report_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link --config /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/vplConfig.ini -k /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link --no-info --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_kernel_cmac_0_1_0 --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_kernel_networklayer_1_0 --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_hls_minirocket_inference_1_0 --messageDb /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link/vpl.pb /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/dr.bd.tcl
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+
+****** vpl v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: [VPL 60-839] Read in kernel information from file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/kernel_info.dat'.
+INFO: [VPL 74-78] Compiler Version string: 2023.2
+INFO: [VPL 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [VPL 60-1032] Extracting hardware platform to /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/vivado/vpl/.local/hw_platform
+[13:20:51] Run vpl: Step create_project: Started
+Creating Vivado project.
+[13:21:00] Run vpl: Step create_project: Completed
+[13:21:00] Run vpl: Step create_bd: Started
+[13:21:51] Run vpl: Step create_bd: Completed
+[13:21:51] Run vpl: Step update_bd: Started
+[13:21:52] Run vpl: Step update_bd: Completed
+[13:21:52] Run vpl: Step generate_target: Started
+[13:23:08] Run vpl: Step generate_target: RUNNING...
+[13:24:23] Run vpl: Step generate_target: RUNNING...
+[13:24:48] Run vpl: Step generate_target: Completed
+[13:24:48] Run vpl: Step config_hw_runs: Started
+[13:25:25] Run vpl: Step config_hw_runs: Completed
+[13:25:25] Run vpl: Step synth: Started
+[13:25:56] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:26:26] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:26:56] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:27:27] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:27:57] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:28:27] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:28:57] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:29:27] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:29:58] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:30:28] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:30:58] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:31:28] Block-level synthesis in progress, 0 of 3 jobs complete, 3 jobs running.
+[13:31:58] Block-level synthesis in progress, 1 of 3 jobs complete, 2 jobs running.
+[13:32:29] Block-level synthesis in progress, 1 of 3 jobs complete, 2 jobs running.
+[13:32:59] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:33:29] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:33:59] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:34:29] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:35:00] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:35:30] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:36:00] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:36:30] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:37:01] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:37:31] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:38:01] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:38:31] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:39:01] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:39:32] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:40:02] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:40:32] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[13:41:02] Block-level synthesis in progress, 3 of 3 jobs complete, 0 jobs running.
+[13:41:32] Top-level synthesis in progress.
+[13:42:03] Top-level synthesis in progress.
+[13:42:33] Top-level synthesis in progress.
+[13:42:59] Run vpl: Step synth: Completed
+[13:42:59] Run vpl: Step impl: Started
+[14:01:08] Finished 2nd of 6 tasks (FPGA linking synthesized kernels to platform). Elapsed time: 00h 40m 43s 
+
+[14:01:08] Starting logic optimization..
+[14:01:39] Phase 1 Initialization
+[14:01:39] Phase 1.1 Core Generation And Design Setup
+[14:02:09] Phase 1.2 Setup Constraints And Sort Netlist
+[14:02:39] Phase 2 Timer Update And Timing Data Collection
+[14:02:39] Phase 2.1 Timer Update
+[14:02:39] Phase 2.2 Timing Data Collection
+[14:03:09] Phase 3 Retarget
+[14:04:10] Phase 4 Constant propagation
+[14:04:40] Phase 5 Sweep
+[14:07:42] Phase 6 BUFG optimization
+[14:08:12] Phase 7 Shift Register Optimization
+[14:08:12] Phase 8 Post Processing Netlist
+[14:08:42] Phase 9 Finalization
+[14:08:42] Phase 9.1 Finalizing Design Cores and Updating Shapes
+[14:09:12] Phase 9.2 Verifying Netlist Connectivity
+[14:09:43] Finished 3rd of 6 tasks (FPGA logic optimization). Elapsed time: 00h 08m 34s 
+
+[14:09:43] Starting logic placement..
+[14:10:43] Phase 1 Placer Initialization
+[14:10:43] Phase 1.1 Placer Initialization Netlist Sorting
+[14:14:45] Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
+[14:15:46] Phase 1.3 Build Placer Netlist Model
+[14:19:48] Phase 1.4 Constrain Clocks/Macros
+[14:20:18] Phase 2 Global Placement
+[14:20:18] Phase 2.1 Floorplanning
+[14:21:49] Phase 2.1.1 Partition Driven Placement
+[14:21:49] Phase 2.1.1.1 PBP: Partition Driven Placement
+[14:23:20] Phase 2.1.1.2 PBP: Clock Region Placement
+[14:24:51] Phase 2.1.1.3 PBP: Discrete Incremental
+[14:25:22] Phase 2.1.1.4 PBP: Compute Congestion
+[14:26:23] Phase 2.1.1.5 PBP: Macro Placement
+[14:26:23] Phase 2.1.1.6 PBP: UpdateTiming
+[14:26:53] Phase 2.1.1.7 PBP: Add part constraints
+[14:27:54] Phase 2.2 Physical Synthesis After Floorplan
+[14:28:25] Phase 2.3 Update Timing before SLR Path Opt
+[14:28:55] Phase 2.4 Post-Processing in Floorplanning
+[14:28:55] Phase 2.5 Global Placement Core
+[14:54:47] Phase 2.5.1 UpdateTiming Before Physical Synthesis
+[14:55:17] Phase 2.5.2 Physical Synthesis In Placer
+[15:00:22] Phase 3 Detail Placement
+[15:00:52] Phase 3.1 Commit Multi Column Macros
+[15:00:52] Phase 3.2 Commit Most Macros & LUTRAMs
+[15:03:24] Phase 3.3 Small Shape DP
+[15:03:24] Phase 3.3.1 Small Shape Clustering
+[15:03:54] Phase 3.3.2 Slice Area Swap
+[15:04:25] Phase 3.3.2.1 Slice Area Swap Initial
+[15:06:57] Phase 3.4 Place Remaining
+[15:07:27] Phase 3.5 Re-assign LUT pins
+[15:08:59] Phase 3.6 Pipeline Register Optimization
+[15:08:59] Phase 3.7 Fast Optimization
+[15:11:00] Phase 4 Post Placement Optimization and Clean-Up
+[15:11:00] Phase 4.1 Post Commit Optimization
+[15:13:02] Phase 4.1.1 Post Placement Optimization
+[15:13:33] Phase 4.1.1.1 BUFG Insertion
+[15:13:33] Phase 1 Physical Synthesis Initialization
+[15:14:34] Phase 4.1.1.2 BUFG Replication
+[15:15:04] Phase 4.1.1.3 Post Placement Timing Optimization
+[15:26:44] Phase 4.1.1.4 Replication
+[15:29:47] Phase 4.2 Post Placement Cleanup
+[15:29:47] Phase 4.3 Placer Reporting
+[15:29:47] Phase 4.3.1 Print Estimated Congestion
+[15:30:17] Phase 4.4 Final Placement Cleanup
+[15:52:06] Finished 4th of 6 tasks (FPGA logic placement). Elapsed time: 01h 42m 23s 
+
+[15:52:06] Starting logic routing..
+[15:53:07] Phase 1 Build RT Design
+[15:55:08] Phase 2 Router Initialization
+[15:55:39] Phase 2.1 Fix Topology Constraints
+[15:55:39] Phase 2.2 Pre Route Cleanup
+[15:55:39] Phase 2.3 Global Clock Net Routing
+[15:56:09] Phase 2.4 Update Timing
+[15:59:43] Phase 2.5 Update Timing for Bus Skew
+[15:59:43] Phase 2.5.1 Update Timing
+[16:00:44] Phase 3 Initial Routing
+[16:00:44] Phase 3.1 Global Routing
+[16:00:44] Phase 3.2 Initial Net Routing
+[16:01:44] Phase 4 Rip-up And Reroute
+[16:01:44] Phase 4.1 Global Iteration 0
+[16:25:05] Phase 4.2 Global Iteration 1
+[16:27:37] Phase 4.3 Global Iteration 2
+[16:30:09] Phase 4.4 Global Iteration 3
+[16:37:16] Phase 4.5 Global Iteration 4
+[16:38:17] Phase 5 Delay and Skew Optimization
+[16:38:17] Phase 5.1 Delay CleanUp
+[16:38:17] Phase 5.1.1 Update Timing
+[16:39:18] Phase 5.1.2 Update Timing
+[16:40:19] Phase 5.1.3 Update Timing
+[16:40:49] Phase 5.2 Clock Skew Optimization
+[16:40:49] Phase 6 Post Hold Fix
+[16:40:49] Phase 6.1 Hold Fix Iter
+[16:40:49] Phase 6.1.1 Update Timing
+[16:41:50] Phase 6.2 Non Free Resource Hold Fix Iter
+[16:41:50] Phase 7 Route finalize
+[16:42:21] Phase 8 Verifying routed nets
+[16:42:21] Phase 9 Depositing Routes
+[16:42:51] Phase 10 Leaf Clock Prog Delay Opt
+[16:43:52] Phase 10.1 Optimize Skews
+[16:43:52] Phase 10.1.1 Leaf ClockOpt Init
+[16:44:53] Phase 10.2 Post SkewOpt Delay Cleanup
+[16:44:53] Phase 10.2.1 Delay CleanUp
+[16:44:53] Phase 10.2.1.1 Update Timing
+[16:45:54] Phase 10.2.1.2 Update Timing
+[16:46:55] Phase 10.3 Post SkewOpt Hold Fix
+[16:46:55] Phase 10.3.1 Hold Fix Iter
+[16:46:55] Phase 10.3.1.1 Update Timing
+[16:48:56] Phase 11 Depositing Routes
+[16:49:57] Phase 12 Resolve XTalk
+[16:49:57] Phase 13 Post Router Timing
+[16:51:59] Phase 14 Physical Synthesis in Router
+[16:51:59] Phase 14.1 Physical Synthesis Initialization
+[16:55:32] Phase 14.2 Critical Path Optimization
+[17:02:38] Phase 15 Route finalize
+[17:02:38] Finished 5th of 6 tasks (FPGA routing). Elapsed time: 01h 10m 31s 
+
+[17:02:38] Starting bitstream generation..
+[17:02:38] Phase 16 Post-Route Event Processing
+[17:18:23] Creating bitmap...
+[17:26:31] Writing bitstream ./level0_i_ulp_my_rm_partial.bit...
+[17:26:31] Finished 6th of 6 tasks (FPGA bitstream generation). Elapsed time: 00h 23m 53s 
+Check VPL, containing 12 checks, has run: 0 errors, 1 warning violation, 1 advisory violation
+WARNING: [AUTO-FREQ-SCALING-04] One or more timing paths failed timing requirements. The kernel clock ulp_ucs/aclk_kernel_00 has an original frequency equal to 300.000000 MHz. The frequency has been automatically changed to 299.7 MHz to enable proper functionality. The clock Id is 0.
+ADVISORY: [AUTO-FREQ-SCALING-08] For clock hbm_aclk, the auto scaled frequency 466.4 MHz exceeds the original specified frequency. The compiler will select the original specified frequency of 450.0 MHz.
+[17:28:14] Run vpl: Step impl: Completed
+[17:28:15] Run vpl: FINISHED. Run Status: impl Complete!
+INFO: [v++ 60-1441] [17:28:19] Run run_link: Step vpl: Completed
+Time (s): cpu = 00:02:51 ; elapsed = 04:07:57 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 20577 ; free virtual = 92893
+INFO: [v++ 60-1443] [17:28:19] Run run_link: Step rtdgen: Started
+INFO: [v++ 60-1453] Command Line: rtdgen
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-991] clock name 'ulp_ucs/aclk_kernel_01' (clock ID '1') is being mapped to clock name 'KERNEL_CLK' in the xclbin
+INFO: [v++ 60-991] clock name 'ulp_ucs/aclk_kernel_00' (clock ID '0') is being mapped to clock name 'DATA_CLK' in the xclbin
+INFO: [v++ 60-991] clock name 'hbm_aclk' (clock ID '') is being mapped to clock name 'hbm_aclk' in the xclbin
+INFO: [v++ 60-1230] The compiler selected the following frequencies for the runtime controllable kernel clock(s) and scalable system clock(s): System (SYSTEM) clock: hbm_aclk = 450, Kernel (KERNEL) clock: ulp_ucs/aclk_kernel_01 = 500, Kernel (DATA) clock: ulp_ucs/aclk_kernel_00 = 299
+INFO: [v++ 60-1453] Command Line: cf2sw -a /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/address_map.xml -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/sdsl.dat -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.xml -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.rtd -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml
+INFO: [v++ 60-1652] Cf2sw returned exit code: 0
+INFO: [v++ 60-1441] [17:28:40] Run run_link: Step rtdgen: Completed
+Time (s): cpu = 00:00:18 ; elapsed = 00:00:20 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19197 ; free virtual = 92893
+INFO: [v++ 60-1443] [17:28:40] Run run_link: Step xclbinutil: Started
+INFO: [v++ 60-1453] Command Line: xclbinutil --add-section BITSTREAM:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/partial.bit --force --target hw --key-value SYS:dfx_enable:true --add-section :JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.rtd --append-section :JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/appendSection.rtd --add-section CLOCK_FREQ_TOPOLOGY:JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_xml.rtd --add-section BUILD_METADATA:JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_build.rtd --add-section EMBEDDED_METADATA:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml --add-section SYSTEM_METADATA:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/systemDiagramModelSlrBaseAddress.json --key-value SYS:PlatformVBNV:xilinx_u280_gen3x16_xdma_1_202211_1 --output /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+XRT Build Version: 2.16.204 (2023.2)
+       Build Date: 2023-10-11 23:45:57
+          Hash ID: fa4c0045003fed0acea4593788dce5ef6d0b66ee
+Creating a default 'in-memory' xclbin image.
+
+Section: 'BITSTREAM'(0) was successfully added.
+Size   : 60782798 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/partial.bit'
+
+Section: 'MEM_TOPOLOGY'(6) was successfully added.
+Format : JSON
+File   : 'mem_topology'
+
+Section: 'IP_LAYOUT'(8) was successfully added.
+Format : JSON
+File   : 'ip_layout'
+
+Section: 'CONNECTIVITY'(7) was successfully added.
+Format : JSON
+File   : 'connectivity'
+
+Section: 'CLOCK_FREQ_TOPOLOGY'(11) was successfully added.
+Size   : 410 bytes
+Format : JSON
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_xml.rtd'
+
+Section: 'BUILD_METADATA'(14) was successfully added.
+Size   : 28505 bytes
+Format : JSON
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_build.rtd'
+
+Section: 'EMBEDDED_METADATA'(2) was successfully added.
+Size   : 123887 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml'
+
+Section: 'SYSTEM_METADATA'(22) was successfully added.
+Size   : 96596 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/systemDiagramModelSlrBaseAddress.json'
+
+Section: 'PARTITION_METADATA'(20) was successfully appended to.
+Format : JSON
+File   : 'partition_metadata'
+
+Section: 'IP_LAYOUT'(8) was successfully appended to.
+Format : JSON
+File   : 'ip_layout'
+Successfully wrote (61090933 bytes) to the output file: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+Leaving xclbinutil.
+INFO: [v++ 60-1441] [17:28:40] Run run_link: Step xclbinutil: Completed
+Time (s): cpu = 00:00:00.08 ; elapsed = 00:00:00.45 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19107 ; free virtual = 92898
+INFO: [v++ 60-1443] [17:28:40] Run run_link: Step xclbinutilinfo: Started
+INFO: [v++ 60-1453] Command Line: xclbinutil --quiet --force --info /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.info --input /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [17:28:41] Run run_link: Step xclbinutilinfo: Completed
+Time (s): cpu = 00:00:00.65 ; elapsed = 00:00:00.72 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19054 ; free virtual = 92898
+INFO: [v++ 60-1443] [17:28:41] Run run_link: Step generate_sc_driver: Started
+INFO: [v++ 60-1453] Command Line: 
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [17:28:41] Run run_link: Step generate_sc_driver: Completed
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.1 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19053 ; free virtual = 92898
+INFO: [v++ 60-2331] SLR2 was specfied for compute unit cmac_0_1, and verified as such in implementation.
+Check POST-VPL, containing 1 checks, has run: 0 errors
+INFO: [v++ 60-244] Generating system estimate report...
+INFO: [v++ 60-1092] Generated system estimate report: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/system_estimate_krnl.xtxt
+INFO: [v++ 60-586] Created /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.ltx
+INFO: [v++ 60-586] Created ./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1307] Run completed. Additional information can be found in:
+	Guidance: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/v++_link_krnl_guidance.html
+	Timing Report: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/imp/impl_1_hw_bb_locked_timing_summary_routed.rpt
+	Vivado Log: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link/vivado.log
+	Steps Log File: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link/link.steps.log
+
+INFO: [v++ 60-2343] Use the vitis_analyzer tool to visualize and navigate the relevant reports. Run the following command. 
+    vitis_analyzer /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.link_summary 
+INFO: [v++ 60-791] Total elapsed time: 4h 9m 27s
+INFO: [v++ 60-1653] Closing dispatch client.
+=== FINISHED Mon May 25 05:28:45 PM PDT 2026 RC=0 elapsed=15102s ===
+-rw------- 1 rdave009 rdave009 61090933 May 25 17:28 /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin

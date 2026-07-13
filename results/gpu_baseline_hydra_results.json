@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "gpu": "Tesla T4",
+    "gpu_memory_gb": 15.6,
+    "pytorch_version": "2.10.0+cu128",
+    "platform": "Google Colab",
+    "data_type": "synthetic (matching real dataset dimensions)",
+    "date": "2026-04-02",
+    "algorithm": "HYDRA",
+    "num_kernels": 512,
+    "kernel_size": 9,
+    "pooling": "max + global_mean",
+    "num_features": 1024
+  },
+  "InsectSound": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 13895.4,
+      "mean_latency_ms": 0.072,
+      "gpu_power_w": 53.7
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 55.8,
+      "mean_latency_ms": 17.925,
+      "p50_latency_ms": 17.429,
+      "p95_latency_ms": 20.705
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 546.3
+    },
+    "time_series_length": 600,
+    "num_classes": 10
+  },
+  "MosquitoSound": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 5138.8,
+      "mean_latency_ms": 0.195,
+      "gpu_power_w": 70.2
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 53.4,
+      "mean_latency_ms": 18.726,
+      "p50_latency_ms": 17.037,
+      "p95_latency_ms": 27.668
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 68.5
+    },
+    "time_series_length": 3750,
+    "num_classes": 2
+  },
+  "FruitFlies": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 4267.3,
+      "mean_latency_ms": 0.234,
+      "gpu_power_w": 64.3
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 57.2,
+      "mean_latency_ms": 17.478,
+      "p50_latency_ms": 17.155,
+      "p95_latency_ms": 19.161
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 52.6
+    },
+    "time_series_length": 5000,
+    "num_classes": 3
+  }
+}

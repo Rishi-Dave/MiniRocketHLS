@@ -1,0 +1,52 @@
+
+
+\section{Experimental Setup}
+\label{sec:ExpSetup}
+
+\subsection{FPGA Implementation Details}
+\label{sec:FPGA_Implementation}
+
+We implemented MiniRocket and Hydra inference accelerators shown in Figs. \ref{fig:MiniMultiRocket_arch} and \ref{fig:Hydra_arch} targeting an AMD Alveo U280 FPGA with a maximum window size of $8{,}192$\footnote{
+Smaller windows can be used as well. The large window provides a direct comparison to software, which classifies the entire time series in one-shot.
+}.
+
+We specified the accelerators using HLS-compatible C++, and compiled them using Vitis HLS 2023.2 with synthesis and bitstream generation using Vivado 2023.2. We report resource utilization post place-and-route and achieved a 300\,MHz target frequency in all cases.
+
+We evaluated three MiniRocket Convolution Engine variants to isolate the impact of our proposed optimizations (Sections \ref{sec:conv_engine} and \ref{sec:fp_mult}):
+\begin{itemize}
+\item \textbf{Na\"ive + FP}: recomputes all dot products each time a new data point arrives using standard 32-bit floating-point multiplication;
+\item \textbf{Na\"ive + bFP}: introduces the bFP multiplier (Eq. \ref{eq:bFP});
+\item \textbf{DP-Reuse + bFP}: reuses dot products within the convolution (Fig. \ref{fig:convolution_engine}).
+\end{itemize}
+Additionally, we evaluate a \textbf{Fused CONV+PPV} kernel that combines convolution and pooling into a single pass, eliminating the intermediate feature-map array and achieving zero DSP utilization.
+The Hydra accelerator uses ap\_fixed$\langle$32,16$\rangle$ arithmetic with UNROLL=16.
+
+\subsection{Software Baseline and Datasets}
+\label{sec:sw_baseline_and_datasets}
+
+MiniRocket CPU baselines use a C++ implementation compiled with \texttt{-O3 -march=native} on the same Xeon E5-2640 v3; the Hydra CPU baseline uses single-threaded Python 3.10 from the Aeon-toolkit \cite{aeon-arxiv, aeon-pkdd}, the reference implementation by the algorithm's authors, as no optimized C++ Hydra implementation was available at time of writing. GPU baselines were measured on an NVIDIA Tesla T4 (16\,GB, 70\,W TDP), a widely deployed inference-class accelerator, using PyTorch 2.10.0 with CUDA 12.8; throughput is reported at batch sizes 256 and 1. All classifiers use ridge regression.
+
+We selected the three longest time series from the UCR Time Series Archive \cite{UCRTimeSeries}; Table \ref{tab:datasets} details their train/test splits and sample length. We trained all classifiers using Aeon and confirmed that our accelerators' inference results match those of Aeon's MiniRocket and Hydra (Table \ref{tab:throughput}).
+
+\begin{table}[b]
+\caption{Time series datasets used in our experiments.}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+                    & Train    & Test      & Sample Length & \# Classes \\\hline
+InsectSound         & 25,000    & 25,000     & 600    & 10 \\ \hline
+MosquitoSound       & 139,786   & 139,786    & 3,750   & 6 \\ \hline
+FruitFlies          & 17,259    & 17,259     & 5,000   & 3\\ \hline
+\end{tabular}
+\label{tab:datasets}
+\end{table}
+
+\subsection{Single-Node Experiments}
+\label{sec:single_node_experiments}
+
+CPU baselines ran on an Intel Xeon E5-2640 v3 @2.60GHz with 128\,GiB DDR4. The FPGA accelerator ran on an Alveo U280 (2022.1 shell) with the same host. FPGA power was measured via \texttt{xbutil examine}; CPU power via Intel RAPL during sustained single-threaded inference. We fully unrolled the 84 kernel and dilation loops with array partitioning for concurrent BRAM access. The Pooling Engine and Regression Classifier are pipelined.
+
+\subsection{Streaming Experiment}
+\label{sec:streaming_experiments}
+
+The FPGA is configured as a SmartNIC integrating the CMAC and UDP modules in Fig. \ref{fig:MiniMultiRocket_arch}. We additionally measured CPU RTT using DPDK kernel bypass. The experiment ran on the Open-Cloud Testbed (OCT) \cite{oct, networkfpga} accessed via CloudLabs \cite{CloudLabs}, a cluster of 24 Alveo U280s connected by 100GbE switches. A CPU client transmits UDP packets to the FPGA inference server; timing is captured as RTT from transmission to prediction receipt, using the ArrowHead time series (251 samples, 3 classes).
+

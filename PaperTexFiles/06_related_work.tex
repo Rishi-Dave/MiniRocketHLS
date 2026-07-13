@@ -1,0 +1,16 @@
+\section{Related Work}
+\label{sec:Related}
+
+\subsection{Time Series Classification}
+\label{sec:TSC}
+
+Research in time series classification is supported by public archives \cite{UCRTimeSeries, UEATimeSeries, MONSTER} and software toolkits \cite{sktime, pyts, tslearn, aeon-arxiv, aeon-pkdd}. Two bake-offs \cite{BakeOff, BakeOffRedux, BakeOffReduxCorrection} compared state-of-the-art classifiers; both identified convolution-based methods among the best.
+
+\textbf{Rocket} \cite{Rocket} introduced untrained convolutional kernels with lengths $m \in \{7, 9, 11\}$ and random weights. MiniRocket \cite{MiniRocket} simplified Rocket using fixed-length ternary kernels ($m = 9$, $C(9,3)=84$ kernels). MultiRocket \cite{MultiRocket} extended MiniRocket with first-order difference features and additional reduction functions. \textbf{Hydra} \cite{Hydra} uses random kernels organized into groups with histogram-based pooling. The 2024 bake-off identified \textbf{MultiRocket+Hydra} and \textbf{HIVE-COTE 2.0} \cite{HIVE-COTE2.0} as best-in-class. This paper presents FPGA accelerators for MiniRocket and Hydra; accelerators for the remaining HIVE-COTE 2.0 classifiers are left for future work.
+
+\subsection{FPGA-accelerated Time Series Computation}
+\label{sec:fpga_time_series}
+
+To the best of our knowledge, this is the first work to investigate hardware acceleration for any time series classifier evaluated in the 2017 or 2024 bake-offs. Prior FPGA work has targeted subroutines used by other classifiers: data correlation \cite{ChiosaAMNES}, shapelets \cite{CostaShapelet, LiuShapelet}, Dynamic Time Warping \cite{SartDTW, WangDTW}, the Matrix Profile \cite{RomeroMP, KalantarLAMP}, and power spectra \cite{SpectralAnomalyDetection}. Eciton \cite{Eciton} accelerates an LSTM-based classifier on FPGA but was not evaluated on the bake-off datasets. The 2024 bake-off considered several CNNs \cite{InceptionTime, H-InceptionTime, LiteTime}, identifying \textbf{H-InceptionTime} \cite{H-InceptionTime} as best among deep-learning approaches.
+
+Unlike CNN-based FPGA accelerators that map learned floating-point convolutions to DSP arrays, our work targets classifiers with fixed (MiniRocket) or untrained (Hydra) kernels. MiniRocket's ternary weights enable zero-DSP multiplication, and the entire pipeline maps to a single-pass dataflow architecture without layer-by-layer scheduling.

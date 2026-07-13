@@ -1,0 +1,28 @@
+{
+  "dataset": "InsectSound",
+  "adapter": "cpu-minirocket",
+  "model_dir": "/home/rdave009/minirocket-hls/MiniRocketHLS/minirocket_modular",
+  "series_length": 600,
+  "num_classes": 10,
+  "n_samples_dataset": 50,
+  "rate_min": 2.0,
+  "rate_max": 50.0,
+  "rate_steps": 3,
+  "rate_mode": "log",
+  "duration_s": 2.0,
+  "warmup_s": 0.5,
+  "cooldown_s": 0.5,
+  "rates_pps": [
+    2.0,
+    9.999999999999998,
+    49.99999999999999
+  ],
+  "host": {
+    "hostname": "wolverine",
+    "platform": "Linux-5.15.0-174-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "pid": 1118402
+  },
+  "ts_start_unix": 1777358054.4836657,
+  "ts_end_unix": 1777358068.3036175
+}

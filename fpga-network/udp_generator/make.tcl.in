@@ -1,0 +1,79 @@
+if { [info exists ::env(LIBRARY_PATH)] } {
+    set ::env(LIBRARY_PATH) /usr/lib/x86_64-linux-gnu:$env(LIBRARY_PATH)
+} else {
+    set ::env(LIBRARY_PATH) /usr/lib/x86_64-linux-gnu
+}
+
+open_project ${PROJECT_NAME}_prj
+
+open_solution "solution1"
+set_part ${FPGA_PART}
+create_clock -period ${CLOCK_PERIOD} -name default
+
+set_top ${PROJECT_NAME}
+
+config_interface -m_axi_latency=64
+config_interface -m_axi_alignment_byte_size=64
+config_interface -m_axi_max_widen_bitwidth=512
+config_rtl -register_reset_num=3
+config_export -format xo
+
+#Check which command
+set command [lindex $argv 2]
+
+# ---------------------------------------------------------------------------
+# BUILD flag wiring -- same policy as minirocket_fused/make.tcl.in (the
+# ONLY pattern proven on real hardware to sustain line-rate TX without a
+# host-spin cap; see udp_generator.cpp file header and
+# memory/network_bandwidth_2026_07_04.md "v4 DECISIVE WIN"):
+#   - synthesis / ip / installip (RTL export for hw): BUILD_CFLAG="-DBUILD=1"
+#     -- TRUE on-chip free-run.
+#   - csim (no COSIM_MAX_WINDOWS env var): BUILD_CFLAG="" -- single-shot,
+#     deterministic (test_udp_generator.cpp calls the top function a fixed
+#     number of times).
+#   - cosim (no COSIM_MAX_WINDOWS env var): BUILD_CFLAG="" for the same
+#     reason -- an unbounded `while(true)` driven by a finite testbench
+#     stream would hang cosim.
+#   - EITHER command with COSIM_MAX_WINDOWS set in the environment: bounded
+#     free-run RTL liveness check. BUILD_CFLAG becomes
+#     "-DBUILD=1 -DCOSIM_MAX_WINDOWS=<N>". NOTE: no dedicated freerun
+#     testbench exists yet for this kernel (unlike minirocket_fused's
+#     test_minirocket_fused_freerun_cosim.cpp) -- test_udp_generator.cpp is
+#     reused as-is; it only exercises 3 top-level calls so COSIM_MAX_WINDOWS
+#     mode is unverified until such a testbench is written.
+# ---------------------------------------------------------------------------
+set FREERUN_VERIFY 0
+set cosim_max_windows_val 4
+if {[info exists ::env(COSIM_MAX_WINDOWS)]} {
+    set FREERUN_VERIFY 1
+    set cosim_max_windows_val $::env(COSIM_MAX_WINDOWS)
+}
+
+if {$FREERUN_VERIFY} {
+    set BUILD_CFLAG "-DBUILD=1 -DCOSIM_MAX_WINDOWS=$cosim_max_windows_val"
+} elseif {$command == "synthesis" || $command == "ip" || $command == "installip"} {
+    set BUILD_CFLAG "-DBUILD=1"
+} else {
+    set BUILD_CFLAG ""
+}
+
+add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/udp_generator.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include $BUILD_CFLAG"
+add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/test_udp_generator.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include"
+
+if {$command == "synthesis"} {
+   csynth_design
+} elseif {$command == "csim"} {
+   csim_design
+} elseif {$command == "cosim"} {
+   cosim_design
+} elseif {$command == "ip"} {
+   export_design -format xo
+} elseif {$command == "installip"} {
+   file mkdir ${IPREPO_DIR}
+   file copy -force ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_prj/solution1/impl/export.xo ${IPREPO_DIR}/${PROJECT_NAME}.xo
+}  else {
+   puts "No valid command specified. Use vitis_hls -f make.tcl <synthesis|csim|cosim|ip|installip> ."
+}
+
+
+exit

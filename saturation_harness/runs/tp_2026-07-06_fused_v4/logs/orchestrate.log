@@ -1,0 +1,68 @@
+[18:40:09] === DATASET InsectSound (ts_len=600) ===
+[18:40:42]   deployed
+[18:40:50]   InsectSound @500: sent=1501 app_d=1501 udp_d=2 pps=500.333 loss=0.000% bw=256.170kbps
+[18:40:58]   InsectSound @1000: sent=3001 app_d=3001 udp_d=5 pps=1000.333 loss=0.000% bw=512.170kbps
+[18:41:07]   InsectSound @2000: sent=6001 app_d=6001 udp_d=10 pps=2000.333 loss=0.000% bw=1024.170kbps
+[18:41:15]   InsectSound @5000: sent=15001 app_d=15001 udp_d=25 pps=5000.333 loss=0.000% bw=2560.170kbps
+[18:41:23]   InsectSound @10000: sent=30001 app_d=30001 udp_d=50 pps=10000.333 loss=0.000% bw=5120.170kbps
+[18:41:31]   InsectSound @25000: sent=75001 app_d=75001 udp_d=125 pps=25000.333 loss=0.000% bw=12800.170kbps
+[18:41:39]   InsectSound @50000: sent=150001 app_d=150001 udp_d=250 pps=50000.333 loss=0.000% bw=25600.170kbps
+[18:41:47]   InsectSound @100000: sent=300001 app_d=300001 udp_d=500 pps=100000.333 loss=0.000% bw=51200.170kbps
+[18:41:55]   InsectSound @250000: sent=749999 app_d=749999 udp_d=1250 pps=249999.667 loss=0.000% bw=127999.830kbps
+[18:42:03]   InsectSound @500000: sent=935345 app_d=935344 udp_d=1559 pps=311781.333 loss=0.000% bw=159632.042kbps
+[18:42:03] === DATASET FruitFlies (ts_len=5000) ===
+[18:42:37]   deployed
+[18:42:45]   FruitFlies @500: sent=1501 app_d=1501 udp_d=0 pps=500.333 loss=0.000% bw=256.170kbps
+[18:42:53]   FruitFlies @1000: sent=3001 app_d=3001 udp_d=0 pps=1000.333 loss=0.000% bw=512.170kbps
+[18:43:01]   FruitFlies @2000: sent=6001 app_d=6001 udp_d=2 pps=2000.333 loss=0.000% bw=1024.170kbps
+[18:43:09]   FruitFlies @5000: sent=15001 app_d=15001 udp_d=3 pps=5000.333 loss=0.000% bw=2560.170kbps
+[18:43:17]   FruitFlies @10000: sent=30001 app_d=30001 udp_d=6 pps=10000.333 loss=0.000% bw=5120.170kbps
+[18:43:25]   FruitFlies @25000: sent=75001 app_d=75001 udp_d=15 pps=25000.333 loss=0.000% bw=12800.170kbps
+[18:43:33]   FruitFlies @50000: sent=150001 app_d=150001 udp_d=30 pps=50000.333 loss=0.000% bw=25600.170kbps
+[18:43:42]   FruitFlies @100000: sent=300001 app_d=300001 udp_d=60 pps=100000.333 loss=0.000% bw=51200.170kbps
+[18:43:50]   FruitFlies @250000: sent=749998 app_d=749997 udp_d=150 pps=249999.000 loss=0.000% bw=127999.488kbps
+[18:43:58]   FruitFlies @500000: sent=914570 app_d=914568 udp_d=183 pps=304856.000 loss=0.000% bw=156086.272kbps
+[18:43:58] === DATASET MosquitoSound (ts_len=3750) ===
+[18:44:31]   deployed
+[18:44:39]   MosquitoSound @500: sent=1501 app_d=1501 udp_d=0 pps=500.333 loss=0.000% bw=256.170kbps
+[18:44:46]   MosquitoSound @1000: sent=3001 app_d=3001 udp_d=1 pps=1000.333 loss=0.000% bw=512.170kbps
+[18:44:54]   MosquitoSound @2000: sent=6001 app_d=6001 udp_d=1 pps=2000.333 loss=0.000% bw=1024.170kbps
+[18:45:03]   MosquitoSound @5000: sent=15001 app_d=15001 udp_d=4 pps=5000.333 loss=0.000% bw=2560.170kbps
+[18:45:10]   MosquitoSound @10000: sent=30001 app_d=30001 udp_d=8 pps=10000.333 loss=0.000% bw=5120.170kbps
+[18:45:18]   MosquitoSound @25000: sent=75001 app_d=75001 udp_d=20 pps=25000.333 loss=0.000% bw=12800.170kbps
+[18:45:26]   MosquitoSound @50000: sent=150001 app_d=150001 udp_d=40 pps=50000.333 loss=0.000% bw=25600.170kbps
+[18:45:35]   MosquitoSound @100000: sent=300001 app_d=300000 udp_d=80 pps=100000.000 loss=0.000% bw=51200.000kbps
+[18:45:43]   MosquitoSound @250000: sent=750001 app_d=749999 udp_d=200 pps=249999.667 loss=0.000% bw=127999.830kbps
+[18:45:54]   MosquitoSound @500000: sent=901222 app_d=901222 udp_d=241 pps=300407.333 loss=0.000% bw=153808.554kbps
+[18:45:54] === v4 SWEEP COMPLETE: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-06_fused_v4/fused_v4_sweep.csv ===
+variant,dataset,configured_pps,sent,duration_s,eth_in_delta,app_in_delta,udp_out_delta,processed_pps,loss_pct,bandwidth_kbps
+fused,InsectSound,500,1501,3,1505,1501,2,500.333,0.000,256.170
+fused,InsectSound,1000,3001,3,3004,3001,5,1000.333,0.000,512.170
+fused,InsectSound,2000,6001,3,6005,6001,10,2000.333,0.000,1024.170
+fused,InsectSound,5000,15001,3,15004,15001,25,5000.333,0.000,2560.170
+fused,InsectSound,10000,30001,3,30004,30001,50,10000.333,0.000,5120.170
+fused,InsectSound,25000,75001,3,75004,75001,125,25000.333,0.000,12800.170
+fused,InsectSound,50000,150001,3,150004,150001,250,50000.333,0.000,25600.170
+fused,InsectSound,100000,300001,3,300005,300001,500,100000.333,0.000,51200.170
+fused,InsectSound,250000,749999,3,750003,749999,1250,249999.667,0.000,127999.830
+fused,InsectSound,500000,935345,3,935349,935344,1559,311781.333,0.000,159632.042
+fused,FruitFlies,500,1501,3,1504,1501,0,500.333,0.000,256.170
+fused,FruitFlies,1000,3001,3,3004,3001,0,1000.333,0.000,512.170
+fused,FruitFlies,2000,6001,3,6006,6001,2,2000.333,0.000,1024.170
+fused,FruitFlies,5000,15001,3,15004,15001,3,5000.333,0.000,2560.170
+fused,FruitFlies,10000,30001,3,30004,30001,6,10000.333,0.000,5120.170
+fused,FruitFlies,25000,75001,3,75004,75001,15,25000.333,0.000,12800.170
+fused,FruitFlies,50000,150001,3,150004,150001,30,50000.333,0.000,25600.170
+fused,FruitFlies,100000,300001,3,300004,300001,60,100000.333,0.000,51200.170
+fused,FruitFlies,250000,749998,3,750001,749997,150,249999.000,0.000,127999.488
+fused,FruitFlies,500000,914570,3,914573,914568,183,304856.000,0.000,156086.272
+fused,MosquitoSound,500,1501,3,1504,1501,0,500.333,0.000,256.170
+fused,MosquitoSound,1000,3001,3,3005,3001,1,1000.333,0.000,512.170
+fused,MosquitoSound,2000,6001,3,6005,6001,1,2000.333,0.000,1024.170
+fused,MosquitoSound,5000,15001,3,15004,15001,4,5000.333,0.000,2560.170
+fused,MosquitoSound,10000,30001,3,30004,30001,8,10000.333,0.000,5120.170
+fused,MosquitoSound,25000,75001,3,75004,75001,20,25000.333,0.000,12800.170
+fused,MosquitoSound,50000,150001,3,150005,150001,40,50000.333,0.000,25600.170
+fused,MosquitoSound,100000,300001,3,300004,300000,80,100000.000,0.000,51200.000
+fused,MosquitoSound,250000,750001,3,750002,749999,200,249999.667,0.000,127999.830
+fused,MosquitoSound,500000,901222,3,901228,901222,241,300407.333,0.000,153808.554

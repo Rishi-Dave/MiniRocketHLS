@@ -1,0 +1,136 @@
+[2026-07-10 13:17:22] === cpu_sweep_3ds_orchestrate.sh (Wolverine-driven) starting; datasets: InsectSound FruitFlies MosquitoSound; rates: 500 1000 2000 5000 10000 25000 50000 100000 250000 500000 ===
+[2026-07-10 13:17:22] *** FPGA on pc160/pc161 left completely untouched -- no xbutil, no program, no reset. ***
+[2026-07-10 13:17:22] starting hydra responder on pc160 192.168.40.30:51001 dataset=InsectSound model=models/hydra_insectsound_model.json
+[2026-07-10 13:17:36]   responder pid(s) on pc160: 13709
+[2026-07-10 13:17:36] === [InsectSound] rate step: 500 pps ===
+[2026-07-10 13:17:37]   packets_received BEFORE: 0
+[2026-07-10 13:17:44]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-10 13:17:44] === [InsectSound] rate step: 1000 pps ===
+[2026-07-10 13:17:45]   packets_received BEFORE: 1501
+[2026-07-10 13:17:52]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-10 13:17:52] === [InsectSound] rate step: 2000 pps ===
+[2026-07-10 13:17:53]   packets_received BEFORE: 4502
+[2026-07-10 13:18:00]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-10 13:18:00] === [InsectSound] rate step: 5000 pps ===
+[2026-07-10 13:18:01]   packets_received BEFORE: 10503
+[2026-07-10 13:18:08]   row: sent=15001 before=10503 after=25504 processed=15001 processed_pps=5000.3
+[2026-07-10 13:18:08] === [InsectSound] rate step: 10000 pps ===
+[2026-07-10 13:18:09]   packets_received BEFORE: 25504
+[2026-07-10 13:18:16]   row: sent=30001 before=25504 after=55505 processed=30001 processed_pps=10000.3
+[2026-07-10 13:18:16] === [InsectSound] rate step: 25000 pps ===
+[2026-07-10 13:18:17]   packets_received BEFORE: 55505
+[2026-07-10 13:18:24]   row: sent=75001 before=55505 after=125748 processed=70243 processed_pps=23414.3
+[2026-07-10 13:18:24] === [InsectSound] rate step: 50000 pps ===
+[2026-07-10 13:18:25]   packets_received BEFORE: 125748
+[2026-07-10 13:18:32]   row: sent=150001 before=125748 after=250860 processed=125112 processed_pps=41704.0
+[2026-07-10 13:18:32] === [InsectSound] rate step: 100000 pps ===
+[2026-07-10 13:18:33]   packets_received BEFORE: 250860
+[2026-07-10 13:18:39]   row: sent=300001 before=250860 after=461890 processed=211030 processed_pps=70343.3
+[2026-07-10 13:18:39] === [InsectSound] rate step: 250000 pps ===
+[2026-07-10 13:18:41]   packets_received BEFORE: 461890
+[2026-07-10 13:18:47]   row: sent=750001 before=461890 after=774785 processed=312895 processed_pps=104298.3
+[2026-07-10 13:18:47] === [InsectSound] rate step: 500000 pps ===
+[2026-07-10 13:18:49]   packets_received BEFORE: 774785
+[2026-07-10 13:18:55]   row: sent=1106446 before=774785 after=1103580 processed=328795 processed_pps=109598.3
+[2026-07-10 13:18:55] stopping hydra responder on pc160
+[2026-07-10 13:18:57] === InsectSound sweep complete ===
+[2026-07-10 13:18:57] starting hydra responder on pc160 192.168.40.30:51001 dataset=FruitFlies model=models/hydra_fruitflies_model.json
+[2026-07-10 13:19:10]   responder pid(s) on pc160: 14295
+[2026-07-10 13:19:10] === [FruitFlies] rate step: 500 pps ===
+[2026-07-10 13:19:11]   packets_received BEFORE: 0
+[2026-07-10 13:19:18]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-10 13:19:18] === [FruitFlies] rate step: 1000 pps ===
+[2026-07-10 13:19:19]   packets_received BEFORE: 1501
+[2026-07-10 13:19:26]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-10 13:19:26] === [FruitFlies] rate step: 2000 pps ===
+[2026-07-10 13:19:27]   packets_received BEFORE: 4502
+[2026-07-10 13:19:34]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-10 13:19:34] === [FruitFlies] rate step: 5000 pps ===
+[2026-07-10 13:19:35]   packets_received BEFORE: 10503
+[2026-07-10 13:19:42]   row: sent=15001 before=10503 after=25185 processed=14682 processed_pps=4894.0
+[2026-07-10 13:19:42] === [FruitFlies] rate step: 10000 pps ===
+[2026-07-10 13:19:43]   packets_received BEFORE: 25185
+[2026-07-10 13:19:50]   row: sent=30001 before=25185 after=52858 processed=27673 processed_pps=9224.3
+[2026-07-10 13:19:50] === [FruitFlies] rate step: 25000 pps ===
+[2026-07-10 13:19:51]   packets_received BEFORE: 52858
+[2026-07-10 13:19:58]   row: sent=75001 before=52858 after=116972 processed=64114 processed_pps=21371.3
+[2026-07-10 13:19:58] === [FruitFlies] rate step: 50000 pps ===
+[2026-07-10 13:19:59]   packets_received BEFORE: 116972
+[2026-07-10 13:20:06]   row: sent=150001 before=116972 after=228994 processed=112022 processed_pps=37340.7
+[2026-07-10 13:20:06] === [FruitFlies] rate step: 100000 pps ===
+[2026-07-10 13:20:07]   packets_received BEFORE: 228994
+[2026-07-10 13:20:14]   row: sent=300001 before=228994 after=409133 processed=180139 processed_pps=60046.3
+[2026-07-10 13:20:14] === [FruitFlies] rate step: 250000 pps ===
+[2026-07-10 13:20:15]   packets_received BEFORE: 409133
+[2026-07-10 13:20:22]   row: sent=750001 before=409133 after=708072 processed=298939 processed_pps=99646.3
+[2026-07-10 13:20:22] === [FruitFlies] rate step: 500000 pps ===
+[2026-07-10 13:20:23]   packets_received BEFORE: 708072
+[2026-07-10 13:20:30]   row: sent=1148038 before=708072 after=1055183 processed=347111 processed_pps=115703.7
+[2026-07-10 13:20:30] stopping hydra responder on pc160
+[2026-07-10 13:20:31] === FruitFlies sweep complete ===
+[2026-07-10 13:20:31] starting hydra responder on pc160 192.168.40.30:51001 dataset=MosquitoSound model=models/hydra_mosquitosound_model.json
+[2026-07-10 13:20:44]   responder pid(s) on pc160: 14881
+[2026-07-10 13:20:44] === [MosquitoSound] rate step: 500 pps ===
+[2026-07-10 13:20:45]   packets_received BEFORE: 0
+[2026-07-10 13:20:52]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-10 13:20:52] === [MosquitoSound] rate step: 1000 pps ===
+[2026-07-10 13:20:53]   packets_received BEFORE: 1501
+[2026-07-10 13:21:00]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-10 13:21:00] === [MosquitoSound] rate step: 2000 pps ===
+[2026-07-10 13:21:01]   packets_received BEFORE: 4502
+[2026-07-10 13:21:08]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-10 13:21:08] === [MosquitoSound] rate step: 5000 pps ===
+[2026-07-10 13:21:09]   packets_received BEFORE: 10503
+[2026-07-10 13:21:16]   row: sent=15001 before=10503 after=25250 processed=14747 processed_pps=4915.7
+[2026-07-10 13:21:16] === [MosquitoSound] rate step: 10000 pps ===
+[2026-07-10 13:21:17]   packets_received BEFORE: 25250
+[2026-07-10 13:21:24]   row: sent=30001 before=25250 after=52932 processed=27682 processed_pps=9227.3
+[2026-07-10 13:21:24] === [MosquitoSound] rate step: 25000 pps ===
+[2026-07-10 13:21:25]   packets_received BEFORE: 52932
+[2026-07-10 13:21:32]   row: sent=75001 before=52932 after=116435 processed=63503 processed_pps=21167.7
+[2026-07-10 13:21:32] === [MosquitoSound] rate step: 50000 pps ===
+[2026-07-10 13:21:33]   packets_received BEFORE: 116435
+[2026-07-10 13:21:40]   row: sent=150001 before=116435 after=232037 processed=115602 processed_pps=38534.0
+[2026-07-10 13:21:40] === [MosquitoSound] rate step: 100000 pps ===
+[2026-07-10 13:21:41]   packets_received BEFORE: 232037
+[2026-07-10 13:21:48]   row: sent=300001 before=232037 after=423935 processed=191898 processed_pps=63966.0
+[2026-07-10 13:21:48] === [MosquitoSound] rate step: 250000 pps ===
+[2026-07-10 13:21:49]   packets_received BEFORE: 423935
+[2026-07-10 13:21:56]   row: sent=750000 before=423935 after=735183 processed=311248 processed_pps=103749.3
+[2026-07-10 13:21:56] === [MosquitoSound] rate step: 500000 pps ===
+[2026-07-10 13:21:57]   packets_received BEFORE: 735183
+[2026-07-10 13:22:04]   row: sent=1150370 before=735183 after=1095171 processed=359988 processed_pps=119996.0
+[2026-07-10 13:22:04] stopping hydra responder on pc160
+[2026-07-10 13:22:05] === MosquitoSound sweep complete ===
+[2026-07-10 13:22:05] === all CPU MiniRocket 3-dataset sweeps complete. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-10_cpu_hydra/cpu_hydra_3ds.csv ===
+variant,dataset,configured_pps,sent,duration_s,processed_pkts,processed_pps,loss_pct,bandwidth_kbps
+cpu-hydra,InsectSound,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-hydra,InsectSound,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-hydra,InsectSound,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-hydra,InsectSound,5000.0,15001,3.0,15001,5000.333333333333,0.0,2560.1706666666664
+cpu-hydra,InsectSound,10000.0,30001,3.0,30001,10000.333333333334,0.0,5120.170666666667
+cpu-hydra,InsectSound,25000.0,75001,3.0,70243,23414.333333333332,6.343915414461144,11988.138666666666
+cpu-hydra,InsectSound,50000.0,150001,3.0,125112,41704.0,16.59255604962634,21352.448
+cpu-hydra,InsectSound,100000.0,300001,3.0,211030,70343.33333333333,29.65690114366285,36015.78666666667
+cpu-hydra,InsectSound,250000.0,750001,3.0,312895,104298.33333333333,58.28072229237028,53400.746666666666
+cpu-hydra,InsectSound,500000.0,1106446,3.0,328795,109598.33333333333,70.28368307174503,56114.346666666665
+cpu-hydra,FruitFlies,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-hydra,FruitFlies,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-hydra,FruitFlies,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-hydra,FruitFlies,5000.0,15001,3.0,14682,4894.0,2.1265248983401097,2505.728
+cpu-hydra,FruitFlies,10000.0,30001,3.0,27673,9224.333333333334,7.759741341955273,4722.858666666667
+cpu-hydra,FruitFlies,25000.0,75001,3.0,64114,21371.333333333332,14.515806455913927,10942.122666666666
+cpu-hydra,FruitFlies,50000.0,150001,3.0,112022,37340.666666666664,25.31916453890307,19118.421333333332
+cpu-hydra,FruitFlies,100000.0,300001,3.0,180139,60046.333333333336,39.95386682044393,30743.72266666667
+cpu-hydra,FruitFlies,250000.0,750001,3.0,298939,99646.33333333333,60.14151981130692,51018.922666666665
+cpu-hydra,FruitFlies,500000.0,1148038,3.0,347111,115703.66666666667,69.76485098925296,59240.27733333334
+cpu-hydra,MosquitoSound,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-hydra,MosquitoSound,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-hydra,MosquitoSound,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-hydra,MosquitoSound,5000.0,15001,3.0,14747,4915.666666666667,1.693220451969868,2516.8213333333333
+cpu-hydra,MosquitoSound,10000.0,30001,3.0,27682,9227.333333333334,7.729742341921941,4724.394666666667
+cpu-hydra,MosquitoSound,25000.0,75001,3.0,63503,21167.666666666668,15.330462260503197,10837.845333333335
+cpu-hydra,MosquitoSound,50000.0,150001,3.0,115602,38534.0,22.932513783241447,19729.408
+cpu-hydra,MosquitoSound,100000.0,300001,3.0,191898,63966.0,36.03421321928927,32750.592
+cpu-hydra,MosquitoSound,250000.0,750000,3.0,311248,103749.33333333333,58.50026666666667,53119.65866666666
+cpu-hydra,MosquitoSound,500000.0,1150370,3.0,359988,119996.0,68.70676391074177,61437.952

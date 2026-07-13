@@ -1,0 +1,35 @@
+% GPU vs FPGA Scalability Comparison — MiniRocket Feature Extraction
+% GPU: Tesla T4 (PyTorch 2.10.0+cu128), FPGA: Alveo U280 fused 1-CU (300 MHz)
+% \input{results/tables/gpu_scalability_table.tex}
+
+\begin{table}[t]
+\centering
+\caption{MiniRocket throughput scaling with time series length. GPU throughput
+at batch sizes 256 and 1; FPGA throughput on a single fused compute unit
+(300\,MHz). The GPU/FPGA throughput ratio drops from 65$\times$ to
+3.8$\times$ as series length increases from 64 to 8192. At batch=1, the FPGA
+matches or exceeds the GPU for lengths $\geq$\,4096 (single CU) and
+$\geq$\,2048 (3-CU, projected).}
+\label{tab:gpu_scalability}
+\begin{tabular}{r r r r r r}
+\toprule
+\textbf{Length} & \textbf{GPU b=256} & \textbf{GPU b=1} & \textbf{FPGA 1CU} & \textbf{GPU/FPGA} & \textbf{b=1/FPGA} \\
+ & (inf/s) & (inf/s) & (inf/s) & (b=256) & \\
+\midrule
+64    & 174,912 & 1,204 & 2,681 & 65.2$\times$ & 0.45$\times$ \\
+128   & 115,308 & 1,091 & 2,458 & 46.9$\times$ & 0.44$\times$ \\
+256   &  65,826 &   950 & 2,512 & 26.2$\times$ & 0.38$\times$ \\
+512   &  33,826 &   798 & 2,204 & 15.4$\times$ & 0.36$\times$ \\
+1,024 &  20,178 &   692 & 1,745 & 11.6$\times$ & 0.40$\times$ \\
+2,048 &   9,331 &   661 & 1,303 &  7.2$\times$ & 0.51$\times$ \\
+4,096 &   4,249 &   606 &   794 &  5.4$\times$ & 0.76$\times$ \\
+8,192 &   1,919 &   539 &   511 &  3.8$\times$ & \textbf{1.05$\times$} \\
+\bottomrule
+\end{tabular}
+\vspace{1mm}
+
+{\footnotesize GPU: Tesla T4, PyTorch 2.10.0+CUDA 12.8, synthetic data (throughput
+is input-value-independent for conv1d). FPGA: Xilinx Alveo U280, fused
+CONV+PPV kernel, 1 CU at 300\,MHz. FPGA 3-CU scales 1.6--1.95$\times$,
+reaching parity with GPU b=1 at $\sim$2048 and exceeding it at $\geq$\,4096.}
+\end{table}

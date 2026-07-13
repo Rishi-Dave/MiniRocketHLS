@@ -77,7 +77,7 @@ INCLUDES = ./src
 MINIROCKET_KRNL := minirocket_inference
 NETLAYER_KRNL := networklayer
 CMAC_KRNL:=cmac_0
-XOs += $(MINIROCKET_XO_REPO)/$(MINIROCKET_KRNL).xo $(NETLAYER_XO_REPO)/$(NETLAYER_KRNL).xo $(CMAC_XO_REPO)/${CMAC_KRNL}.xo
+XOs += $(MINIROCKET_XO_REPO)/$(MINIROCKET_KRNL).xo $(NETLAYER_XO_REPO)/$(NETLAYER_KRNL).xo $(CMAC_XO_REPO)/${CMAC_KRNL}.xo $(MINIROCKET_XO_REPO)/pktDropper.xo
 
 ############################## Setting up Host Variables ##############################
 
@@ -86,7 +86,11 @@ CXXFLAGS += -fmessage-length=0 -I$(INCLUDES) -I${HOST_DIR}/include
 LDFLAGS += -lrt -lstdc++ 
 
 ############################## Setting up Kernel Variables ##############################
-VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM) --save-temps -I$(INCLUDES) --config config.cfg
+# CONFIG default preserves existing minirocket_dpr behavior (fpga-network/config.cfg).
+# Override for other variants, e.g.:
+#   make build ... MINIROCKET_KRNL=minirocket_fused_inference CONFIG=minirocket_fused/config.cfg BUILD_DIR=./build_dir.hw.fused
+CONFIG ?= config.cfg
+VPP_FLAGS += -t $(TARGET) --platform $(PLATFORM) --save-temps -I$(INCLUDES) --config $(CONFIG)
 ifneq ($(TARGET), hw)
 	VPP_FLAGS += -g
 endif

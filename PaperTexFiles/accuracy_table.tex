@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Classification accuracy (\%) across platforms.}
+\label{tab:accuracy}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l l r r r r r}
+\toprule
+Algorithm & Dataset & TS Len & Samples & Python & C++/CPU & FPGA \\
+\midrule
+MiniRocket & InsectSound & 600 & 25,000 & 78.84 & 74.12 & 74.12 \\
+MiniRocket & MosquitoSound & 3,750 & 139,786 & 87.59 & 87.87 & 87.88 \\
+MiniRocket & FruitFlies & 5,000 & 17,259 & 96.98 & 95.83 & 95.82 \\
+\addlinespace
+HYDRA & InsectSound & 600 & 25,000 & 69.41 & 70.4$^{\ddagger}$ & 69.41 \\
+HYDRA & MosquitoSound & 3,750 & 139,786 & 70.05 & 72.5$^{\ddagger}$ & 70.05 \\
+HYDRA & FruitFlies & 5,000 & 17,259 & 87.61 & 86.5$^{\ddagger}$ & 87.61 \\
+\bottomrule
+\end{tabular}}
+\vspace{1mm}
+
+{\footnotesize $^{\ddagger}$HYDRA C++ baseline compiles the HLS kernel sources natively (\texttt{-O3 -march=native}); accuracy reported on a 1000-sample subset (full set $>$8\,GB JSON). FPGA accuracy validated by both v2\_fixed (monolithic) and hydra\_stream (3-kernel pipeline) variants ($\Delta$=0.00\% vs Python reference).}
+\end{table}

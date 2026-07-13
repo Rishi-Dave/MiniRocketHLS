@@ -1,0 +1,105 @@
+if { [info exists ::env(LIBRARY_PATH)] } {
+    set ::env(LIBRARY_PATH) /usr/lib/x86_64-linux-gnu:$env(LIBRARY_PATH)
+} else {
+    set ::env(LIBRARY_PATH) /usr/lib/x86_64-linux-gnu
+}
+
+open_project ${PROJECT_NAME}_prj
+
+open_solution "solution1"
+set_part ${FPGA_PART}
+create_clock -period ${CLOCK_PERIOD} -name default
+
+set_top ${PROJECT_NAME}
+
+config_interface -m_axi_latency=64
+config_interface -m_axi_alignment_byte_size=64
+config_interface -m_axi_max_widen_bitwidth=512
+config_rtl -register_reset_num=3
+config_export -format xo
+
+#Check which command
+set command [lindex $argv 2]
+
+# ---------------------------------------------------------------------------
+# BUILD flag wiring -- REVISED 2026-07-06 (v4: DATAFLOW decouple + packed
+# single-packet emit + TRUE on-chip free-run, see minirocket_fused.cpp file
+# header "v4"). v3 (2026-07-05) unconditionally set BUILD_CFLAG="" for every
+# target because the then-current per-class multi-packet emit had wedged
+# hardware twice under `-DBUILD=1` free-run. v4 replaces that multi-packet
+# emit with ONE packed packet per window (see minirocket_fused.cpp FIX 1),
+# which is the change that makes re-enabling on-chip free-run worth
+# re-testing. Policy now:
+#   - synthesis / ip / installip (RTL export for hw): BUILD_CFLAG="-DBUILD=1"
+#     -- TRUE on-chip free-run compiled in, exactly what v4 is meant to
+#     validate for hardware line-rate ingestion.
+#   - csim (no COSIM_MAX_WINDOWS env var): BUILD_CFLAG="" -- keeps the
+#     existing single-shot-per-packet testbench (test_minirocket_fused.cpp)
+#     working exactly as before; DATAFLOW degrades to two sequential
+#     single-shot calls per invocation in C simulation when neither BUILD
+#     nor COSIM_MAX_WINDOWS is defined (see minirocket_fused.cpp's
+#     `#if defined(COSIM_MAX_WINDOWS) ... #elif BUILD==1 ... #endif` guards),
+#     so this remains the fast, deterministic bit-exact correctness check.
+#   - cosim (no COSIM_MAX_WINDOWS env var): BUILD_CFLAG="" for the same
+#     reason as csim -- an unbounded `while(true)` fed by a single-packet TB
+#     that only ever writes one packet would spin forever and hang cosim.
+#   - EITHER command with COSIM_MAX_WINDOWS set in the environment: this is
+#     the dedicated bounded free-run RTL check. BUILD_CFLAG becomes
+#     "-DBUILD=1 -DCOSIM_MAX_WINDOWS=<N>" and the freerun testbench
+#     (test_minirocket_fused_freerun_cosim.cpp) is swapped in instead of the
+#     normal one; it pre-loads N complete windows before calling the kernel
+#     ONCE, so the compiled-in `while(true)` (bounded to
+#     COSIM_MAX_WINDOWS*time_series_length+64 iterations, see
+#     minirocket_fused.cpp) has to actually drain everything and return --
+#     this is the free-run RTL liveness check cosim CAN perform (it cannot
+#     model real NetLayer/CMAC backpressure, see file header "HISTORY").
+# ---------------------------------------------------------------------------
+set FREERUN_VERIFY 0
+set cosim_max_windows_val 4
+if {[info exists ::env(COSIM_MAX_WINDOWS)]} {
+    set FREERUN_VERIFY 1
+    set cosim_max_windows_val $::env(COSIM_MAX_WINDOWS)
+}
+
+if {$FREERUN_VERIFY} {
+    set BUILD_CFLAG "-DBUILD=1 -DCOSIM_MAX_WINDOWS=$cosim_max_windows_val"
+} elseif {$command == "synthesis" || $command == "ip" || $command == "installip"} {
+    set BUILD_CFLAG "-DBUILD=1"
+} else {
+    set BUILD_CFLAG ""
+}
+
+add_files ${CMAKE_CURRENT_SOURCE_DIR}/src/minirocket_fused.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include $BUILD_CFLAG"
+
+add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/minirocket_hls_testbench_loader.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
+if {$FREERUN_VERIFY} {
+    add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/test_minirocket_fused_freerun_cosim.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test $BUILD_CFLAG"
+} else {
+    add_files -tb ${CMAKE_CURRENT_SOURCE_DIR}/test/test_minirocket_fused.cpp -cflags "-I${CMAKE_CURRENT_BINARY_DIR}/include -I${CMAKE_CURRENT_BINARY_DIR}/test"
+}
+
+if {$command == "synthesis"} {
+   csynth_design
+} elseif {$command == "csim"} {
+   if {$FREERUN_VERIFY} {
+      csim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_test_data_compact.json $cosim_max_windows_val"
+   } else {
+      csim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_test_data_compact.json csim"
+   }
+} elseif {$command == "cosim"} {
+   if {$FREERUN_VERIFY} {
+      cosim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_test_data_compact.json $cosim_max_windows_val"
+   } else {
+      cosim_design -argv "${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_minirocket_model.json ${CMAKE_CURRENT_SOURCE_DIR}/InsectSound_test_data_compact.json cosim"
+   }
+} elseif {$command == "ip"} {
+   export_design -format xo
+} elseif {$command == "installip"} {
+   file mkdir ${IPREPO_DIR}
+   file copy -force ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_prj/solution1/impl/export.xo ${IPREPO_DIR}/${PROJECT_NAME}.xo
+}  else {
+   puts "No valid command specified. Use vitis_hls -f make.tcl <synthesis|csim|cosim|ip|installip> ."
+}
+
+
+exit

@@ -175,7 +175,7 @@ int main(int argc, char* argv[]) {
                 num_dilations_out_1,
                 num_features_out_1,
                 n_feature_per_kernel,
-                ((num_features_out_1 + num_features_out_0) * n_feature_per_kernel)/2
+                num_features_out_0 * n_feature_per_kernel
             );
 
 

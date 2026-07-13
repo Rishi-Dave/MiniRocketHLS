@@ -1,0 +1,44 @@
+\section{Experimental Results}
+\label{sec:ExpResults}
+
+\subsection{Experimental Setup}
+\label{sec:ExpSetup}
+
+% Wolverine
+% AMD Xilinx Alveo U280
+% Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz
+
+% CPU Experiments
+% Intel(R) Core(TM) i9-9900 CPU @ 3.10GHz
+
+
+% OCT
+% AMD Xilinx Alveo U280
+% Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz
+% 100 GbE data center switches
+% CMAC/ UltraScale+ Integrated 100G Ethernet Subsystem
+% UDP/ Xilinx 
+% Ethernet Controller XL710 for 40GbE QSFP+
+We compare our FPGA-based MiniRocket, MultiRocket, and Hydra inference engines to software implementations written in (multi-threaded) Python 3.10 in the Aeon-toolkit \cite{aeon-arxiv, aeon-pkdd}. All models were trained using Aeon, and all experiments were performed using the three largest time series from the UCR Time Series Archive \cite{UCRTimeSeries}: \textit{InsectSound} (Training size: 139883, Test set size: 139883, Length: 3750), \textit{MosquitoSound} (Training size: 25000, Test set size: 25000, Length: 600), and \textit{FruitFlies} (Training size: 17259, Test set size: 17259, Length: 5000). The FPGA's intermediate computations and inference results are identical to the Aeon baseline. 
+
+We perform two sets of experiments. In the first, the input time series is stored in local memory on both the baseline CPU and FPGA (HBM); in the second, we stream the time series across a network: the FPGA processes the time series directly, while the CPU receives its data via the NIC. 
+
+The CPU baseline experiments were run on a Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz with 128GiB of DDR4. Latency and throughput was caluclated using overall execution time using Python's built in \textit{time} library and power consumption was estimated using PyRAPL. The FPGA experiments were run in-house on an AMD Xilinx Alveo U280 utilzing the 2022.1 shell, with a Intel(R) Xeon(R) CPU E5-2640 v3 @ 2.60GHz as the host CPU. The test cases and weights are loaded onto off-chip High-Bandwidth Memory (HBM) then loaded onto on-chip BRAM during runtime. Vitis/Vivado 2023.2 was used to develope and verify the design. Resource utilization are given post place and route, and power consumption is measured at runtime by on-board sensors. 
+
+We ran the network experiments on the Open-Cloud Testbed (OCT) \cite{oct, networkfpga} accessed via CloudLabs \cite{CloudLabs}. OCT is a cluster of 24 AMD Xilinx Alveo U280 connected by 100GbE switches, with host Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz connected to the same cluster utilizing an Ethernet Controller XL710 for 40GbE. The UltraScale+ Integrated 100G Ethernet Subsystem and AMD's UDP IP \cite{xup_vitis_network_example} provided networking to the FPGA design. The client node utilizes Python Sockets to send UDP packets containing a new time series datapoint as the payload. The inference server (CPU baseline or FPGA) maintains time series window: the arrival of a new datapoint triggers  inference; the server transmits the predicted classes back to the client over UDP. The timing is captured on the client side as the Round-Trip Time (RTT) from when a packet is sent to when the predicted class is received. 
+
+\subsection{Results}
+
+\begin{table}[]
+\begin{tabular}{|l|l|l|l|}
+\hline
+                      & Naive + FP & Naive + bFP & Stream + bFP \\ \hline
+Kernel                &           &             &              \\ \hline
+Regression Classifier &            &             &              \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+
+\label{sec:Results}

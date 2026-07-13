@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Energy efficiency: MiniRocket inference. FPGA 25.7\,W (static-dominated at $<$5\% utilization); GPU via nvidia-smi; CPU via RAPL.}
+\label{tab:power}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Platform & Tput (inf/s) & Power (W) & mJ/inf & vs CPU \\
+\midrule
+InsectSound & CPU C++ & 289 & 52.8 & 182.7 & 1$\times$ \\
+ & GPU T4 (b=256) & 30,469 & 68 & 2.2 & 83$\times$ \\
+ & FPGA 3-CU & 5,012 & 25.7 & 5.1 & 36$\times$ \\
+\midrule
+MosquitoSound & CPU C++ & 48 & 40.0 & 833.3 & 1$\times$ \\
+ & GPU T4 (b=256) & 4,198 & 54 & 12.9 & 65$\times$ \\
+ & FPGA 3-CU & 2,820 & 25.7 & 9.1 & 92$\times$ \\
+\midrule
+FruitFlies & CPU C++ & 258 & 49.9 & 193.4 & 1$\times$ \\
+ & GPU T4 (b=256) & 3,227 & 54 & 16.7 & 12$\times$ \\
+ & FPGA 3-CU & 2,191 & 25.7 & 11.7 & 17$\times$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

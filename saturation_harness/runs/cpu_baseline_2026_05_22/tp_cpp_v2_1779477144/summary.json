@@ -1,0 +1,17 @@
+{
+  "fpga_ip": "192.168.40.31",
+  "fpga_port": 62177,
+  "packet_bytes": 64,
+  "rates": [
+    {"target_pps": 50000, "sent": 100001, "recv_acks": 100001, "achieved_pps": 50000.5, "loss_pct": 0, "bps": 2.56003e+07},
+    {"target_pps": 90082.4, "sent": 180182, "recv_acks": 180182, "achieved_pps": 90091, "loss_pct": 0, "bps": 4.61266e+07},
+    {"target_pps": 162297, "sent": 324624, "recv_acks": 324084, "achieved_pps": 162312, "loss_pct": 0.166346, "bps": 8.31037e+07},
+    {"target_pps": 292402, "sent": 584968, "recv_acks": 584817, "achieved_pps": 292484, "loss_pct": 0.0258134, "bps": 1.49752e+08},
+    {"target_pps": 526805, "sent": 1053742, "recv_acks": 687188, "achieved_pps": 526871, "loss_pct": 34.7859, "bps": 2.69758e+08},
+    {"target_pps": 949118, "sent": 1354227, "recv_acks": 687024, "achieved_pps": 677114, "loss_pct": 49.2682, "bps": 3.46682e+08},
+    {"target_pps": 1.70998e+06, "sent": 1356544, "recv_acks": 688053, "achieved_pps": 678272, "loss_pct": 49.279, "bps": 3.47275e+08},
+    {"target_pps": 3.08078e+06, "sent": 1350084, "recv_acks": 689426, "achieved_pps": 675042, "loss_pct": 48.9346, "bps": 3.45622e+08},
+    {"target_pps": 5.55047e+06, "sent": 1352419, "recv_acks": 688763, "achieved_pps": 676210, "loss_pct": 49.0718, "bps": 3.46219e+08},
+    {"target_pps": 1e+07, "sent": 1352350, "recv_acks": 688695, "achieved_pps": 676175, "loss_pct": 49.0742, "bps": 3.46202e+08}
+  ]
+}

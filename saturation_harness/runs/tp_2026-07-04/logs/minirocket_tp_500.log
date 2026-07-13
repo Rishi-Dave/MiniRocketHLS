@@ -1,0 +1,11 @@
+[tp] tgt=       500pps sent=    1501 ack=      19 loss= 98.7% achieved=       500pps
+[
+  {
+    "target_pps": 500.0,
+    "sent": 1501,
+    "recv_acks": 19,
+    "achieved_pps": 500.3333333333333,
+    "loss_pct": 98.73417721518987,
+    "bps": 256170.66666666666
+  }
+]

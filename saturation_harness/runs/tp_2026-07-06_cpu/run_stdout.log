@@ -1,0 +1,136 @@
+[2026-07-07 07:41:33] === cpu_sweep_3ds_orchestrate.sh (Wolverine-driven) starting; datasets: InsectSound FruitFlies MosquitoSound; rates: 500 1000 2000 5000 10000 25000 50000 100000 250000 500000 ===
+[2026-07-07 07:41:33] *** FPGA on pc160/pc161 left completely untouched -- no xbutil, no program, no reset. ***
+[2026-07-07 07:41:33] starting minirocket responder on pc160 192.168.40.30:51000 dataset=InsectSound model=models/InsectSound_minirocket_model.json
+[2026-07-07 07:41:46]   responder pid(s) on pc160: 50697
+[2026-07-07 07:41:46] === [InsectSound] rate step: 500 pps ===
+[2026-07-07 07:41:47]   packets_received BEFORE: 0
+[2026-07-07 07:41:54]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-07 07:41:54] === [InsectSound] rate step: 1000 pps ===
+[2026-07-07 07:41:55]   packets_received BEFORE: 1501
+[2026-07-07 07:42:02]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-07 07:42:02] === [InsectSound] rate step: 2000 pps ===
+[2026-07-07 07:42:03]   packets_received BEFORE: 4502
+[2026-07-07 07:42:10]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-07 07:42:10] === [InsectSound] rate step: 5000 pps ===
+[2026-07-07 07:42:11]   packets_received BEFORE: 10503
+[2026-07-07 07:42:18]   row: sent=15001 before=10503 after=25504 processed=15001 processed_pps=5000.3
+[2026-07-07 07:42:18] === [InsectSound] rate step: 10000 pps ===
+[2026-07-07 07:42:19]   packets_received BEFORE: 25504
+[2026-07-07 07:42:26]   row: sent=30001 before=25504 after=51723 processed=26219 processed_pps=8739.7
+[2026-07-07 07:42:26] === [InsectSound] rate step: 25000 pps ===
+[2026-07-07 07:42:27]   packets_received BEFORE: 51723
+[2026-07-07 07:42:34]   row: sent=75001 before=51723 after=103299 processed=51576 processed_pps=17192.0
+[2026-07-07 07:42:34] === [InsectSound] rate step: 50000 pps ===
+[2026-07-07 07:42:35]   packets_received BEFORE: 103299
+[2026-07-07 07:42:42]   row: sent=150001 before=103299 after=179806 processed=76507 processed_pps=25502.3
+[2026-07-07 07:42:42] === [InsectSound] rate step: 100000 pps ===
+[2026-07-07 07:42:43]   packets_received BEFORE: 179806
+[2026-07-07 07:42:50]   row: sent=300001 before=179806 after=273785 processed=93979 processed_pps=31326.3
+[2026-07-07 07:42:50] === [InsectSound] rate step: 250000 pps ===
+[2026-07-07 07:42:51]   packets_received BEFORE: 273785
+[2026-07-07 07:42:58]   row: sent=750000 before=273785 after=382985 processed=109200 processed_pps=36400.0
+[2026-07-07 07:42:58] === [InsectSound] rate step: 500000 pps ===
+[2026-07-07 07:42:59]   packets_received BEFORE: 382985
+[2026-07-07 07:43:06]   row: sent=906579 before=382985 after=493385 processed=110400 processed_pps=36800.0
+[2026-07-07 07:43:06] stopping minirocket responder on pc160
+[2026-07-07 07:43:07] === InsectSound sweep complete ===
+[2026-07-07 07:43:07] starting minirocket responder on pc160 192.168.40.30:51000 dataset=FruitFlies model=models/FruitFlies_minirocket_model.json
+[2026-07-07 07:43:21]   responder pid(s) on pc160: 51284
+[2026-07-07 07:43:21] === [FruitFlies] rate step: 500 pps ===
+[2026-07-07 07:43:22]   packets_received BEFORE: 0
+[2026-07-07 07:43:29]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-07 07:43:29] === [FruitFlies] rate step: 1000 pps ===
+[2026-07-07 07:43:30]   packets_received BEFORE: 1501
+[2026-07-07 07:43:36]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-07 07:43:36] === [FruitFlies] rate step: 2000 pps ===
+[2026-07-07 07:43:38]   packets_received BEFORE: 4502
+[2026-07-07 07:43:44]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-07 07:43:44] === [FruitFlies] rate step: 5000 pps ===
+[2026-07-07 07:43:46]   packets_received BEFORE: 10503
+[2026-07-07 07:43:52]   row: sent=15001 before=10503 after=25357 processed=14854 processed_pps=4951.3
+[2026-07-07 07:43:52] === [FruitFlies] rate step: 10000 pps ===
+[2026-07-07 07:43:54]   packets_received BEFORE: 25357
+[2026-07-07 07:44:00]   row: sent=30001 before=25357 after=54085 processed=28728 processed_pps=9576.0
+[2026-07-07 07:44:00] === [FruitFlies] rate step: 25000 pps ===
+[2026-07-07 07:44:02]   packets_received BEFORE: 54085
+[2026-07-07 07:44:08]   row: sent=75001 before=54085 after=120185 processed=66100 processed_pps=22033.3
+[2026-07-07 07:44:08] === [FruitFlies] rate step: 50000 pps ===
+[2026-07-07 07:44:09]   packets_received BEFORE: 120185
+[2026-07-07 07:44:16]   row: sent=150001 before=120185 after=241304 processed=121119 processed_pps=40373.0
+[2026-07-07 07:44:16] === [FruitFlies] rate step: 100000 pps ===
+[2026-07-07 07:44:17]   packets_received BEFORE: 241304
+[2026-07-07 07:44:24]   row: sent=300001 before=241304 after=431845 processed=190541 processed_pps=63513.7
+[2026-07-07 07:44:24] === [FruitFlies] rate step: 250000 pps ===
+[2026-07-07 07:44:25]   packets_received BEFORE: 431845
+[2026-07-07 07:44:32]   row: sent=750001 before=431845 after=685576 processed=253731 processed_pps=84577.0
+[2026-07-07 07:44:32] === [FruitFlies] rate step: 500000 pps ===
+[2026-07-07 07:44:33]   packets_received BEFORE: 685576
+[2026-07-07 07:44:40]   row: sent=895199 before=685576 after=1093690 processed=408114 processed_pps=136038.0
+[2026-07-07 07:44:40] stopping minirocket responder on pc160
+[2026-07-07 07:44:42] === FruitFlies sweep complete ===
+[2026-07-07 07:44:42] starting minirocket responder on pc160 192.168.40.30:51000 dataset=MosquitoSound model=models/MosquitoSound_minirocket_model.json
+[2026-07-07 07:44:55]   responder pid(s) on pc160: 51868
+[2026-07-07 07:44:55] === [MosquitoSound] rate step: 500 pps ===
+[2026-07-07 07:44:56]   packets_received BEFORE: 0
+[2026-07-07 07:45:03]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-07 07:45:03] === [MosquitoSound] rate step: 1000 pps ===
+[2026-07-07 07:45:04]   packets_received BEFORE: 1501
+[2026-07-07 07:45:11]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-07 07:45:11] === [MosquitoSound] rate step: 2000 pps ===
+[2026-07-07 07:45:12]   packets_received BEFORE: 4502
+[2026-07-07 07:45:19]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-07 07:45:19] === [MosquitoSound] rate step: 5000 pps ===
+[2026-07-07 07:45:20]   packets_received BEFORE: 10503
+[2026-07-07 07:45:27]   row: sent=15001 before=10503 after=25481 processed=14978 processed_pps=4992.7
+[2026-07-07 07:45:27] === [MosquitoSound] rate step: 10000 pps ===
+[2026-07-07 07:45:28]   packets_received BEFORE: 25481
+[2026-07-07 07:45:35]   row: sent=30001 before=25481 after=53702 processed=28221 processed_pps=9407.0
+[2026-07-07 07:45:35] === [MosquitoSound] rate step: 25000 pps ===
+[2026-07-07 07:45:36]   packets_received BEFORE: 53702
+[2026-07-07 07:45:43]   row: sent=75001 before=53702 after=118155 processed=64453 processed_pps=21484.3
+[2026-07-07 07:45:43] === [MosquitoSound] rate step: 50000 pps ===
+[2026-07-07 07:45:44]   packets_received BEFORE: 118155
+[2026-07-07 07:45:51]   row: sent=150001 before=118155 after=236324 processed=118169 processed_pps=39389.7
+[2026-07-07 07:45:51] === [MosquitoSound] rate step: 100000 pps ===
+[2026-07-07 07:45:52]   packets_received BEFORE: 236324
+[2026-07-07 07:45:59]   row: sent=300001 before=236324 after=442685 processed=206361 processed_pps=68787.0
+[2026-07-07 07:45:59] === [MosquitoSound] rate step: 250000 pps ===
+[2026-07-07 07:46:00]   packets_received BEFORE: 442685
+[2026-07-07 07:46:07]   row: sent=750000 before=442685 after=787685 processed=345000 processed_pps=115000.0
+[2026-07-07 07:46:07] === [MosquitoSound] rate step: 500000 pps ===
+[2026-07-07 07:46:08]   packets_received BEFORE: 787685
+[2026-07-07 07:46:15]   row: sent=936889 before=787685 after=1166434 processed=378749 processed_pps=126249.7
+[2026-07-07 07:46:15] stopping minirocket responder on pc160
+[2026-07-07 07:46:16] === MosquitoSound sweep complete ===
+[2026-07-07 07:46:16] === all CPU MiniRocket 3-dataset sweeps complete. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-06_cpu/cpu_minirocket_3ds.csv ===
+variant,dataset,configured_pps,sent,duration_s,processed_pkts,processed_pps,loss_pct,bandwidth_kbps
+cpu-minirocket,InsectSound,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-minirocket,InsectSound,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-minirocket,InsectSound,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-minirocket,InsectSound,5000.0,15001,3.0,15001,5000.333333333333,0.0,2560.1706666666664
+cpu-minirocket,InsectSound,10000.0,30001,3.0,26219,8739.666666666666,12.606246458451388,4474.709333333333
+cpu-minirocket,InsectSound,25000.0,75001,3.0,51576,17192.0,31.23291689444141,8802.304
+cpu-minirocket,InsectSound,50000.0,150001,3.0,76507,25502.333333333332,48.995673362177584,13057.194666666666
+cpu-minirocket,InsectSound,100000.0,300001,3.0,93979,31326.333333333332,68.67377108742971,16039.082666666665
+cpu-minirocket,InsectSound,250000.0,750000,3.0,109200,36400.0,85.44,18636.8
+cpu-minirocket,InsectSound,500000.0,906579,3.0,110400,36800.0,87.82235194064721,18841.6
+cpu-minirocket,FruitFlies,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-minirocket,FruitFlies,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-minirocket,FruitFlies,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-minirocket,FruitFlies,5000.0,15001,3.0,14854,4951.333333333333,0.9799346710219314,2535.0826666666667
+cpu-minirocket,FruitFlies,10000.0,30001,3.0,28728,9576.0,4.243191893603548,4902.912
+cpu-minirocket,FruitFlies,25000.0,75001,3.0,66100,22033.333333333332,11.867841762109844,11281.066666666666
+cpu-minirocket,FruitFlies,50000.0,150001,3.0,121119,40373.0,19.254538303077982,20670.976
+cpu-minirocket,FruitFlies,100000.0,300001,3.0,190541,63513.666666666664,36.48654504484985,32518.997333333333
+cpu-minirocket,FruitFlies,250000.0,750001,3.0,253731,84577.0,66.16924510767319,43303.424
+cpu-minirocket,FruitFlies,500000.0,895199,3.0,408114,136038.0,54.410806982581526,69651.456
+cpu-minirocket,MosquitoSound,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-minirocket,MosquitoSound,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-minirocket,MosquitoSound,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-minirocket,MosquitoSound,5000.0,15001,3.0,14978,4992.666666666667,0.1533231117925471,2556.2453333333333
+cpu-minirocket,MosquitoSound,10000.0,30001,3.0,28221,9407.0,5.933135562147928,4816.384
+cpu-minirocket,MosquitoSound,25000.0,75001,3.0,64453,21484.333333333332,14.063812482500238,10999.978666666666
+cpu-minirocket,MosquitoSound,50000.0,150001,3.0,118169,39389.666666666664,21.221191858720946,20167.50933333333
+cpu-minirocket,MosquitoSound,100000.0,300001,3.0,206361,68787.0,31.2132292892357,35218.944
+cpu-minirocket,MosquitoSound,250000.0,750000,3.0,345000,115000.0,54.0,58880.0
+cpu-minirocket,MosquitoSound,500000.0,936889,3.0,378749,126249.66666666667,59.57375953821638,64639.829333333335

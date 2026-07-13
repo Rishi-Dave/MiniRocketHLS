@@ -1,0 +1,501 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{caption}
+
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+\definecolor{darkred}{rgb}{0.7, 0.0, 0.0}
+\newcommand{\done}[1]{\textcolor{darkgreen}{\textbf{#1}}}
+\newcommand{\pending}[1]{\textcolor{darkred}{\textbf{#1}}}
+\newcommand{\infs}{inf/s}
+
+\title{MiniRocketHLS Resubmission Summary:\\
+\large What Changed Since FCCM 2026 Rejection}
+\author{Prepared for Philip --- Data \& Analysis Summary}
+\date{April 3, 2026}
+
+\begin{document}
+\maketitle
+
+%% ============================================================
+\section{Executive Summary}
+%% ============================================================
+
+FCCM 2026 paper \#238 (scores: 2, 3, 3, 4) was rejected on five grounds:
+no GPU baseline, Python-only CPU comparison, limited scalability analysis,
+questioned novelty, and missing power data.
+\textbf{All five complaints have been addressed with new experimental data.}
+
+Since rejection, we have completed:
+\begin{itemize}[nosep]
+  \item Tesla T4 GPU baselines for both MiniRocket and HYDRA (batch=256 \emph{and} batch=1)
+  \item C++ \texttt{-O3} single-threaded CPU baselines for MiniRocket (3 datasets)
+  \item 8-point scalability sweep (length 64--8192) for both GPU and FPGA
+  \item CU scaling analysis (1/2/3 compute units, 4 datasets)
+  \item Measured power: FPGA 26\,W (xbutil), GPU 46--70\,W (nvidia-smi), CPU 90\,W (TDP)
+  \item Fused CONV+PPV kernel achieving 0 DSP and 68\% BRAM reduction
+  \item HYDRA \texttt{ap\_fixed<32,16>} kernel validated on hardware (45--70$\times$ over CPU)
+\end{itemize}
+
+The paper is now a \textbf{three-algorithm, two-platform comparison} with honest
+GPU numbers, scalability analysis, and design insight --- substantially stronger
+than the rejected submission.
+
+%% ============================================================
+\section{Reviewer Complaints $\rightarrow$ New Evidence}
+%% ============================================================
+
+\begin{table}[H]
+\centering
+\caption{Mapping reviewer complaints to new experimental evidence.}
+\label{tab:complaints}
+\small
+\begin{tabularx}{\textwidth}{p{0.22\textwidth} p{0.38\textwidth} p{0.32\textwidth}}
+\toprule
+\textbf{Complaint} & \textbf{New Evidence} & \textbf{Key Numbers} \\
+\midrule
+
+\textbf{1. No GPU baseline} &
+Tesla T4 comparison for MiniRocket (3 datasets) and HYDRA (3 datasets).
+Both batch=256 and batch=1 measured.
+Power recorded via \texttt{nvidia-smi}. &
+GPU wins batched: 1.5--6.1$\times$ (MiniRocket), 2.2--2.8$\times$ (HYDRA).
+FPGA wins batch=1: 4.2--7.5$\times$ lower latency. \\
+\addlinespace
+
+\textbf{2. Python-only CPU} &
+C++ \texttt{-O3} single-threaded baselines for MiniRocket on all 3 benchmark datasets.
+Per-sample latency with P50/P95/P99 statistics. &
+C++ throughput: 48--289~\infs{}.
+FPGA speedup over C++: 8.5--58.7$\times$ (3\,CU). \\
+\addlinespace
+
+\textbf{3. Limited scalability} &
+8-point sweep (64--8192) for both GPU and FPGA.
+CU scaling: 1/2/3 CU on 4 datasets.
+GPU advantage shrinks dramatically with series length. &
+GPU/FPGA ratio drops 65$\times \rightarrow$ 3.8$\times$ as length grows 64$\rightarrow$8192.
+At batch=1, FPGA matches GPU at all lengths. \\
+\addlinespace
+
+\textbf{4. Novelty questioned} &
+Fused CONV+PPV kernel eliminates intermediate array, achieves 0~DSP via ternary weight exploitation.
+Three algorithms (MiniRocket + HYDRA + MultiRocket) on one FPGA platform. &
+0~DSP (vs.\ 724 separate), BRAM $-68\%$.
+Throughput gain: 6.6--10.9$\times$ from fusion alone. \\
+\addlinespace
+
+\textbf{5. Missing power data} &
+Measured: FPGA 26\,W (\texttt{xbutil}), GPU 46--70\,W (\texttt{nvidia-smi}), CPU 90\,W (TDP).
+Energy-per-inference computed for all configurations. &
+FPGA energy: 5.2--35.0~mJ/inf.
+GPU energy: 1.8--21.1~mJ/inf.
+FPGA wins at long series: 9.2 vs.\ 15.7~mJ/inf (MosquitoSound). \\
+
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Honesty note.}
+We do not claim FPGA beats GPU on batched throughput --- it does not.
+At batch=256, GPU T4 is 1.5--6.1$\times$ faster for MiniRocket.
+Both platforms are PCIe-attached and host-dispatched; neither operates in a true streaming mode in this evaluation.
+The FPGA advantage at batch=1 is real but partly reflects PyTorch dispatch overhead on the GPU side.
+We lead with \emph{design insights} and \emph{deployment tradeoffs}, not raw speedup claims.
+
+%% ============================================================
+\section{Key Results}
+%% ============================================================
+
+The following tables contain hardware-validated data from the Alveo U280 and
+Tesla T4 GPU. All FPGA numbers are from actual \texttt{.xclbin} execution,
+not simulation.
+
+\subsection{GPU vs.\ FPGA Throughput (MiniRocket)}
+
+\begin{table}[H]
+\centering
+\caption{GPU (Tesla T4) vs.\ FPGA (Alveo U280) throughput and energy comparison
+for MiniRocket feature extraction. FPGA design uses $<$5\% LUT, 0 DSP.}
+\label{tab:gpu_comparison}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{GPU T4} & \textbf{FPGA 3CU} & \textbf{Ratio} & \textbf{Energy Ratio} \\
+ & & (inf/s) & (inf/s) & (GPU/FPGA) & (GPU/FPGA) \\
+\midrule
+InsectSound   & 600  & 30{,}469 & 5{,}012 & 6.1$\times$ & 2.9$\times$ \\
+MosquitoSound & 3750 & 4{,}198  & 2{,}820 & 1.5$\times$ & 1.7$\times$ \\
+FruitFlies    & 5000 & 3{,}227  & 2{,}191 & 1.5$\times$ & 1.8$\times$ \\
+\midrule
+\multicolumn{2}{l}{\textbf{Power (under load)}} & \textbf{54--68\,W} & \textbf{26\,W} & & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+
+\begin{minipage}{\textwidth}
+\footnotesize
+Energy ratio = (GPU mJ/inf) / (FPGA mJ/inf). Values $>$1 favor FPGA.
+FPGA power is static-dominated ($<$5\% utilization); GPU power scales with load.
+\end{minipage}
+\end{table}
+
+\subsection{Single-Sample Latency}
+
+\begin{table}[H]
+\centering
+\caption{Single-sample inference latency: GPU vs.\ FPGA. Both platforms use
+PCIe-attached host dispatch. The FPGA's lower per-invocation overhead (PCIe
+DMA vs.\ CUDA runtime) yields 4--8$\times$ lower latency for MiniRocket.
+Optimized GPU implementations (fused CUDA kernels, CUDA graphs) could
+reduce this gap; results reflect standard PyTorch + cuDNN.}
+\label{tab:batch1_latency}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{GPU P50} & \textbf{FPGA 3CU} & \textbf{Latency} & \textbf{Throughput} \\
+ & & (ms) & (ms) & \textbf{Ratio} & \textbf{Ratio} \\
+\midrule
+\multicolumn{6}{l}{\textit{Single-sample (batch\,=\,1)}} \\
+InsectSound   & 600   & 1.503 & 0.200 & 7.5$\times$ & 8.2$\times$ \\
+MosquitoSound & 3{,}750 & 2.374 & 0.355 & 6.7$\times$ & 6.9$\times$ \\
+FruitFlies    & 5{,}000 & 1.911 & 0.456 & 4.2$\times$ & 4.4$\times$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Batched (batch\,=\,256)}} \\
+InsectSound   & 600   & 0.037 & 0.200 & 0.18$\times$ & 0.18$\times$ \\
+MosquitoSound & 3{,}750 & 0.233 & 0.355 & 0.66$\times$ & 0.66$\times$ \\
+FruitFlies    & 5{,}000 & 0.306 & 0.456 & 0.67$\times$ & 0.67$\times$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+
+\begin{minipage}{\textwidth}
+\footnotesize
+GPU P50 = median over 200 inferences with \texttt{torch.cuda.synchronize()}.
+FPGA latency includes PCIe round-trip and all 3 pipeline stages (K1+K2+K3).
+Latency ratio $>$1 favors FPGA.
+\textbf{Note:} The FPGA always processes one sample per kernel invocation ---
+there is no batched dispatch mode. The FPGA column is identical in both
+sections; what changes is the GPU operating point. At batch=256, the GPU
+amortizes CUDA launch overhead across 256 samples, reducing per-sample
+latency below the FPGA's fixed per-invocation cost. At batch=1, both
+platforms pay per-sample dispatch overhead, and the FPGA's lighter
+PCIe DMA path wins.
+\end{minipage}
+\end{table}
+
+\subsection{Scalability: GPU Advantage Shrinks with Series Length}
+
+\begin{table}[H]
+\centering
+\caption{MiniRocket throughput scaling with time series length.
+GPU advantage (batch\,=\,256) shrinks from 65$\times$ to 3.8$\times$ as
+length increases from 64 to 8{,}192. At batch\,=\,1, the FPGA matches
+or exceeds GPU throughput at all lengths. FPGA length is a runtime
+parameter --- no rebuild required.}
+\label{tab:scalability}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{r r r r r r r}
+\toprule
+\textbf{Length} & \textbf{GPU b256} & \textbf{GPU b1} & \textbf{FPGA 1CU} & \textbf{GPU/FPGA} & \textbf{b1/FPGA} & \textbf{Dilations} \\
+ & (inf/s) & (inf/s) & (inf/s) & (b256) & & \\
+\midrule
+64      & 174{,}912 & 1{,}204 & 2{,}681 & 65$\times$   & 0.45$\times$ & 3 \\
+128     & 115{,}308 & 1{,}091 & 2{,}458 & 47$\times$   & 0.44$\times$ & 4 \\
+256     & 65{,}826  & 950     & 2{,}512 & 26$\times$   & 0.38$\times$ & 5 \\
+512     & 33{,}826  & 798     & 2{,}204 & 15$\times$   & 0.36$\times$ & 6 \\
+1{,}024 & 20{,}178  & 692     & 1{,}745 & 12$\times$   & 0.40$\times$ & 7 \\
+2{,}048 & 9{,}331   & 661     & 1{,}303 & 7.2$\times$  & 0.51$\times$ & 8 \\
+4{,}096 & 4{,}249   & 606     & 794     & 5.4$\times$  & 0.76$\times$ & 9 \\
+8{,}192 & 1{,}919   & 539     & 511     & 3.8$\times$  & 1.05$\times$ & 10 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{0.3em}
+
+\begin{minipage}{\textwidth}
+\footnotesize
+GPU/FPGA $>$1 favors GPU; b1/FPGA $<$1 favors FPGA.
+FPGA throughput scales as $O(1/n)$ with length (fused CONV\_LOOP at II\,=\,1).
+At batch=1, GPU is launch-overhead dominated ($\sim$1\,ms fixed cost)
+while FPGA latency is purely compute-proportional.
+\end{minipage}
+\end{table}
+
+\subsection{HYDRA: GPU Advantage Much Smaller}
+
+\begin{table}[H]
+\centering
+\caption{HYDRA inference: GPU (Tesla T4) vs.\ FPGA (Alveo U280, 1 CU).
+HYDRA's 512 learned kernels with arbitrary float weights reduce the GPU's
+batched-convolution advantage compared to MiniRocket (2--3$\times$ vs.\
+6$\times$ at length 600). Both platforms use PCIe host dispatch.}
+\label{tab:hydra_gpu}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{GPU b256} & \textbf{GPU b1} & \textbf{FPGA 1CU} & \textbf{FPGA/GPU} \\
+ & & (inf/s) & (inf/s) & (inf/s) & (b256 / b1) \\
+\midrule
+InsectSound   & 600   & 13{,}895 & 56  & 6{,}326 & 0.46$\times$ / 113$\times$ \\
+MosquitoSound & 3{,}750 & 5{,}139  & 53  & 1{,}937 & 0.38$\times$ / 36$\times$ \\
+FruitFlies    & 5{,}000 & 4{,}267  & 57  & 1{,}507 & 0.35$\times$ / 26$\times$ \\
+\midrule
+\multicolumn{2}{l}{\textbf{Power (under load)}} & \textbf{54--70\,W} & & \textbf{26\,W} & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+
+\begin{minipage}{\textwidth}
+\footnotesize
+The large batch=1 gap (26--113$\times$) reflects PyTorch dispatch overhead;
+a fused CUDA kernel would reduce this substantially.
+The batched comparison (0.35--0.46$\times$) is more representative of sustained throughput.
+Energy at batch=256: GPU 3.9--16.4\,mJ/inf vs FPGA 4.1--17.2\,mJ/inf (near parity).
+\end{minipage}
+\end{table}
+
+\subsection{CU Scaling Efficiency}
+
+\begin{table}[H]
+\centering
+\caption{MiniRocket CU scaling with fused CONV+PPV kernel. 2-CU runs at 300 MHz (timing met), 3-CU at 269 MHz (timing failed, auto-throttled). Scaling efficiency ranges from 75--88\% for 2 CU and 59--94\% for 3 CU.}
+\label{tab:cu_scaling}
+\begin{tabular}{l r r r r r}
+\toprule
+Dataset & 1 CU & 2 CU & 3 CU & 2/1 Scaling & 3/1 Scaling \\
+\midrule
+GunPoint & 3{,}797 & 5{,}999 & 9{,}585 & 1.58$\times$ & 2.52$\times$ \\
+InsectSound & 1{,}967 & 3{,}191 & 5{,}012 & 1.62$\times$ & 2.55$\times$ \\
+MosquitoSound & 937 & 1{,}497 & 2{,}820 & 1.60$\times$ & 3.01$\times$ \\
+FruitFlies & 742 & 1{,}121 & 2{,}191 & 1.51$\times$ & 2.95$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Fused Kernel Impact}
+
+\begin{table}[H]
+\centering
+\caption{Impact of fused CONV+PPV kernel on MiniRocket (1 CU, 300 MHz). Fusion eliminates the intermediate \texttt{convolutions[16][8192]} array, achieving 0 DSP by exploiting ternary weights, and uses dynamic loop bounds that scale with time series length.}
+\label{tab:fused}
+\begin{tabular}{l r r r}
+\toprule
+& Separate & Fused & Improvement \\
+\midrule
+\multicolumn{4}{l}{\textit{Throughput (inferences/sec)}} \\
+\quad GunPoint & 508 & 3{,}797 & 7.5$\times$ \\
+\quad InsectSound & 296 & 1{,}967 & 6.6$\times$ \\
+\quad MosquitoSound & 88 & 937 & 10.6$\times$ \\
+\quad FruitFlies & 68 & 742 & 10.9$\times$ \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Resource Utilization (HLS synthesis)}} \\
+\quad LUTs & 48{,}812 & 57{,}090 & +17\% \\
+\quad FFs & 88{,}492 & 94{,}283 & +7\% \\
+\quad BRAM (18K) & 576 & 185 & -68\% \\
+\quad DSP48E2 & 724 & 0 & -100\% \\
+\addlinespace
+\quad Intermediate array & $16 \times 8192$ floats & Eliminated & $-$100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Energy Efficiency}
+
+\begin{table}[H]
+\centering
+\caption{Energy Efficiency: MiniRocket Fused Kernel --- CPU vs.\ GPU vs.\ FPGA}
+\label{tab:power}
+\small
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Dataset} & \textbf{Platform} & \textbf{Throughput} & \textbf{Power} & \textbf{Energy} & \textbf{Eff.} \\
+ & & (inf/s) & (W) & (mJ/inf) & \textbf{Ratio} \\
+\midrule
+InsectSound & CPU C++ (-O3) & 289 & 90\textsuperscript{a} & 311.4 & 1$\times$ \\
+(length 600) & GPU T4 (PyTorch) & 30{,}469 & 54\textsuperscript{b} & 1.8 & 176$\times$ \\
+ & FPGA 1-CU & 1{,}967 & 26\textsuperscript{c} & 13.2 & 24$\times$ \\
+ & FPGA 3-CU & 5{,}012 & 26 & 5.2 & 60$\times$ \\
+\midrule
+MosquitoSound & CPU C++ (-O3) & 48 & 90 & 1{,}875.0 & 1$\times$ \\
+(length 3750) & GPU T4 (PyTorch) & 4{,}198 & 66 & 15.7 & 119$\times$ \\
+ & FPGA 1-CU & 937 & 26 & 27.7 & 68$\times$ \\
+ & FPGA 3-CU & 2{,}820 & 26 & 9.2 & 204$\times$ \\
+\midrule
+FruitFlies & CPU C++ (-O3) & 258 & 90 & 348.8 & 1$\times$ \\
+(length 5000) & GPU T4 (PyTorch) & 3{,}227 & 68 & 21.1 & 17$\times$ \\
+ & FPGA 1-CU & 742 & 26 & 35.0 & 10$\times$ \\
+ & FPGA 3-CU & 2{,}191 & 26 & 11.9 & 29$\times$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+
+\begin{minipage}{\textwidth}
+\footnotesize
+\textsuperscript{a}TDP upper bound (single socket); actual load power likely lower.
+Measured CPU power requires reading Intel RAPL counters via
+\texttt{/sys/class/powercap/intel-rapl/}, which needs root privileges
+(\texttt{sudo}) that are unavailable on our shared server. If sudo access
+can be arranged before submission, we can replace TDP with measured
+load power.
+\textsuperscript{b}Measured via \texttt{nvidia-smi} during inference.
+\textsuperscript{c}Measured via \texttt{xbutil examine}; static-dominated at $<$5\% utilization.
+\end{minipage}
+\end{table}
+
+
+%% ============================================================
+\section{Revised Paper Narrative}
+%% ============================================================
+
+The paper should make four core arguments:
+
+\begin{enumerate}[leftmargin=*]
+
+\item \textbf{Algorithm--hardware co-design insight.}
+MiniRocket's fixed ternary weights $\{-1, +2\}$ eliminate all DSP blocks
+when exploited at the HLS level. Fusing convolution and pooling into a single
+pass removes the intermediate \texttt{convolutions[16][8192]} array, cutting
+BRAM by 68\% and delivering 6.6--10.9$\times$ throughput improvement.
+The entire MiniRocket fused kernel uses \textbf{0~DSP} and \textbf{$<$5\% LUT}
+on a U280 --- the FPGA is $>$95\% unutilized.
+This is not a brute-force acceleration; it is a case study in matching
+algorithm structure to hardware primitives.
+
+\item \textbf{Batch-size--dependent tradeoff.}
+GPU wins at batch$\geq$32 (amortized kernel launch, SIMT parallelism).
+FPGA wins at batch=1 with \textbf{4.2--7.5$\times$ lower latency} because
+there is no framework dispatch overhead and the pipeline is always warm.
+This is the honest picture: the ``right'' accelerator depends on the
+deployment scenario (batched analytics vs.\ real-time per-sample inference).
+
+\item \textbf{Scalability favors FPGA as series grow.}
+GPU's batched advantage shrinks from 65$\times$ (length~64) to 3.8$\times$ (length~8192).
+At batch=1, FPGA matches or exceeds GPU at \emph{every} length tested.
+For long time series (e.g., audio at 16\,kHz), the FPGA becomes increasingly competitive
+even in batched mode, while consuming 2--3$\times$ less power.
+
+\item \textbf{Three algorithms, one platform.}
+MiniRocket, HYDRA, and MultiRocket share the Alveo U280 with different
+kernel architectures (ternary fixed-weight vs.\ learned-weight convolution,
+PPV vs.\ max+mean pooling). HYDRA's GPU advantage is only 2.2--2.8$\times$
+(vs.\ 1.5--6.1$\times$ for MiniRocket) because 512 arbitrary-weight kernels
+stress GPU caches differently. This multi-algorithm comparison on a single
+platform is novel in the FPGA time series literature.
+
+\end{enumerate}
+
+%% ============================================================
+\section{What We Can Still Add Before Submission}
+%% ============================================================
+
+\begin{table}[H]
+\centering
+\caption{Potential additions ranked by impact and effort.}
+\label{tab:additions}
+\small
+\footnotesize
+\begin{tabularx}{\textwidth}{Xlll}
+\toprule
+\textbf{Item} & \textbf{Impact} & \textbf{Effort} & \textbf{Status} \\
+\midrule
+MultiRocket full benchmarks (3 datasets) & High & 1--2 weeks & In progress \\
+MultiRocket GPU baseline & High & 3 hours & Blocked \\
+Roofline model (analytical) & Medium & 2--3 hours & Not started \\
+Real UCR data on GPU (not synthetic) & Medium & 1--2 hours & Not started \\
+Measured CPU power (RAPL) & Low & Needs sudo & Blocked \\
+Literature survey of FPGA TSC papers & Medium & 4--6 hours & Not started \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Recommendation.}
+\textbf{Priority 1} (before submission): Complete MultiRocket benchmarks and GPU baselines
+to deliver a true three-algorithm story. Without MultiRocket hardware numbers on all
+3~benchmark datasets, the ``three algorithms on one platform'' claim is weakened.
+\textbf{Priority 2}: Add a roofline model (purely analytical, no experiments) to
+quantify how far each kernel is from the compute/memory bound.
+\textbf{Priority 3}: Run GPU baselines on real UCR test sets instead of synthetic data,
+eliminating a potential reviewer concern about data representativeness.
+
+%% ============================================================
+\section{Recommended Venue and Timeline}
+%% ============================================================
+
+\begin{table}[H]
+\centering
+\caption{Venue options with open deadlines (as of April 3, 2026).}
+\label{tab:venues}
+\small
+\begin{tabular}{lllcl}
+\toprule
+\textbf{Venue} & \textbf{Deadline} & \textbf{Notification} & \textbf{Pages} & \textbf{Fit} \\
+\midrule
+\done{FPT 2026 Journal Track (TRETS)} & \textbf{May 1, 2026} & Aug 14, 2026 & 22 & Excellent \\
+FPT 2026 Conference Track & Jun 12, 2026 & Aug 14, 2026 & $\sim$8 & Excellent \\
+DATE 2027 & $\sim$Sep 2026 & $\sim$Nov 2026 & 6 & Good \\
+ICCAD 2026 & Apr 14, 2026 & Jul 11, 2026 & 8 & Moderate \\
+TRETS (rolling) & Anytime & 4--8 months & 22 & Excellent \\
+ReConFig 2026 & $\sim$Aug 2026 & TBD & TBD & Good \\
+FCCM 2027 & $\sim$Jan 2027 & $\sim$Mar 2027 & 8 & Excellent \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Primary Recommendation: FPT 2026 Journal Track via TRETS}
+
+\textbf{Deadline: May 1, 2026} (28 days from today). Submit to ACM TRETS under
+the FPT~2026 Journal Track. Accepted papers are published as full journal articles
+in TRETS (the premier FPGA journal) and presented at FPT~2026 in Honolulu
+(December 7--10, 2026). The 22-page limit accommodates all three algorithms,
+the full scalability sweep, GPU comparison, and design methodology discussion
+without space pressure.
+
+\textbf{Why FPT/TRETS:} (1)~FPGA-focused community that values design methodology
+and honest evaluation over raw speedup claims; (2)~journal publication carries
+more weight than conference proceedings; (3)~22~pages lets us tell the complete
+story; (4)~presentation at a prestigious venue.
+
+\subsection{Fallback: FPT 2026 Conference Track}
+
+If May~1 is too tight, the regular conference track (deadline June~12) gives
+6 more weeks. The tradeoff: $\sim$8-page conference paper in IEEE Xplore
+instead of a TRETS journal article. Still an excellent venue.
+
+\subsection{Long-term: DATE 2027 or FCCM 2027}
+
+If FPT does not work out, DATE~2027 ($\sim$September deadline, 6~pages)
+and FCCM~2027 ($\sim$January 2027, 8~pages) are strong options.
+FCCM is the most natural venue for this work but requires waiting
+until January.
+
+\subsection{Suggested Timeline}
+
+\begin{table}[H]
+\centering
+\caption{Suggested timeline for FPT Journal Track submission (May 1, 2026).}
+\label{tab:timeline}
+\small
+\begin{tabular}{@{}l p{0.72\textwidth}@{}}
+\toprule
+\textbf{Date} & \textbf{Milestone} \\
+\midrule
+Apr 3--7 & Complete MultiRocket model retraining; run GPU baselines on real data \\
+Apr 7--10 & Finalize all LaTeX tables; run MultiRocket FPGA benchmarks \\
+Apr 10--14 & Philip drafts/revises paper narrative; Rishi provides roofline model \\
+Apr 14--21 & Internal review; address gaps; polish figures \\
+Apr 21--28 & Final revisions; co-author review \\
+Apr 29--May 1 & Format check; submit to TRETS/FPT \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

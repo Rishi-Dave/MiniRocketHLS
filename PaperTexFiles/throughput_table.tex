@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\caption{Throughput (inferences/sec) and classification accuracy (\%). Baseline = single-threaded C++ \texttt{-O3 -march=native} on the same kernel source compiled natively (HLS pragmas no-op); Speedup = FPGA 3CU / C++ baseline.}
+\label{tab:throughput}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l l r r r r r r r}
+\toprule
+Algorithm & Dataset & Len & C++ Base & FPGA 1CU & FPGA 3CU & Speedup & Ref Acc & FPGA Acc \\
+\midrule
+MiniRocket & InsectSound & 600 & 289 & 1,967 & 5,012 & 17.3$\times$ & 78.84 & 74.12 \\
+MiniRocket & MosquitoSound & 3,750 & 48 & 937 & 2,820 & 58.7$\times$ & 87.59 & 87.88 \\
+MiniRocket & FruitFlies & 5,000 & 258 & 742 & 2,191 & 8.5$\times$ & 96.98 & 95.82 \\
+\addlinespace
+HYDRA & InsectSound & 600 & 1,372 & 6,326 & 10,573 & 7.7$\times$ & 69.41 & 69.41 \\
+HYDRA & MosquitoSound & 3,750 & 326 & 1,937 & 3,516 & 10.8$\times$ & 70.05 & 70.05 \\
+HYDRA & FruitFlies & 5,000 & 245 & 1,507 & 2,972 & 12.1$\times$ & 87.61 & 87.61 \\
+\bottomrule
+\end{tabular}}
+\vspace{1mm}
+
+{\footnotesize Ref Acc = full-precision (float64) reference accuracy on the full test set. MiniRocket FPGA accuracy differences ($\leq$5\%) arise from float64$\to$float32 model export; HYDRA matches exactly.}
+\end{table}

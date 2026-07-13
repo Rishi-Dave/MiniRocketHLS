@@ -1,0 +1,4 @@
+runs/
+from_prith/
+*.pyc
+__pycache__/

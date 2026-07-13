@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{HYDRA FPGA design comparison: monolithic kernel vs.\ 3-kernel dataflow pipeline (on-chip AXI-Stream). Both use ap\_fixed$\langle$32,16$\rangle$, UNROLL=16, 1\,CU on Alveo U280.}
+\label{tab:hydra_comparison}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l r r r r r r}
+\toprule
+ & \multicolumn{3}{c}{Monolithic (v2\_fixed)} & \multicolumn{3}{c}{Dataflow (3-kernel)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Dataset & Acc (\%) & Lat (ms) & Tput (inf/s) & Acc (\%) & Lat (ms) & Tput (inf/s) \\
+\midrule
+InsectSound  & 69.41 & 0.158 & 6,326 & 69.41 & 5.19 & 193$^{*}$ \\
+MosquitoSound & 70.05 & 0.516 & 1,937 & 70.05 & 32.1 &  31$^{*}$ \\
+FruitFlies   & 87.61 & 0.663 & 1,507 & 87.61 & 42.7 &  23$^{*}$ \\
+\bottomrule
+\end{tabular}}
+\vspace{1mm}
+
+{\footnotesize $^{*}$Streaming throughput limited by per-sample OpenCL dispatch, not kernel compute. Both variants match the Python reference exactly ($\Delta$=0.00\%).}
+\end{table}

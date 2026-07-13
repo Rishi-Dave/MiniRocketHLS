@@ -99,6 +99,30 @@ $(BUILD_DIR)/krnl.xclbin: $(BINARY_CONTAINER_hydra_OBJS)
 
 xclbin: build
 
+# Multi-CU builds (reuse existing hydra_inference.xo)
+BUILD_DIR_2CU := ./build_dir.hw.v2_fixed_2cu
+BUILD_DIR_3CU := ./build_dir.hw.v2_fixed_3cu
+
+build-2cu: check-vitis check-xrt $(BINARY_CONTAINER_hydra_OBJS)
+	mkdir -p $(BUILD_DIR_2CU)
+	v++ -l $(VPP_FLAGS) --temp_dir $(BUILD_DIR_2CU)/_x --config ./config_2cu.cfg \
+		-o $(BUILD_DIR_2CU)/krnl.xclbin $(BINARY_CONTAINER_hydra_OBJS)
+
+build-3cu: check-vitis check-xrt $(BINARY_CONTAINER_hydra_OBJS)
+	mkdir -p $(BUILD_DIR_3CU)
+	v++ -l $(VPP_FLAGS) --temp_dir $(BUILD_DIR_3CU)/_x --config ./config_3cu.cfg \
+		-o $(BUILD_DIR_3CU)/krnl.xclbin $(BINARY_CONTAINER_hydra_OBJS)
+
+# Multi-CU host applications
+HOST_SRCS_2CU := host/src/hydra_host_2cu.cpp host/src/hydra_loader_v2.cpp host/src/npy_loader.cpp host/src/hydra_utils.cpp
+HOST_SRCS_3CU := host/src/hydra_host_3cu.cpp host/src/hydra_loader_v2.cpp host/src/npy_loader.cpp host/src/hydra_utils.cpp
+
+host-2cu: check-xrt $(HOST_SRCS_2CU)
+	g++ $(CXXFLAGS) $(HOST_SRCS_2CU) $(LDFLAGS) -o ./host/hydra_host_2cu
+
+host-3cu: check-xrt $(HOST_SRCS_3CU)
+	g++ $(CXXFLAGS) $(HOST_SRCS_3CU) $(LDFLAGS) -o ./host/hydra_host_3cu
+
 # Run on hardware/emulation
 run:
 	@echo "========================================="

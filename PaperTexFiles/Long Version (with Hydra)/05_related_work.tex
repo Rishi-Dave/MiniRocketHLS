@@ -1,0 +1,23 @@
+\section{Related Work}
+\label{sec:Related}
+
+\subsection{Time Series Classification}
+\label{sec:TSC}
+
+Research in time series classification has been supported by three public time series archives hosted at the University of California, Riverside \cite{UCRTimeSeries}, the University of East Anglia \cite{UEATimeSeries}, and Monash University \cite{MONSTER}. %One concern about ongoing research in time series classification is that the relatively small size of existing datasets hampers the ability to investigate deep learning models \cite{MONSTER}. %\textbf{Mention InceptionTime as a possible exception?}
+Two ``bake-offs,'' published in 2017 and 2024 \cite{BakeOff, BakeOffRedux, BakeOffReduxCorrection}, compared state-of-the-art time series classifiers on the most advanced datasets of the day in order to identify the most competitive; the 2024 bake-off identified two classifers as best-in-class: a combined \textbf{MultiRocket+Hydra} classifier, and the \textbf{Hierarchical Vote Collective of Transformation Ensembles version 2.0 (HIVE-COTE 2.0)} \cite{HIVE-COTE2.0}, an ensemble of four classifiers, one of which, the \textbf{Arsenal}, is an ensemble of Rocket classifiers; we plan to investigate FPGA acceleration of HIVE-COTE 2.0 in the future, using this work to inform our implementation of the Arsenal. Several public archives contain open-source implementations of the classifiers evaluated in the bake-offs \cite{sktime, pyts, tslearn, aeon-arxiv, aeon-pkdd}. %including Rocket, MiniRocket, MultiRocket, and Hydra. 
+
+%As interest in time series classification grew, a need for larger-scale empirical comparisons across competing methods emerged; two large-scale ``Bake-offs'' published in 2017 \cite{BakeOff} and 2024 \cite{BakeOffRedux, BakeOffReduxCorrection}, respectively, attempted to characterize the state-of-the-art in the field at their respective times. 
+
+%We \textit{do not} claim that MiniRocket is the ``best'' time series classification algorithm by any measure. The methods that have historically reported the best classification accuracy tend to be ensembles of other classifiers \cite{HIVE-COTE, TS-CHIEF, HIVE-COTE2.0}, which may include random-based convolution methods in the same general category as MiniRocket \textbf{and others... cite section}. FPGA acceleration for many (if not all) time series classifiers that are competitive with the state-of-the-art would be a worthy endeavor; this paper represents one step in this direction. 
+
+\subsection{FPGA-accelerated Time Series Computation}
+\label{sec:fpga_time_series}
+
+To the best of our knowledge, this is the first work to investigate hardware acceleration for any of the time series classifiers evaluated in the 2017 or 2024 bake-offs. FPGAs have been used to accelerate time series data processing kernels which are themselves subroutines of competitive time series classifiers. For example data correlation \cite{ChiosaAMNES} and shapelet \cite{CostaShapelet, LiuShapelet} accelerators could be used by two of the HIVE-COTE 2.0 classifiers: the \textbf{Diverse Representation Canonical Interval Forest} and the \textbf{Shapelet Transform Classifier}, respectively. 
+
+FPGA accelerators for the \textbf{Dynamic Time Warping (DTW)} distance measure \cite{SartDTW, WangDTW}, the \textbf{Matrix Profile (MP)} self-similarity representation \cite{RomeroMP, KalantarLAMP}, and power spectra computation  \cite{SpectralAnomalyDetection} inform this work; however none of the competitive classifiers included in the bake-offs utilize these approaches. 
+
+Eciton \cite{Eciton} is an FPGA-based time series classifier using a \textbf{Long Short Term Memory (LSTM)} neural network; Eciton was not evaluated on the same datasets as either bake-off. The 2024 bake-off did not consider LSTMs, but did consider several CNNs \cite{InceptionTime, H-InceptionTime, LiteTime}, and identified \textbf{H-InceptionTime}  \cite{H-InceptionTime} as best-in-class among those approaches, although HIVE-COTE 2.0 and MultiRocket+Hydra outperformed it. If deep learning approaches become more competitive, we plan to investigate FPGA acceleration of them as well.
+
+% We may investigate FPGA-based acceleration for deep learning approaches to time series classification, but only if and when they become competitive with the state-of-the-art. 

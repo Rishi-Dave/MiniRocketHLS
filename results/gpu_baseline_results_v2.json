@@ -1,0 +1,87 @@
+{
+  "metadata": {
+    "gpu": "Tesla T4",
+    "gpu_memory_gb": 15.6,
+    "pytorch_version": "2.10.0+cu128",
+    "platform": "Google Colab",
+    "data_type": "synthetic (matching real dataset dimensions)",
+    "date": "2026-04-02",
+    "note": "v2 includes batch=1 latency benchmarks"
+  },
+  "InsectSound": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 27302.6,
+      "mean_latency_ms": 0.037,
+      "gpu_power_w": 45.7
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 609.3,
+      "mean_latency_ms": 1.641,
+      "p50_latency_ms": 1.503,
+      "p95_latency_ms": 2.453
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 729.3,
+      "mean_latency_ms": 1.371
+    },
+    "time_series_length": 600,
+    "num_samples": 1000
+  },
+  "MosquitoSound": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 4289.4,
+      "mean_latency_ms": 0.233,
+      "gpu_power_w": 69.3
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 410.1,
+      "mean_latency_ms": 2.438,
+      "p50_latency_ms": 2.374,
+      "p95_latency_ms": 2.958
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 37.7,
+      "mean_latency_ms": 26.491
+    },
+    "time_series_length": 3750,
+    "num_samples": 1000
+  },
+  "FruitFlies": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 3271.3,
+      "mean_latency_ms": 0.306,
+      "gpu_power_w": 68.4
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 497.5,
+      "mean_latency_ms": 2.010,
+      "p50_latency_ms": 1.911,
+      "p95_latency_ms": 3.218
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 27.6,
+      "mean_latency_ms": 36.214
+    },
+    "time_series_length": 5000,
+    "num_samples": 1000
+  },
+  "GunPoint_synthetic": {
+    "gpu_batch256": {
+      "throughput_inf_per_s": 64535.7,
+      "mean_latency_ms": 0.015,
+      "gpu_power_w": 35.5
+    },
+    "gpu_batch1": {
+      "throughput_inf_per_s": 825.5,
+      "mean_latency_ms": 1.211,
+      "p50_latency_ms": 1.161,
+      "p95_latency_ms": 1.407
+    },
+    "cpu_pytorch": {
+      "throughput_inf_per_s": 4826.8,
+      "mean_latency_ms": 0.207
+    },
+    "time_series_length": 150,
+    "num_samples": 150
+  }
+}

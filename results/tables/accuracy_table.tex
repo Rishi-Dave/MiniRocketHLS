@@ -1,15 +1,23 @@
 \begin{table}[t]
 \centering
-\caption{MiniRocket classification accuracy (\%) across platforms. C++ and FPGA use identical exported model weights, achieving bit-exact predictions. Python (aeon) trains with \texttt{float64} precision, causing minor accuracy differences from the \texttt{float32} exported model.}
+\caption{Classification accuracy (\%) across platforms for MiniRocket and HYDRA. C++ and FPGA use identical exported model weights, achieving bit-exact predictions. Python trains with \texttt{float64} precision, causing minor differences from the \texttt{float32}/ap\_fixed exported models.}
 \label{tab:accuracy}
-\begin{tabular}{l r r r r r r r}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l l r r r r r}
 \toprule
-Dataset & TS Len & Samples & Python (aeon) & C++ {\texttt{-O3}} & FPGA 1CU & FPGA 2CU & FPGA 3CU \\
+Algorithm & Dataset & TS Len & Samples & Python & C++/CPU & FPGA \\
 \midrule
-GunPoint & 150 & 60 & -- & -- & 98.33 & 98.33 & 98.33 \\
-InsectSound & 600 & 25,000 & 78.84 & 74.12 & 74.12 & 74.12 & 74.12 \\
-MosquitoSound & 3,750 & 139,786 & 87.59 & 87.87 & 87.88 & 87.88 & 87.88 \\
-FruitFlies & 5,000 & 17,259 & 96.98 & 95.83 & 95.82 & 95.82 & 95.82 \\
+MiniRocket & GunPoint & 150 & 60 & -- & -- & 98.33 \\
+MiniRocket & InsectSound & 600 & 25,000 & 78.84 & 74.12 & 74.12 \\
+MiniRocket & MosquitoSound & 3,750 & 139,786 & 87.59 & 87.87 & 87.88 \\
+MiniRocket & FruitFlies & 5,000 & 17,259 & 96.98 & 95.83 & 95.82 \\
+\addlinespace
+HYDRA & InsectSound & 600 & 25,000 & 69.41 & 69.41$^{\dagger}$ & 69.41 \\
+HYDRA & MosquitoSound & 3,750 & 139,786 & 70.05 & 70.05$^{\dagger}$ & 70.05 \\
+HYDRA & FruitFlies & 5,000 & 17,259 & 87.61 & 87.61$^{\dagger}$ & 87.61 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
+\vspace{1mm}
+
+{\footnotesize $^{\dagger}$HYDRA CPU baseline is Python (single-threaded), not C++. FPGA accuracy validated by both v2\_fixed (monolithic) and hydra\_stream (3-kernel pipeline) variants ($\Delta$=0.00\% vs Python reference).}
 \end{table}

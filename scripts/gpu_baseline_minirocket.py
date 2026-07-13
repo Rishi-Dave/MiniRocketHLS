@@ -169,6 +169,38 @@ def benchmark_cpu(time_series, num_runs=3):
     }
 
 
+def benchmark_gpu_batch1(time_series, num_warmup=5, num_samples=200, device='cuda'):
+    """Benchmark single-sample (batch=1) GPU latency for real-time comparison with FPGA."""
+    n = min(num_samples, len(time_series))
+
+    # Warmup
+    for i in range(num_warmup):
+        _ = minirocket_gpu_inference(time_series[i:i+1], device)
+    torch.cuda.synchronize()
+
+    latencies = []
+    for i in range(n):
+        torch.cuda.synchronize()
+        t0 = time.perf_counter()
+        _ = minirocket_gpu_inference(time_series[i:i+1], device)
+        torch.cuda.synchronize()
+        t1 = time.perf_counter()
+        latencies.append(t1 - t0)
+
+    latencies_ms = np.array(latencies) * 1000
+    return {
+        'throughput_inf_per_s': 1000.0 / np.mean(latencies_ms),
+        'mean_latency_ms': np.mean(latencies_ms),
+        'p50_latency_ms': np.median(latencies_ms),
+        'p95_latency_ms': np.percentile(latencies_ms, 95),
+        'p99_latency_ms': np.percentile(latencies_ms, 99),
+        'min_latency_ms': np.min(latencies_ms),
+        'max_latency_ms': np.max(latencies_ms),
+        'batch_size': 1,
+        'num_samples': n,
+    }
+
+
 def get_gpu_power():
     """Get current GPU power draw via nvidia-smi."""
     import subprocess
@@ -266,7 +298,14 @@ if __name__ == '__main__':
                 gpu_result['gpu_power_w'] = gpu_power_load
                 print(f"  GPU Power (load): {gpu_power_load:.1f} W")
 
-            results[name] = {'gpu': gpu_result}
+            # Batch=1 latency benchmark
+            gpu_batch1 = benchmark_gpu_batch1(X_bench, device='cuda')
+            print(f"  GPU batch=1: {gpu_batch1['throughput_inf_per_s']:.1f} inf/s, "
+                  f"mean={gpu_batch1['mean_latency_ms']:.3f} ms, "
+                  f"P50={gpu_batch1['p50_latency_ms']:.3f} ms, "
+                  f"P95={gpu_batch1['p95_latency_ms']:.3f} ms")
+
+            results[name] = {'gpu': gpu_result, 'gpu_batch1': gpu_batch1}
 
         cpu_result = benchmark_cpu(X_bench[:min(200, len(X_bench))])
         print(f"  CPU (PyTorch): {cpu_result['throughput_inf_per_s']:.1f} inf/s, "
@@ -281,16 +320,31 @@ if __name__ == '__main__':
     print("\n" + "="*70)
     print("  SUMMARY TABLE")
     print("="*70)
-    print(f"{'Dataset':<20} {'Length':<8} {'GPU inf/s':<12} {'CPU inf/s':<12} {'GPU/CPU':<8} {'GPU Power'}")
-    print("-"*70)
+    print(f"{'Dataset':<20} {'Length':<8} {'GPU b256':<12} {'GPU b1':<12} {'CPU inf/s':<12} {'GPU Power'}")
+    print("-"*74)
 
     for name, data in datasets.items():
         gpu_tp = results[name].get('gpu', {}).get('throughput_inf_per_s', 0)
+        gpu_b1 = results[name].get('gpu_batch1', {}).get('throughput_inf_per_s', 0)
         cpu_tp = results[name].get('cpu_pytorch', {}).get('throughput_inf_per_s', 0)
-        ratio = gpu_tp / cpu_tp if cpu_tp > 0 else 0
         power = results[name].get('gpu', {}).get('gpu_power_w', 'N/A')
         power_str = f"{power:.0f}W" if isinstance(power, float) else power
-        print(f"{name:<20} {data['length']:<8} {gpu_tp:<12.1f} {cpu_tp:<12.1f} {ratio:<8.1f}x {power_str}")
+        print(f"{name:<20} {data['length']:<8} {gpu_tp:<12.1f} {gpu_b1:<12.1f} {cpu_tp:<12.1f} {power_str}")
+
+    # Batch=1 latency comparison with FPGA
+    fpga_latency = {
+        'InsectSound': 0.200, 'MosquitoSound': 0.355, 'FruitFlies': 0.456,  # 3CU
+    }
+    print(f"\n  BATCH=1 LATENCY COMPARISON (real-time inference):")
+    print(f"  {'Dataset':<20} {'GPU b1 P50':<14} {'FPGA 3CU':<14} {'Ratio'}")
+    print(f"  {'-'*56}")
+    for name in ['InsectSound', 'MosquitoSound', 'FruitFlies']:
+        b1 = results.get(name, {}).get('gpu_batch1', {})
+        if b1:
+            gpu_p50 = b1.get('p50_latency_ms', 0)
+            fpga_lat = fpga_latency.get(name, 0)
+            ratio_str = f"{gpu_p50/fpga_lat:.1f}x" if fpga_lat > 0 and gpu_p50 > 0 else "N/A"
+            print(f"  {name:<20} {gpu_p50:<14.3f} {fpga_lat:<14.3f} {ratio_str}")
 
     # Save results
     output_file = 'gpu_baseline_results.json'

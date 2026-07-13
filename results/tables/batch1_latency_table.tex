@@ -1,0 +1,41 @@
+% Batch=1 (single-sample) latency comparison: GPU vs FPGA
+% Both platforms are PCIe-attached, host-dispatched, one sample at a time.
+% GPU: Tesla T4 (Colab), PyTorch F.conv1d, CUDA synchronized per sample
+% FPGA: Alveo U280, fused CONV+PPV, 3 CU at 269 MHz, OpenCL host dispatch
+% Data from Colab run 2026-04-02 + existing FPGA benchmarks
+
+\begin{table}[t]
+\centering
+\caption{Single-sample inference latency: GPU vs.\ FPGA. Both platforms use
+PCIe-attached host dispatch. The FPGA's lower per-invocation overhead (PCIe
+DMA vs.\ CUDA runtime) yields 4--8$\times$ lower latency for MiniRocket.
+Optimized GPU implementations (fused CUDA kernels, CUDA graphs) could
+reduce this gap; results reflect standard PyTorch + cuDNN.}
+\label{tab:batch1_latency}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{GPU P50} & \textbf{FPGA 3CU} & \textbf{Latency} & \textbf{Throughput} \\
+ & & (ms) & (ms) & \textbf{Ratio} & \textbf{Ratio} \\
+\midrule
+\multicolumn{6}{l}{\textit{Single-sample (batch\,=\,1)}} \\
+InsectSound   & 600   & 1.503 & 0.200 & 7.5$\times$ & 8.2$\times$ \\
+MosquitoSound & 3{,}750 & 2.374 & 0.355 & 6.7$\times$ & 6.9$\times$ \\
+FruitFlies    & 5{,}000 & 1.911 & 0.456 & 4.2$\times$ & 4.4$\times$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Batched (batch\,=\,256)}} \\
+InsectSound   & 600   & 0.037 & 0.200 & 0.18$\times$ & 0.18$\times$ \\
+MosquitoSound & 3{,}750 & 0.233 & 0.355 & 0.66$\times$ & 0.66$\times$ \\
+FruitFlies    & 5{,}000 & 0.306 & 0.456 & 0.67$\times$ & 0.67$\times$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+\footnotesize
+GPU P50 = median over 200 inferences with \texttt{torch.cuda.synchronize()}.
+FPGA latency includes PCIe round-trip and all 3 pipeline stages (K1+K2+K3).
+Latency ratio $>$1 favors FPGA. Note that neither platform uses streaming;
+both are host-dispatched via PCIe. The FPGA advantage reflects lower
+per-invocation dispatch overhead, not a fundamentally different execution model.
+At batch=256 the GPU amortizes CUDA launch overhead and achieves lower
+per-sample latency.
+\end{table}

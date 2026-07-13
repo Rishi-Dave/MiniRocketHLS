@@ -1,0 +1,105 @@
+[model] /users/rdave009/InsectSound_minirocket_model.json
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program fused xclbin
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway(.31) + fill 16 slots (batched tweak2)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (model -> HBM; BUILD=1 free-run: one start, wait blocks)
+[8] loader log
+[info] loading model /users/rdave009/InsectSound_minirocket_model.json
+[info] dataset shape: ts_len=600 num_dilations=9 num_features=840 num_classes=10
+[info] opening device 0000:3b:00.1
+[info] registering xclbin /users/rdave009/krnl.xclbin.fused
+[info] opening kernel minirocket_fused_inference:{minirocket_fused_inference_1}
+[hbm ] arg2 coefficients               size=33600      group=2
+[hbm ] arg3 intercept                  size=40         group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=36         group=6
+[hbm ] arg7 num_features_per_dilation  size=36         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+[9] baseline counters
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] fused on pc160, SocketTable->pc161
+[model] /users/rdave009/FruitFlies_minirocket_model.json
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program fused xclbin
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway(.31) + fill 16 slots (batched tweak2)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (model -> HBM; BUILD=1 free-run: one start, wait blocks)
+[8] loader log
+[info] loading model /users/rdave009/FruitFlies_minirocket_model.json
+[info] dataset shape: ts_len=5000 num_dilations=10 num_features=840 num_classes=3
+[info] opening device 0000:3b:00.1
+[info] registering xclbin /users/rdave009/krnl.xclbin.fused
+[info] opening kernel minirocket_fused_inference:{minirocket_fused_inference_1}
+[hbm ] arg2 coefficients               size=10080      group=2
+[hbm ] arg3 intercept                  size=12         group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=40         group=6
+[hbm ] arg7 num_features_per_dilation  size=40         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+[9] baseline counters
+eth_in_packets         11
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] fused on pc160, SocketTable->pc161
+[model] /users/rdave009/MosquitoSound_minirocket_model.json
+[1] kill loader
+[2] reset user partition
+Are you sure you wish to proceed? [Y/n]: Y (Force override)
+Successfully reset Device[0000:3b:00.1]
+[3] program fused xclbin
+INFO: xbutil program succeeded on 0000:3b:00.1
+[4] setup_netlayer -> pc161 (.31)
+  slot15.myPort    = 0
+  slot15.valid     = 0
+[done] netlayer bring-up complete
+[5+6] gateway(.31) + fill 16 slots (batched tweak2)
+  MISMATCH 0xA18: wrote 0x1 got 0x0
+tweak2: 65 writes, 6 mismatch
+[7] start loader LAST (model -> HBM; BUILD=1 free-run: one start, wait blocks)
+[8] loader log
+[info] loading model /users/rdave009/MosquitoSound_minirocket_model.json
+[info] dataset shape: ts_len=3750 num_dilations=9 num_features=840 num_classes=6
+[info] opening device 0000:3b:00.1
+[info] registering xclbin /users/rdave009/krnl.xclbin.fused
+[info] opening kernel minirocket_fused_inference:{minirocket_fused_inference_1}
+[hbm ] arg2 coefficients               size=20160      group=2
+[hbm ] arg3 intercept                  size=24         group=3
+[hbm ] arg4 scaler_mean                size=3360       group=4
+[hbm ] arg5 scaler_scale               size=3360       group=5
+[hbm ] arg6 dilations                  size=36         group=6
+[hbm ] arg7 num_features_per_dilation  size=36         group=7
+[hbm ] arg8 biases                     size=3360       group=8
+[hold] HBM loaded, kernel entering host-side spin (start/wait per packet). SIGKILL to release.
+[9] baseline counters
+eth_in_packets         10
+udp_in_packets         0
+udp_out_packets        0
+app_in_packets         0
+[done] fused on pc160, SocketTable->pc161
