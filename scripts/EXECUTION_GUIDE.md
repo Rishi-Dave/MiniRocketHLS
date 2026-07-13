@@ -33,6 +33,8 @@ bash scripts/run_hydra_v2_benchmarks.sh full
 
 ## Step 2: MultiRocket Model Training (~24-48h background)
 
+**SKIP — MultiRocket dropped 2026-04-08 (invalid results; see multirocket_optimized/README.md)**
+
 **Why:** Only GunPoint and InsectSound models trained. MosquitoSound/FruitFlies missing.
 
 ```bash
@@ -116,6 +118,8 @@ If neither works, use Xeon E5-2640 v3 TDP of **90W** (not 100W) with explicit ca
 ---
 
 ## Step 6: MultiRocket FPGA Rebuild (after Step 2 completes)
+
+**SKIP — MultiRocket dropped 2026-04-08 (invalid results; see multirocket_optimized/README.md)**
 
 **Why:** Current xclbin (Dec 30 2025) predates the Jan 6 2026 fix that added 3 missing pooling ops.
 

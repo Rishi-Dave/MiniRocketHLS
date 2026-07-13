@@ -1,6 +1,14 @@
+> [!CAUTION]
+> **RETRACTED — MultiRocket results in this document are INVALID (dropped 2026-04-08).**
+> The host loader read non-existent JSON fields, so all hardware runs below executed with
+> an all-zero model — the accuracy figures are not real measurements. A corrected host
+> (Round 3) collapsed to 28.6% accuracy (suspected ap_fixed<32,16> overflow; float-based
+> csim masked it). Nothing in this document should be cited. MultiRocket was dropped from
+> the FCCM paper; artifacts are retained for reference only.
+
 # MultiRocket FPGA Implementation
 
-**Status:** ✅ Complete - Hardware Validated
+**Status:** ⛔ DROPPED (2026-04-08) — results invalid, see banner
 **Date:** 2025-12-31
 **Base:** Optimized MiniRocket Implementation
 **FPGA:** Xilinx Alveo U280
