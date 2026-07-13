@@ -1,0 +1,88 @@
+#ifndef HYDRA_AXIS_INFERENCE_HLS_H
+#define HYDRA_AXIS_INFERENCE_HLS_H
+
+/*
+ * HYDRA AXI-Stream variant — v6 "v2_fixed port" (2026-07-10).
+ *
+ * Compute path is the hydra v2_fixed core (git 8b6939a / _x.hw.v2_fixed
+ * cpu_sources/hydra.cpp): batch-parallel BATCH_LOOP(32) →
+ * CONV_POOL_LOOP(II=1) → PARALLEL_KERNELS(16, UNROLL), ap_fixed<32,16>
+ * internal with ap_fixed<48,32> accumulators, fused conv+max/mean pooling.
+ * ~12x the samples/s of the old float core (whose CONV_LOOP was stuck at
+ * II=5).
+ *
+ * I/O path is the minirocket_fused v4/dropfull wrapper (DATAFLOW split):
+ *   ingest  : always-drain AXIS read, DROP-ON-FULL guarded write into an
+ *             internal raw_samples FIFO (never backpressures NetLayer).
+ *   compute : buffer-then-classify — fill an L-sample window (5 duplicate
+ *             BRAM copies for conflict-free 9-tap reads), one inference per
+ *             window, ONE packed output pkt (num_classes float32 logits),
+ *             GUARDED non-blocking emit. Bug-B sideband set explicitly.
+ *
+ * Wire format (unchanged): 512-bit beat, low 4 bytes = one float32 sample.
+ * HBM interface stays float* ("float HBM interface" like v2_fixed); floats
+ * are converted to fx_t once, at parameter-load / window-write time.
+ *
+ * HOST CONTRACT (same as v2_fixed): kernels MUST be sorted by dilation so
+ * all 16 kernels in a batch share one dilation, and the per-feature arrays
+ * (scaler_mean, scaler_scale, coefficients) must be permuted to match the
+ * sorted feature order. saturation_harness/load_hydra_hbm.cpp does this.
+ */
+
+#include "ap_int.h"
+#include "ap_fixed.h"
+#include "hls_stream.h"
+#include "ap_axi_sdata.h"
+#include <stdint.h>
+
+// Interface types — float on the wire and in HBM (host compatibility).
+typedef float data_t;
+typedef int int_t;
+
+// Internal compute types (v2_fixed): 1-cycle ap_fixed accumulation vs
+// 7-cycle float — this is what buys CONV_POOL_LOOP II=1.
+typedef ap_fixed<32, 16> fx_t;
+typedef ap_fixed<48, 32> acc_t;
+
+// HYDRA constants — must match hydra_optimized/hydra/include/hydra.hpp.
+#define MAX_TIME_SERIES_LENGTH 5120
+#define NUM_KERNELS 512
+#define NUM_GROUPS 8
+#define KERNELS_PER_GROUP 64
+#define KERNEL_SIZE 9
+#define MAX_FEATURES 2048
+#define MAX_DILATIONS 8
+#define MAX_CLASSES 10
+#define POOLING_OPERATORS 2  // max + mean
+
+// v2_fixed batching: 16 kernels per batch, uniform dilation per batch
+// (host sorts by dilation; 512/8 dilation groups = 64 kernels each, a
+// multiple of 16, so uniformity always holds after sorting).
+#define UNROLL_FACTOR 16
+#define NUM_BATCHES (NUM_KERNELS / UNROLL_FACTOR)
+
+// AXI-Stream packet definition (matches NetLayer S_AXIS_sk2nl exactly:
+// USER=0, ID=0 — see v5 note in git history; do not widen).
+#define DWIDTH 512
+#define TDWIDTH 16
+typedef ap_axiu<DWIDTH, 0, 0, TDWIDTH> pkt;
+
+// Top-level streaming inference kernel (signature/arg order unchanged from
+// v5 — load_hydra_hbm.cpp arg indices 2..12 stay valid).
+extern "C" void hydra_axis_inference(
+    hls::stream<pkt> &input_timeseries,
+    hls::stream<pkt> &output_predictions,
+    data_t* coefficients,
+    data_t* intercept,
+    data_t* scaler_mean,
+    data_t* scaler_scale,
+    data_t* kernel_weights,
+    data_t* biases,
+    int_t*  dilations,
+    int_t time_series_length,
+    int_t num_features,
+    int_t num_classes,
+    int_t num_groups
+);
+
+#endif // HYDRA_AXIS_INFERENCE_HLS_H
