@@ -427,7 +427,7 @@ void udp(
 
 #pragma HLS INTERFACE ap_none register port=myIpAddress
 #pragma HLS INTERFACE s_axilite port=SocketTable bundle=s_axilite
-#pragma HLS INTERFACE s_axilite port=numberSockets offset=0x10 offset=0x10 bundle=s_axilite
+#pragma HLS INTERFACE s_axilite port=numberSockets offset=0x10 offset=0x10 offset=0x10 bundle=s_axilite
 #pragma HLS INTERFACE ap_ctrl_none port=return
 
 

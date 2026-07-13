@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{MiniRocket classification accuracy (\%) across platforms. C++ and FPGA use identical exported model weights, achieving bit-exact predictions. Python (aeon) trains with \texttt{float64} precision, causing minor accuracy differences from the \texttt{float32} exported model.}
+\label{tab:accuracy}
+\begin{tabular}{l r r r r r r r}
+\toprule
+Dataset & TS Len & Samples & Python (aeon) & C++ {\texttt{-O3}} & FPGA 1CU & FPGA 2CU & FPGA 3CU \\
+\midrule
+GunPoint & 150 & 60 & -- & -- & 98.33 & 98.33 & 98.33 \\
+InsectSound & 600 & 25,000 & 78.84 & 74.12 & 74.12 & 74.12 & 74.12 \\
+MosquitoSound & 3,750 & 139,786 & 87.59 & 87.87 & 87.88 & 87.88 & 87.88 \\
+FruitFlies & 5,000 & 17,259 & 96.98 & 95.83 & 95.82 & 95.82 & 95.82 \\
+\bottomrule
+\end{tabular}
+\end{table}

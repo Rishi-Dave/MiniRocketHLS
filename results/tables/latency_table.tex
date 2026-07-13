@@ -1,0 +1,32 @@
+\begin{table}[t]
+\centering
+\caption{MiniRocket per-sample inference latency (ms).}
+\label{tab:latency}
+\begin{tabular}{l l r r r r}
+\toprule
+Dataset & Platform & Mean & P50 & P95 & P99 \\
+\midrule
+GunPoint & FPGA 1CU & 0.388 & 0.361 & 0.482 & 0.812 \\
+ & FPGA 2CU & 0.167 & -- & -- & -- \\
+ & FPGA 3CU & 0.104 & -- & -- & -- \\
+\addlinespace
+InsectSound & Python & 1.924 & -- & -- & -- \\
+ & C++ -O3 & 3.461 & 3.399 & 3.909 & 4.005 \\
+ & FPGA 1CU & 0.630 & 0.619 & 0.763 & 0.823 \\
+ & FPGA 2CU & 0.313 & -- & -- & -- \\
+ & FPGA 3CU & 0.200 & -- & -- & -- \\
+\addlinespace
+MosquitoSound & Python & 12.181 & -- & -- & -- \\
+ & C++ -O3 & 20.835 & 20.588 & 22.099 & 24.224 \\
+ & FPGA 1CU & 1.214 & 1.206 & 1.357 & 1.441 \\
+ & FPGA 2CU & 0.668 & -- & -- & -- \\
+ & FPGA 3CU & 0.355 & -- & -- & -- \\
+\addlinespace
+FruitFlies & Python & 25.400 & -- & -- & -- \\
+ & C++ -O3 & 3.874 & 3.916 & 4.281 & 4.514 \\
+ & FPGA 1CU & 1.491 & 1.488 & 1.607 & 1.655 \\
+ & FPGA 2CU & 0.892 & -- & -- & -- \\
+ & FPGA 3CU & 0.456 & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

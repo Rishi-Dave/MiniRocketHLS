@@ -1,0 +1,47 @@
+{
+  "variant": "hydra_optimized",
+  "build": "v2_fixed",
+  "description": "HYDRA with ap_fixed<32,16> internal, float HBM interface, UNROLL=16, sorted by dilation",
+  "fpga": "Xilinx Alveo U280",
+  "clock_mhz": 300,
+  "compute_units": 1,
+  "date": "2026-04-02",
+  "datasets": [
+    {
+      "dataset": "InsectSound",
+      "num_samples": 25000,
+      "time_series_length": 600,
+      "num_classes": 10,
+      "accuracy_pct": 69.41,
+      "throughput_inf_per_s": 6326,
+      "avg_latency_ms": 0.158,
+      "total_time_s": 3.95,
+      "cpu_throughput_inf_per_s": 90.1,
+      "speedup_vs_cpu": 70.2
+    },
+    {
+      "dataset": "MosquitoSound",
+      "num_samples": 139786,
+      "time_series_length": 3750,
+      "num_classes": 2,
+      "accuracy_pct": 69.81,
+      "throughput_inf_per_s": 1937,
+      "avg_latency_ms": 0.516,
+      "total_time_s": 72.17,
+      "cpu_throughput_inf_per_s": 39.2,
+      "speedup_vs_cpu": 49.4
+    },
+    {
+      "dataset": "FruitFlies",
+      "num_samples": 17259,
+      "time_series_length": 5000,
+      "num_classes": 3,
+      "accuracy_pct": 88.21,
+      "throughput_inf_per_s": 1507,
+      "avg_latency_ms": 0.663,
+      "total_time_s": 11.45,
+      "cpu_throughput_inf_per_s": 33.6,
+      "speedup_vs_cpu": 44.8
+    }
+  ]
+}

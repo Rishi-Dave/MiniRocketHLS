@@ -94,78 +94,77 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Test on loaded data
+    // Test on loaded data - streaming mode
+    // Feed all points of each time series, check prediction only after the last point
     int num_correct = 0;
-
-    int num_tests = std::min((int)test_inputs[0].size(), (csim) ? 1000 : 100); 
+    int input_length = std::min((int)test_inputs[0].size(), MAX_TIME_SERIES_LENGTH);
+    int num_samples = std::min((int)test_inputs.size(), csim ? 10 : 5);
+    int num_tests = num_samples;
 
     std::cout << "\n" << std::string(60, '=') << std::endl;
-    std::cout << "C++ MiniRocket Step-by-Step Comparison (Test Sample 1)" << std::endl;
+    std::cout << "Streaming CSIM: Feed full time series, check final prediction" << std::endl;
+    std::cout << "  Time series length: " << input_length << std::endl;
+    std::cout << "  Number of test samples: " << num_samples << std::endl;
     std::cout << std::string(60, '=') << std::endl;
 
-    int input_length = std::min((int)test_inputs[0].size(), MAX_TIME_SERIES_LENGTH);
+    for (int sample_idx = 0; sample_idx < num_samples; sample_idx++) {
+        int ts_len = std::min((int)test_inputs[sample_idx].size(), MAX_TIME_SERIES_LENGTH);
 
-    std::cout << "Running in quick test mode (limited to 100 samples)..." << std::endl;
-    for (int test_idx = 0; test_idx < num_tests; test_idx++) {
+        // Feed all points of this time series
+        for (int t = 0; t < ts_len; t++) {
+            pkt in_pkt;
+            in_pkt.keep = -1;
+            in_pkt.last = 1;
+            in_pkt.data = *((ap_uint<DWIDTH>*)&test_inputs[sample_idx][t]);
+            input_timeseries.write(in_pkt);
 
-        pkt in_pkt;
-        in_pkt.keep = -1;
-        in_pkt.last = 1;
-        in_pkt.data = *((ap_uint<DWIDTH>*)&test_inputs[0][test_idx]);
-        input_timeseries.write(in_pkt);
+            minirocket_inference(
+                input_timeseries,
+                output_predictions,
+                flattened_coefficients,
+                intercept,
+                scaler_mean,
+                scaler_scale,
+                dilations,
+                num_features_per_dilation,
+                biases,
+                input_length,
+                num_features,
+                num_classes,
+                num_dilations
+            );
 
-        minirocket_inference(
-            input_timeseries,
-            output_predictions,
-            flattened_coefficients,
-            intercept,
-            scaler_mean,
-            scaler_scale,
-            dilations,
-            num_features_per_dilation,
-            biases,
-            input_length,
-            num_features,
-            num_classes,
-            num_dilations
-        );
+            // Read and discard predictions for all but the last point
+            data_t predictions[MAX_CLASSES];
+            for (int i = 0; i < num_classes; i++) {
+                pkt out_pkt;
+                output_predictions.read(out_pkt);
+                ap_uint< DWIDTH > out_data = out_pkt.data;
+                predictions[i] = *((data_t*)&out_data);
+            }
 
-        data_t* predictions = new data_t[num_classes];
+            // Only check accuracy on the LAST point (full window)
+            if (t == ts_len - 1) {
+                int predicted_class = 0;
+                data_t max_score = predictions[0];
+                for (int i = 1; i < num_classes; i++) {
+                    if (predictions[i] > max_score) {
+                        max_score = predictions[i];
+                        predicted_class = i;
+                    }
+                }
 
-        std::cout << "Received predictions: [";
-        for (int i = 0; i < num_classes; i++) {
-            pkt out_pkt;
-            output_predictions.read(out_pkt);
-            ap_uint< DWIDTH > out_data = out_pkt.data;
-            predictions[i] = *((data_t*)&out_data); 
-            std::cout << predictions[i] << " ";
-        }
-        std::cout << "]" << std::endl;
+                int expected_class = (sample_idx < (int)expected_classes.size()) ? expected_classes[sample_idx] : 0;
+                bool correct = (predicted_class == expected_class);
+                if (correct) num_correct++;
 
-        // Find predicted class
-        int predicted_class = 0;
-        data_t max_score = predictions[0];
-        for (int i = 1; i < num_classes; i++) {
-            if (predictions[i] > max_score) {
-                max_score = predictions[i];
-                predicted_class = i;
+                std::cout << "Sample " << sample_idx << ": pred=[";
+                for (int i = 0; i < num_classes; i++) std::cout << predictions[i] << " ";
+                std::cout << "] predicted=" << predicted_class
+                          << " expected=" << expected_class
+                          << (correct ? " ✓" : " ✗") << std::endl;
             }
         }
-
-        // Get expected class directly from labels
-        int expected_class = (test_idx < expected_classes.size()) ? expected_classes[test_idx] : 0;
-
-        bool correct = (predicted_class == expected_class);
-        if (correct) num_correct++;
-
-        // if (test_idx % 10 == 9 || test_idx == num_tests - 1) {
-        //     float current_accuracy = (float)num_correct / (test_idx + 1) * 100.0f;
-        //     std::cout << "  Completed " << (test_idx + 1) << " tests - Accuracy: "
-        //             << std::fixed << std::setprecision(1) << current_accuracy
-        //             << "% (" << num_correct << "/" << (test_idx + 1) << " correct)" << std::endl;
-        // }
-
-        delete[] predictions;
     }
         
     

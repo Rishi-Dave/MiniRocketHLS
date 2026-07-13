@@ -304,8 +304,7 @@ bool MiniRocketTestbenchLoader::load_test_data(
     std::string content = read_file(test_filename);
     if (content.empty()) return false;
     
-    auto test_inputs_1d = parse_float_array(content, "X_test");
-    test_inputs.push_back(test_inputs_1d);
+    test_inputs = parse_2d_float_array(content, "X_test");
     
     // Parse y_test as 1D array and convert to 2D format
     auto y_labels = parse_float_array(content, "y_pred");

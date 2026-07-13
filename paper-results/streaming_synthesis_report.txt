@@ -1,0 +1,27 @@
+Streaming Fused MiniRocket Kernel - HLS Synthesis Report
+=========================================================
+Date: 2026-03-13
+Source: fpga-network/minirocket/build_synth/minirocket_inference_prj/solution1/syn/report/
+
+Top-Level: minirocket_inference
+  Clock Target: 3.33ns (300 MHz)
+  Estimated Fmax: 397.61 MHz
+
+Resource Utilization:
+  BRAM_18K: 487 (12% of U280)
+  DSP:      518 (5%)   -- all from float fadd in CONV_LOOP (bFP multiply is DSP-free)
+  FF:       119,076 (4%)
+  LUT:      90,076 (6%)
+
+Key Loop Performance:
+  CONV_LOOP: II=1 achieved (iteration latency=67)
+  Feature Extraction: 1,280 - 203,129 cycles (dynamic with ts_length)
+  Scaler: 122 - 10,022 cycles
+  Classifier: 411 - 160,046 cycles (BINARY_FEATURE_LOOP II=4 violation)
+
+Note: 518 DSPs are from float addition in CONV_LOOP (data_t = float).
+The bFP multiplier (optimized_fp_multiply) uses XNOR + increment, 0 multiply DSPs.
+The modular fused kernel (ap_fixed<32,16>) achieves 0 DSP total.
+The streaming kernel uses float for network compatibility.
+
+Csim Validation: 10/10 correct on GunPoint (100% accuracy)

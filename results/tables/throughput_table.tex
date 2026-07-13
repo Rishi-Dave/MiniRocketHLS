@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{MiniRocket throughput (inferences/sec) and speedup over C++ baseline. C++ compiled with \texttt{-O3 -march=native}. Longer time series benefit disproportionately from the fused CONV+PPV kernel.}
+\label{tab:throughput}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l r r r r r r r}
+\toprule
+Dataset & TS Len & Python & C++ \texttt{-O3} & FPGA 1CU & FPGA 2CU & FPGA 3CU & Speedup \\
+\midrule
+GunPoint & 150 & -- & -- & 3,797.1 & 5,999.1 & 9,585.0 & -- \\
+InsectSound & 600 & 519.9 & 288.9 & 1,966.8 & 3,191.1 & 5,012.2 & 17.3$\times$ \\
+MosquitoSound & 3,750 & 82.1 & 48.0 & 937.0 & 1,496.9 & 2,819.6 & 58.7$\times$ \\
+FruitFlies & 5,000 & 39.4 & 258.2 & 742.3 & 1,121.4 & 2,190.7 & 8.5$\times$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

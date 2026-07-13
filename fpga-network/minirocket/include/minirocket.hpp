@@ -8,18 +8,23 @@
 #include "ap_axi_sdata.h"
 
 // HLS-optimized data types
-//typedef ap_fixed<32,16> data_t;     // 32-bit fixed point: 16 integer, 16 fractional bits
 typedef float data_t;
 typedef ap_int<32> int_t;           // 32-bit signed integer
 typedef ap_uint<8> idx_t;           // 8-bit unsigned for small indices
 
 // Constants for MiniRocket (compile-time known)
-#define MAX_TIME_SERIES_LENGTH 512
+#define MAX_TIME_SERIES_LENGTH 8192
 #define MAX_FEATURES 10000
 #define NUM_KERNELS 84
 #define KERNEL_SIZE 9
 #define MAX_DILATIONS 8
 #define MAX_CLASSES 4
+
+// Fused CONV+PPV parameters
+#define UNROLL_FACTOR 28
+#define NUM_KERNEL_GROUPS (NUM_KERNELS / UNROLL_FACTOR)  // 84/28 = 3
+#define MAX_FEATURES_PER_DILATION 3
+#define NUM_TS_COPIES 5  // ceil(9 reads / 2 ports per BRAM) = 5
 
 // Network packet definitions for AXI stream interface
 #define DWIDTH 512
@@ -36,69 +41,21 @@ typedef union {
     };
 } float_num_t;
 
-// HLS-optimized structure for model parameters (arrays instead of vectors)
-struct MiniRocketModelParams_HLS {
-    data_t coefficients[MAX_CLASSES][MAX_FEATURES];
-    data_t intercept[MAX_CLASSES];
-    data_t scaler_mean[MAX_FEATURES];
-    data_t scaler_scale[MAX_FEATURES];
-    
-    int_t dilations[MAX_DILATIONS];
-    int_t num_features_per_dilation[MAX_DILATIONS];
-    data_t biases[MAX_FEATURES];
-    
-    int_t num_dilations;
-    int_t num_features;
-    int_t num_classes;
-    int_t time_series_length;
-};
-
 // HLS-optimized top-level function for FPGA
 extern "C" void minirocket_inference(
-    hls::stream<pkt> &input_timeseries,      // Input time series
-    hls::stream<pkt> &output_predictions,      // Output predictions
-    data_t* coefficients,           // Model coefficients (flattened)
-    data_t* intercept,              // Model intercept
-    data_t* scaler_mean,            // Scaler mean values
-    data_t* scaler_scale,           // Scaler scale values
-    int_t* dilations,               // Dilation values
-    int_t* num_features_per_dilation, // Features per dilation
-    data_t* biases,                 // Bias values
+    hls::stream<pkt> &input_timeseries,
+    hls::stream<pkt> &output_predictions,
+    data_t* coefficients,
+    data_t* intercept,
+    data_t* scaler_mean,
+    data_t* scaler_scale,
+    int_t* dilations,
+    int_t* num_features_per_dilation,
+    data_t* biases,
     int_t time_series_length,
     int_t num_features,
     int_t num_classes,
     int_t num_dilations
-);
-
-// HLS-optimized MiniRocket feature extraction
-void minirocket_feature_extraction_hls(
-    data_t time_series[MAX_TIME_SERIES_LENGTH],
-    data_t features[MAX_FEATURES],
-    int_t dilations[MAX_DILATIONS],
-    int_t num_features_per_dilation[MAX_DILATIONS],
-    data_t biases[MAX_FEATURES],
-    int_t time_series_length,
-    int_t num_dilations,
-    int_t num_features
-);
-
-// HLS-optimized scaling function
-void apply_scaler_hls(
-    data_t features[MAX_FEATURES],
-    data_t scaled_features[MAX_FEATURES],
-    data_t scaler_mean[MAX_FEATURES],
-    data_t scaler_scale[MAX_FEATURES],
-    int_t num_features
-);
-
-// HLS-optimized linear classifier
-void linear_classifier_predict_hls(
-    data_t scaled_features[MAX_FEATURES],
-    data_t predictions[MAX_CLASSES],
-    data_t coefficients[MAX_CLASSES][MAX_FEATURES],
-    data_t intercept[MAX_CLASSES],
-    int_t num_features,
-    int_t num_classes
 );
 
 #endif // MINIROCKET_INFERENCE_HLS_H

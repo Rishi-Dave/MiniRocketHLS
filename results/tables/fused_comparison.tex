@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{Impact of fused CONV+PPV kernel on MiniRocket (1 CU, 300 MHz). Fusion eliminates the intermediate \texttt{convolutions[16][8192]} array, achieving 0 DSP by exploiting ternary weights, and uses dynamic loop bounds that scale with time series length.}
+\label{tab:fused}
+\begin{tabular}{l r r r}
+\toprule
+& Separate & Fused & Improvement \\
+\midrule
+\multicolumn{4}{l}{\textit{Throughput (inferences/sec)}} \\
+\quad GunPoint & 507.5 & 3,797.1 & 7.5$\times$ \\
+\quad InsectSound & 295.9 & 1,966.8 & 6.6$\times$ \\
+\quad MosquitoSound & 88.1 & 937.0 & 10.6$\times$ \\
+\quad FruitFlies & 67.9 & 742.3 & 10.9$\times$ \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Resource Utilization (HLS synthesis)}} \\
+\quad LUTs & 48,812 & 57,090 & +17\% \\
+\quad FFs & 88,492 & 94,283 & +7\% \\
+\quad BRAM (18K) & 576 & 185 & -68\% \\
+\quad DSP48E2 & 724 & 0 & -100\% \\
+\addlinespace
+\quad Intermediate array & $16 \times 8192$ floats & Eliminated & $-$100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
