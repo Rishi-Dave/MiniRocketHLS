@@ -1,6 +1,6 @@
 \begin{table*}[t]
 \centering
-\caption{Resource utilization for MiniRocket accelerator variants. DSP changes between single-node and streaming are due to removal of HBM data mover modules. BRAM increases in streaming are due to CMAC and UDP network stack integration ($\sim$980 BRAM). The fused CONV+PPV kernel achieves 0 DSP by exploiting ternary $\{-1, +2\}$ weights.}
+\caption{Resource utilization for MiniRocket and HYDRA accelerator variants on Alveo U280. The fused CONV+PPV kernel achieves 0 DSP by exploiting ternary $\{-1, +2\}$ weights. HYDRA v2\_fixed uses ap\_fixed$\langle$32,16$\rangle$ with UNROLL=16. BRAM increases in streaming variants are due to CMAC and UDP network stack integration ($\sim$980 BRAM).}
 \label{tab:resource_annotated}
 \begin{tabular}{l l r r r r r l}
 \toprule
@@ -15,10 +15,8 @@ MiniRocket & Fused 1CU & 94,283 & 57,090 & 0 & 185 & 300 MHz & 0 DSP (ternary) \
 MiniRocket & Fused 2CU & 188,566 & 114,180 & 0 & 370 & 300 MHz & 0 DSP (ternary) \\
 MiniRocket & Fused 3CU & 159,086 & 92,703 & 1264 & 428 & 269 MHz & UNROLL=28 \\
 \addlinespace
-MultiRocket & SN Naive+FP & 214,565 & 161,948 & 68 & 1,475 & 300 MHz &  \\
-MultiRocket & SN Naive+bFP & 207,909 & 158,215 & 44 & 1,619 & 300 MHz &  \\
-MultiRocket & SN DP-Reuse+bFP & 200,496 & 151,145 & 30 & 1,103 & 300 MHz &  \\
-MultiRocket & Stream DP-Reuse+bFP & 194,551 & 148,768 & 4 & 1,350 & 300 MHz & +CMAC/UDP \\
+HYDRA & v2\_fixed 1CU & 58,537 & 41,746 & 1,355 & 86 & 300 MHz & ap\_fixed, UNROLL=16 \\
+HYDRA & Stream 1CU & 20,823 & 15,866 & 55 & 115 & 405 MHz & 3-kernel AXI-Stream \\
 \bottomrule
 \end{tabular}
 \end{table*}
