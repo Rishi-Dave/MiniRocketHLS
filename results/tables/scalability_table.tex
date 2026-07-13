@@ -1,0 +1,40 @@
+% MiniRocket scalability: GPU vs FPGA throughput vs time series length
+% GPU: Tesla T4 (Colab), PyTorch F.conv1d, batch=256 and batch=1
+% FPGA: Alveo U280, fused CONV+PPV, 1 CU, 300 MHz
+% Both use synthetic data — throughput depends only on tensor dimensions.
+
+\begin{table}[t]
+\centering
+\caption{MiniRocket throughput scaling with time series length.
+GPU advantage (batch\,=\,256) shrinks from 65$\times$ to 3.8$\times$ as
+length increases from 64 to 8{,}192. At batch\,=\,1, the FPGA matches
+or exceeds GPU throughput at all lengths. FPGA length is a runtime
+parameter --- no rebuild required.}
+\label{tab:scalability}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{r r r r r r r}
+\toprule
+\textbf{Length} & \textbf{GPU b256} & \textbf{GPU b1} & \textbf{FPGA 1CU} & \textbf{GPU/FPGA} & \textbf{b1/FPGA} & \textbf{Dilations} \\
+ & (inf/s) & (inf/s) & (inf/s) & (b256) & & \\
+\midrule
+64      & 174{,}912 & 1{,}204 & 2{,}681 & 65$\times$   & 0.45$\times$ & 3 \\
+128     & 115{,}308 & 1{,}091 & 2{,}458 & 47$\times$   & 0.44$\times$ & 4 \\
+256     & 65{,}826  & 950     & 2{,}512 & 26$\times$   & 0.38$\times$ & 5 \\
+512     & 33{,}826  & 798     & 2{,}204 & 15$\times$   & 0.36$\times$ & 6 \\
+1{,}024 & 20{,}178  & 692     & 1{,}745 & 12$\times$   & 0.40$\times$ & 7 \\
+2{,}048 & 9{,}331   & 661     & 1{,}303 & 7.2$\times$  & 0.51$\times$ & 8 \\
+4{,}096 & 4{,}249   & 606     & 794     & 5.4$\times$  & 0.76$\times$ & 9 \\
+8{,}192 & 1{,}919   & 539     & 511     & 3.8$\times$  & 1.05$\times$ & 10 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{0.3em}
+\footnotesize
+GPU/FPGA $>$1 favors GPU; b1/FPGA $<$1 favors FPGA.
+GPU throughput scales super-linearly with length because longer series
+require more dilations (more \texttt{conv1d} kernel launches).
+FPGA throughput scales as $O(1/n)$ with length due to the fused
+CONV\_LOOP at II\,=\,1. At batch=1, GPU is launch-overhead dominated
+($\sim$1\,ms fixed cost) while FPGA latency is purely compute-proportional.
+Both platforms use PCIe host dispatch.
+\end{table}

@@ -1,0 +1,24 @@
+{
+  "metadata": {
+    "gpu": "Tesla T4",
+    "pytorch_version": "2.10.0+cu128",
+    "date": "2026-04-02",
+    "batch_size": 256,
+    "num_samples": 1000,
+    "platform": "Google Colab"
+  },
+  "results": [
+    {"length": 64, "batch256_throughput": 174911.5, "batch1_throughput": 1203.9, "num_dilations": 3},
+    {"length": 128, "batch256_throughput": 115307.8, "batch1_throughput": 1091.1, "num_dilations": 4},
+    {"length": 256, "batch256_throughput": 65825.7, "batch1_throughput": 949.5, "num_dilations": 5},
+    {"length": 512, "batch256_throughput": 33825.5, "batch1_throughput": 797.9, "num_dilations": 6},
+    {"length": 1024, "batch256_throughput": 20178.1, "batch1_throughput": 691.6, "num_dilations": 7},
+    {"length": 2048, "batch256_throughput": 9330.5, "batch1_throughput": 660.9, "num_dilations": 8},
+    {"length": 4096, "batch256_throughput": 4249.3, "batch1_throughput": 605.5, "num_dilations": 9},
+    {"length": 8192, "batch256_throughput": 1918.7, "batch1_throughput": 538.7, "num_dilations": 10}
+  ],
+  "fpga_reference": {
+    "64": 2681.0, "128": 2457.7, "256": 2512.1, "512": 2203.9,
+    "1024": 1744.9, "2048": 1302.5, "4096": 793.6, "8192": 511.1
+  }
+}

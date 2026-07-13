@@ -1,0 +1,29 @@
+% HYDRA v2 (ap_fixed<32,16>) FPGA benchmark results
+% Data from results/hydra_v2_fixed_benchmarks.json (1 CU, 300 MHz, Alveo U280)
+% 512 learned kernels, 9-tap, max + global mean pooling, 1024 features
+
+\begin{table}[t]
+\centering
+\caption{HYDRA FPGA inference on Alveo U280 (1 CU, 300\,MHz, \texttt{ap\_fixed<32,16>}).
+512 learned kernels with arbitrary float weights, producing 1{,}024 features
+via max + mean pooling. Speedup is over single-threaded Python CPU baseline.}
+\label{tab:hydra}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{Samples} & \textbf{Accuracy} & \textbf{FPGA} & \textbf{CPU} & \textbf{Speedup} \\
+ & & & (\%) & (inf/s) & (inf/s) & \\
+\midrule
+InsectSound   & 600   & 25{,}000  & 69.41 & 6{,}326 & 90  & 70$\times$ \\
+MosquitoSound & 3{,}750 & 139{,}786 & 69.81 & 1{,}937 & 39  & 49$\times$ \\
+FruitFlies    & 5{,}000 & 17{,}259  & 88.21 & 1{,}507 & 34  & 45$\times$ \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+\footnotesize
+HYDRA uses \texttt{float*} HBM interface with internal \texttt{ap\_fixed<32,16>}
+conversion --- no host code changes required. CPU baseline is custom Python
+(single-threaded NumPy convolution). FPGA throughput scales inversely with
+series length due to the $O(n)$ convolution loop at II\,=\,1.
+Resource utilization: 2.3\% LUT, 1.5\% FF, 4.2\% BRAM, 7.6\% DSP.
+\end{table}

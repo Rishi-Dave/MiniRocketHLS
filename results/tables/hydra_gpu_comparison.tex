@@ -1,0 +1,35 @@
+% HYDRA: GPU (Tesla T4) vs FPGA (Alveo U280) comparison
+% 512 learned kernels, 9-tap, arbitrary float weights, max + mean pooling
+% GPU data from Colab run 2026-04-02; FPGA from hydra_v2_fixed_benchmarks.json
+% Both platforms are PCIe-attached, host-dispatched.
+
+\begin{table}[t]
+\centering
+\caption{HYDRA inference: GPU (Tesla T4) vs.\ FPGA (Alveo U280, 1 CU).
+HYDRA's 512 learned kernels with arbitrary float weights reduce the GPU's
+batched-convolution advantage compared to MiniRocket (2--3$\times$ vs.\
+6$\times$ at length 600). Both platforms use PCIe host dispatch.}
+\label{tab:hydra_gpu}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{Dataset} & \textbf{Length} & \textbf{GPU b256} & \textbf{GPU b1} & \textbf{FPGA 1CU} & \textbf{FPGA/GPU} \\
+ & & (inf/s) & (inf/s) & (inf/s) & (b256 / b1) \\
+\midrule
+InsectSound   & 600   & 13{,}895 & 56  & 6{,}326 & 0.46$\times$ / 113$\times$ \\
+MosquitoSound & 3{,}750 & 5{,}139  & 53  & 1{,}937 & 0.38$\times$ / 36$\times$ \\
+FruitFlies    & 5{,}000 & 4{,}267  & 57  & 1{,}507 & 0.35$\times$ / 26$\times$ \\
+\midrule
+\multicolumn{2}{l}{\textbf{Power (under load)}} & \textbf{54--70\,W} & & \textbf{26\,W} & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+\footnotesize
+GPU uses PyTorch \texttt{F.conv1d} with cuDNN, grouping 512 kernels into
+4 batched convolutions (one per unique dilation). The large batch=1 gap
+(26--113$\times$) reflects PyTorch per-call dispatch overhead across 4
+grouped \texttt{conv1d} invocations; a fused CUDA kernel would reduce
+this substantially. The batched comparison (0.35--0.46$\times$) is more
+representative of sustained throughput. Energy at batch=256:
+GPU 3.9--16.4\,mJ/inf vs FPGA 4.1--17.2\,mJ/inf (near parity).
+\end{table}
