@@ -1,5 +1,9 @@
 # MiniRocketHLS Documentation Overview
 
+> **Note:** This index predates the 2026 reorganization (fused-kernel results,
+> HYDRA, and the network-saturation thread) — see [../README.md](../README.md)
+> for the current map.
+
 ## Repository Organization Complete
 
 The MiniRocketHLS repository has been reorganized with comprehensive documentation explaining the research, implementation, and performance results.

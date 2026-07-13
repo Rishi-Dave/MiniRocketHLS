@@ -1,5 +1,9 @@
 # MiniRocket HLS - Documentation Index
 
+> **Note:** This index predates the 2026 reorganization (fused-kernel results,
+> HYDRA, and the network-saturation thread) — see [../README.md](../README.md)
+> for the current map.
+
 This document serves as a comprehensive guide to all documentation in the repository, organized by purpose and audience.
 
 ---
