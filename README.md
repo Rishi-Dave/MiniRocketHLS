@@ -1,381 +1,160 @@
-# MiniRocket FPGA Accelerator
+# MiniRocketHLS
 
-**High-Performance Time Series Classification on Xilinx Alveo U280 using MiniRocket Algorithm**
+**FPGA acceleration of convolution-based time series classification (MiniRocket, HYDRA) on Xilinx Alveo U280, including a fully in-fabric, host-free FPGA-to-FPGA inference path.**
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Xilinx_Alveo_U280-orange.svg)](https://www.xilinx.com/products/boards-and-kits/alveo/u280.html)
 [![HLS](https://img.shields.io/badge/Vitis_HLS-2023.2-green.svg)](https://www.xilinx.com/products/design-tools/vitis/vitis-hls.html)
 
----
-
-## Overview
-
-This repository implements the **MiniRocket time series classification algorithm** on Xilinx Alveo U280 FPGAs using Vitis HLS. The project provides **two implementations**:
-
-1. **1:1 Paper-Faithful Reference** - Exact implementation of the original MiniRocket algorithm
-2. **Optimized Version** - FPGA-optimized with simplified kernel weights for 77x performance improvement
-
-Both implementations achieve **100% accuracy** on UCR benchmark datasets, validating that the optimizations maintain algorithmic correctness while delivering massive speedup.
-
-### Key Results (Validated on UCR Datasets)
-
-| Metric | 1:1 Reference | Optimized | Improvement |
-|--------|---------------|-----------|-------------|
-| **Throughput (GunPoint)** | 45.8 inf/sec | 3,468 inf/sec | **75.7x faster** |
-| **Throughput (ItalyPower)** | 250 inf/sec | 19,267 inf/sec | **77.1x faster** |
-| **Accuracy** | 98.33% / 97.26% | 98.33% / 97.26% | **Identical** |
-| **Clock Freq** | 300 MHz | 404 MHz | 1.35x |
-| **Active CUs** | 1 | 4 | 4x parallelism |
-
-**1-CU Reference Build** (Branch: `1cu-reference-build`):
-- GunPoint: 45.8 inf/sec, 98.33% accuracy (59/60 correct)
-- ItalyPowerDemand: 250 inf/sec, 97.26% accuracy (320/329 correct)
-- Build Time: ~2 hours @ 300 MHz target frequency
-- HBM Banks Used: 9 (HBM[0-8])
-
-### MiniRocket Algorithm
-
-**MiniRocket** (MINImally RandOm Convolutional KErnel Transform) is a state-of-the-art time series classification method:
-- Ultra-fast training (seconds vs hours for deep learning)
-- ~94% average accuracy on UCR benchmark
-- Hardware-friendly (fixed kernels, no backpropagation)
-- Universal (works across diverse time series domains)
-
-**Reference**: Dempster, A., Schmidt, D.F., Webb, G.I. (2021). ["MiniRocket: A Very Fast (Almost) Deterministic Transform for Time Series Classification."](https://dl.acm.org/doi/10.1145/3447548.3467231) KDD 2021.
+This repository accompanies "FPGA Acceleration of Convolution-based Classification
+Algorithms for Streaming Time Series" (Dave, Yuvaraj, Brisk — UC Riverside), FCCM
+resubmission. Sources: `PaperTexFiles/`.
 
 ---
 
-## Repository Structure
+## Three results, one repo
+
+1. **Host-dispatched accelerators (FCCM architecture story).** MiniRocket and
+   HYDRA inference kernels on a single U280, PCIe host-dispatched, benchmarked
+   against CPU and GPU baselines. Current lead: **MiniRocket fused CONV+PPV,
+   1-CU, 3,797 inf/s** on GunPoint (397.6 MHz Fmax, WNS +0.007ns, 300 MHz
+   achieved), 0 DSP (ternary weights), 185 BRAM (-68% vs the pre-fusion
+   kernel). See [docs/RESULTS.md](docs/RESULTS.md).
+2. **The fusion optimization.** Fusing the convolution and PPV-feature stages
+   into a single pass — eliminating an intermediate `convolutions[16][8192]`
+   array — turns out to matter more than any other single change in the
+   MiniRocket line: 6.6-10.9x throughput over the pre-fusion (`v16_fixed`)
+   kernel, and the speedup *grows* with series length because the fused
+   kernel's loop bound is dynamic. Detail: [docs/RESULTS.md](docs/RESULTS.md#fusion-impact).
+3. **Network F2F saturation (the decisive result).** Two U280s, wire-to-wire:
+   an in-fabric UDP packet generator on one card feeds a 100G CMAC link
+   straight into the CMAC -> NetLayer -> inference pipeline on the other —
+   no NIC, no host, no PCIe round-trip on either side. MiniRocket fused v6
+   sustains up to **~22M samples/s (≈11.2 Gbps, generator-limited)**; HYDRA
+   u64 up to **13.4M samples/s (≈6.85 Gbps)**; the CPU baseline's loss-free
+   knee is ~5k pps. Full writeup, caveats, and source CSVs:
+   **[docs/NETWORK_RESULTS.md](docs/NETWORK_RESULTS.md)**.
+
+---
+
+## Architecture: the conv-engine ablation ladder
+
+The accelerator variants in this repo form a deliberate ablation, each step
+isolating one design decision (see `PaperTexFiles/03_architecture.tex` for
+the full argument):
+
+| Step | Variant dir | What it isolates |
+|---|---|---|
+| Naive + FP (floating point) | `reference_1to1/` | Paper-faithful baseline, full-precision arithmetic |
+| Naive + bFP (ternary, no-DSP) | `optimized_version/` | -1/0/+1 kernel weights remove the multiplier from the convolution |
+| DP-Reuse + bFP (temporal carry-forward) | `minirocket_modular/` (DP-Reuse build) | Reuses partial sums across dilations; **honest negative result on the network path** — plateaus at ~694 pps, same cliff as naive, because the bottleneck there is the CMAC RX FIFO, not compute (see `docs/NETWORK_RESULTS.md`) |
+| Fused CONV+PPV | `minirocket_modular/` (fused build) | Single-pass convolution + feature extraction, 0 DSP, current MiniRocket throughput leader |
+| HYDRA fixed-point | `hydra_optimized/` | Same ablation path applied to HYDRA's dictionary-kernel algorithm, `ap_fixed<32,16>` |
+
+---
+
+## Variant status (validated numbers, host-dispatched thread)
+
+| Variant | Best config | Throughput | Status | Source |
+|---|---|---|---|---|
+| `reference_1to1` | 1-CU, 242 MHz | 45 inf/s | Baseline (Dec 2025) | `results/results_master.csv` |
+| `optimized_version` | 4-CU, 404 MHz | 3,468 inf/s (77x vs. CPU) | Historical — superseded by fused kernel below | `results/results_master.csv`; historical framing, see [docs/RESULTS.md](docs/RESULTS.md#superseded) |
+| `minirocket_modular` (v16_fixed, pre-fusion) | 1-CU, 300 MHz | 67.9-507.5 inf/s (dataset-dependent) | Superseded by fused kernel | `results/all_data_for_sheets.csv` |
+| `minirocket_modular` (**fused CONV+PPV**) | 1-CU, 300 MHz | **3,797 inf/s** (GunPoint) | **Current MiniRocket lead** — timing met (WNS +0.007ns) | `results/minirocket_fused_results.csv` |
+| `minirocket_modular` (fused, 2-CU) | 2-CU, 300 MHz | 5,999 inf/s (GunPoint) | Timing met (WNS +0.001ns) | `results/minirocket_fused_results.csv` |
+| `minirocket_modular` (fused, 3-CU) | 3-CU, target 300 MHz | 9,585 inf/s (GunPoint) | **Timing FAILED** (WNS -0.380ns), auto-throttled to 269.3 MHz | `results/minirocket_fused_summary.txt` |
+| `hydra_optimized` (v2_fixed, `ap_fixed<32,16>`) | 1-CU, 300 MHz | 6,326 inf/s (InsectSound, 69.41% acc, 70.2x vs CPU) | Hardware-validated | `results/hydra_v2_fixed_benchmarks.json` |
+| `hydra_optimized` (v2_fixed, 2-CU) | 2-CU, 300 MHz | 8,028 inf/s (InsectSound) | Timing met | `results/all_data_for_sheets.csv` |
+| `hydra_optimized` (v2_fixed, 3-CU) | 3-CU, target 300 MHz | 10,573 inf/s (InsectSound) | **Timing FAILED**, auto-throttled | `results/all_data_for_sheets.csv` |
+| `hydra_optimized/hydra_axis` | 1-CU, 200 MHz (300/250 MHz failed timing) | see [docs/NETWORK_RESULTS.md](docs/NETWORK_RESULTS.md) | Network-attached HYDRA (F2F thread) | `docs/NETWORK_RESULTS.md` |
+| `hydra_stream` | 3-kernel AXI-Stream, 404.86 MHz | 23-193 inf/s | Architectural demo only — per-sample OpenCL dispatch bound, not compute-bound; accuracy delta 0.00% vs Python | `results/all_data_for_sheets.csv` |
+| `fpga-network/minirocket_fused` | Network F2F, UNROLL=84, 300 MHz (WNS 0.000) | up to ~22M samples/s ≈ 11.2 Gbps | **Headline network result** | [docs/NETWORK_RESULTS.md](docs/NETWORK_RESULTS.md) |
+| `multirocket_optimized` / `multirocket_stream` / `multirocket_fp_optimization` | — | — | **DROPPED 2026-04-08** — host loader bug ran hardware against an all-zero model; all prior accuracy/throughput numbers are invalid. See retraction banners in those directories' READMEs. | `MULTIROCKET_FIXES_SUMMARY.md`, banners added in commit `7f58b99` |
+
+GPU comparison (Tesla T4, batch=256 vs. FPGA 3-CU): 6.1x on InsectSound
+(L=600), narrowing to 1.5x on MosquitoSound/FruitFlies (L=3750/5000) — the
+GPU's batching advantage shrinks as series get longer. At batch=1, GPU drops
+to 55-57 inf/s (HYDRA; PyTorch per-call dispatch overhead across grouped
+`conv1d` invocations), so the FPGA wins 26-113x at batch=1. Power: U280
+25.7W (static-dominated, <5% fabric utilization, measured via `xbutil
+examine --report electrical`), GPU 54-68W (`nvidia-smi`), CPU 90W TDP per
+socket (dual-socket Xeon E5-2640 v3, single-threaded workload attributed to
+one socket; no RAPL/sudo access for a measured figure — treat as an upper
+bound favoring the CPU). Detail and full tables: [docs/RESULTS.md](docs/RESULTS.md).
+
+---
+
+## Repository map
 
 ```
 MiniRocketHLS/
-├── README.md                           # This file
-├── docs/                               # Documentation
-│   ├── ALGORITHM.md                    # Algorithm explanation & optimizations
-│   ├── FPGA_IMPLEMENTATION.md          # Implementation details
-│   ├── RESULTS.md                      # Benchmark results & analysis
-│   ├── 1to1_vs_optimized_comparison.md # Performance comparison (1:1 vs optimized)
-│   ├── DOCUMENTATION_INDEX.md          # Documentation navigation
-│   ├── DOCUMENTATION_SUMMARY.md        # Quick reference guide
-│   └── FILE_STRUCTURE.md               # Detailed file structure
-├── reference_1to1/                     # 1:1 paper-faithful implementation
-│   ├── src/
-│   │   ├── minirocket_inference_hls.cpp  # Core HLS kernel (paper-faithful)
-│   │   ├── minirocket_inference_hls.h    # HLS headers
-│   │   ├── minirocket_host.cpp           # OpenCL host application
-│   │   ├── krnl.cpp                      # Kernel wrapper
-│   │   ├── krnl.hpp                      # Kernel interface definitions
-│   │   ├── minirocket_hls_testbench_loader.* # Model/data loader
-│   │   └── test_hls.cpp                  # C++ testbench (no FPGA needed)
-│   ├── build/                          # HLS synthesis scripts
-│   │   └── src/make.tcl                # HLS build configuration
-│   ├── config.cfg                      # Vitis v++ configuration (2 CUs)
-│   ├── Makefile                        # Build system (7658 lines)
-│   ├── minirocket_ucr_model.json       # Trained model parameters
-│   └── ucr_benchmark_results.md        # UCR dataset validation results
-└── optimized_version/                  # Optimized implementation archive
-    ├── src/                            # Source code (-1,0,+1 weights)
-    ├── docs/                           # Results and documentation
-    └── benchmarks/                     # Performance data
-
+├── README.md                  # This file
+├── docs/                      # Canonical documentation
+│   ├── RESULTS.md             #   Host-dispatched thread: consolidated results tables
+│   ├── NETWORK_RESULTS.md     #   Network F2F thread: the decisive result (read this)
+│   ├── ALGORITHM.md, FPGA_IMPLEMENTATION.md, FILE_STRUCTURE.md   # supporting detail
+│   └── DOCUMENTATION_INDEX.md, DOCUMENTATION_SUMMARY.md          # legacy indices (predate 2026 reorg)
+├── reference_1to1/             # Paper-faithful 1:1 MiniRocket baseline
+├── optimized_version/          # Ternary-weight (-1/0/+1), no-DSP MiniRocket (Dec-2025 story)
+├── minirocket_modular/         # DP-Reuse and fused-CONV+PPV MiniRocket builds (current lead)
+├── minirocket_stream/          # AXI-Stream MiniRocket pipeline (architectural demo)
+├── hydra_optimized/            # HYDRA fixed-point (v2_fixed) + hydra_axis/ (network-attached HYDRA)
+├── hydra_stream/               # AXI-Stream HYDRA pipeline (architectural demo)
+├── multirocket_optimized/      # DROPPED — invalid results, retraction banners in place
+├── multirocket_stream/         # DROPPED — see multirocket_optimized banner
+├── multirocket_fp_optimization/# DROPPED — see multirocket_optimized banner
+├── fpga-network/               # NetLayer stack: minirocket_fused (F2F kernel), pktDropper
+│                                #   (drop-on-full ingest fix), udp_generator (in-fabric sender),
+│                                #   NetLayers/, Ethernet/ (CMAC integration)
+├── saturation_harness/         # Rate-sweep harness (rate_sweep.py, f2f_knee_sweep.sh) + runs/
+│                                #   (per-run JSONL, CSVs, plots — source of NETWORK_RESULTS.md numbers)
+├── cpu/, cpu-network/          # C++ / Python CPU baselines (host-dispatched and network)
+├── scripts/                    # Figure/table generators, power measurement, log parsers
+├── results/                    # results_master.csv, all_data_for_sheets.csv, per-dataset
+│                                #   per-sample CSVs, JSON benchmark dumps — primary data source
+├── paper-results/               # results_summary.csv, CPU logs feeding the paper tables
+├── PaperTexFiles/               # FCCM paper source (fccm.tex, section .tex files, figures)
+└── fp_optimization/              # Stale doc copies — see docs/ for canonical content
 ```
-
-**Quick Links**:
-- **Implementation**: [reference_1to1/src/minirocket_inference_hls.cpp](reference_1to1/src/minirocket_inference_hls.cpp)
-- **Host Code**: [reference_1to1/src/minirocket_host.cpp](reference_1to1/src/minirocket_host.cpp)
-- **Build Config**: [reference_1to1/config.cfg](reference_1to1/config.cfg)
-- **Performance Comparison**: [docs/1to1_vs_optimized_comparison.md](docs/1to1_vs_optimized_comparison.md)
-- **Algorithm Details**: [docs/ALGORITHM.md](docs/ALGORITHM.md)
 
 ---
 
-## Quick Start
+## Quick start
 
-### Prerequisites
+**Hardware:** Xilinx Alveo U280 (`xcvu9p-flga2104-2-i`). **Toolchain:** Vitis
+HLS / Vitis 2023.2, XRT 2023.2.
 
-**Hardware**:
-- Xilinx Alveo U280 FPGA (xcvu9p-flga2104-2-i)
-- x86_64 host system with PCIe x16 slot
-
-**Software**:
-- Xilinx Vitis/Vitis HLS 2023.2
-- Xilinx Runtime (XRT) 2023.2
-- Python 3.8+ with NumPy, scikit-learn, sktime
-- GCC 7.5+ with C++14 support
-
-### Installation
+Each variant directory has its own `Makefile`. Do not use ad-hoc build
+scripts — build targets are:
 
 ```bash
-# 1. Clone repository
-git clone <repository-url>
-cd MiniRocketHLS/reference_1to1
-
-# 2. Source Xilinx tools
-source /opt/xilinx/Vitis/2023.2/settings64.sh
-source /opt/xilinx/xrt/setup.sh
-
-# 3. Install Python dependencies (if training models)
-pip3 install numpy scikit-learn sktime
+cd <variant_dir>            # e.g. minirocket_modular, hydra_optimized
+make TARGET=hw_emu          # hardware emulation (~1 hour)
+make TARGET=hw              # full hardware build (hours — see that variant's build log for timing)
 ```
 
-### Build FPGA Bitstream
+For the network (F2F) variants, see `fpga-network/` and the reproduction
+pointers in [docs/NETWORK_RESULTS.md](docs/NETWORK_RESULTS.md#reproduction-pointers)
+(`saturation_harness/f2f_knee_sweep.sh`, per-variant deploy scripts).
 
-```bash
-cd reference_1to1
-
-# Build hardware bitstream with pre-trained UCR model
-make build TARGET=hw PLATFORM=/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
-
-# Build time: ~7 hours (hardware synthesis)
-```
-
-The build process:
-1. Synthesizes HLS kernel from C++ to RTL (paper-faithful implementation)
-2. Links 2 compute units (configurable in config.cfg)
-3. Runs place & route for U280 FPGA (242 MHz achieved clock)
-4. Generates bitstream: `build_dir.hw.*/krnl.xclbin` (~47 MB)
-
-### Run Inference on FPGA
-
-```bash
-# Compile host application
-make host
-
-# Run on FPGA hardware
-./host build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin \
-        minirocket_ucr_model.json \
-        minirocket_ucr_model_test_data.json
-```
-
-**Expected output**:
-```
-Initializing MiniRocket FPGA accelerator...
-Number of compute units: 1
-Platform: Xilinx
-Device: xilinx_u280_gen3x16_xdma_base_1
-Loading xclbin: build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
-Creating kernels...
-FPGA initialization complete!
-
-Loading model: minirocket_ucr_model.json
-Model loaded: 840 features, 4 classes, 8 dilations
-
-Running inference on 300 samples...
-Batch inference (300 samples): 6665.95 ms
-Throughput: 45.0 inferences/sec
-
-=== RESULTS ===
-Accuracy: 300/300 (100.00%)
-```
+Training and CPU baselines: `cpu/`, `hydra_optimized/scripts/train_hydra.py`,
+`scripts/` (figure/table generation from `results/`).
 
 ---
 
-## Usage
+## Documentation index
 
-### Training Custom Models
-
-```python
-# Use the provided training script (requires sktime)
-python3 train_minirocket.py --dataset <ucr_dataset_name>
-
-# Or train on your own data
-from train_minirocket import MiniRocketFPGA
-import numpy as np
-
-# Load your time series (samples × timesteps)
-X_train = np.load("your_train_data.npy")
-y_train = np.load("your_train_labels.npy")
-X_test = np.load("your_test_data.npy")
-y_test = np.load("your_test_labels.npy")
-
-# Train and export
-model = MiniRocketFPGA()
-model.fit(X_train, y_train)
-model.export_model("my_model.json", X_test, y_test)
-```
-
-### Testing with C++ Simulation (No FPGA Required)
-
-```bash
-# Compile C++ testbench
-g++ -o test_hls src/test_hls.cpp src/minirocket_inference_hls.cpp \
-    src/minirocket_hls_testbench_loader.cpp -I./src -std=c++14 -O2
-
-# Run test
-./test_hls minirocket_ucr_model.json minirocket_ucr_model_test_data.json
-```
-
-### HLS Synthesis (Generate RTL)
-
-```bash
-# Run HLS C simulation and synthesis
-vitis_hls -f build/src/run_hls.tcl
-
-# Outputs RTL to: minirocket_hls/solution1/syn/
-```
-
-### Hardware Emulation
-
-```bash
-# Faster iteration for functional verification (~1 hour vs 7 hours for hw build)
-make all TARGET=hw_emu PLATFORM=xilinx_u280_gen3x16_xdma_1_202211_1
-
-# Setup emulation
-emconfigutil --platform xilinx_u280_gen3x16_xdma_1_202211_1
-XCL_EMULATION_MODE=hw_emu ./host build_dir.hw_emu.*/krnl.xclbin minirocket_ucr_model.json minirocket_ucr_model_test_data.json
-```
-
----
-
-## Documentation
-
-Comprehensive documentation is provided in the `docs/` directory:
-
-1. **[ALGORITHM.md](ALGORITHM.md)** - Detailed explanation of MiniRocket algorithm and FPGA optimizations
-2. **[FPGA_IMPLEMENTATION.md](FPGA_IMPLEMENTATION.md)** - Complete implementation pipeline from Python to FPGA
-3. **[RESULTS.md](RESULTS.md)** - Benchmark results and performance analysis
-
----
-
-## Performance Analysis
-
-### Throughput Comparison
-
-The optimized version achieves **77x faster throughput** than the 1:1 reference:
-
-| Implementation | Configuration | Throughput | Speedup |
-|----------------|---------------|------------|---------|
-| **1:1 Reference** | 1 CU @ 242 MHz | 45 inf/sec | 1x |
-| **Optimized** | 1 CU @ 404 MHz | ~867 inf/sec | 19x |
-| **Optimized** | 4 CU @ 404 MHz | **3,468 inf/sec** | **77x** |
-
-### Why is the Optimized Version Faster?
-
-1. **Simplified Kernel Weights**: -1, 0, +1 pattern instead of random weights
-   - Reduces computational complexity
-   - Eliminates need for cumulative convolution inside kernel loop
-
-2. **Higher Clock Frequency**: 404 MHz vs 242 MHz (1.67x faster)
-   - Simpler logic allows better timing closure
-   - Achieved 35% overclock beyond 300 MHz target
-
-3. **Multi-CU Parallelism**: 4 compute units working simultaneously
-   - Near-linear scaling (4x throughput with 4 CUs)
-   - Only 1 CU usable in 1:1 reference due to memory bank connectivity
-
-4. **Convolution Placement**: Computed once per dilation vs 84 times
-   - Reduces memory bandwidth requirements
-   - Better resource utilization
-
-### Accuracy Validation
-
-Both implementations achieve **exact CPU accuracy match** on real UCR benchmark datasets:
-
-**1:1 Reference** (validated Dec 24, 2025):
-```
-GunPoint:           59/60 correct (98.33%) - matches Python baseline
-ItalyPowerDemand:   320/329 correct (97.26%) - matches Python baseline
-```
-
-**Optimized** (from commit 77b3cee):
-```
-Matched CPU reference (100% on synthetic, exact parity validated)
-```
-
-This validates that both implementations achieve **perfect numerical parity** with Python CPU baseline.
-
-See [ucr_benchmark_results.md](../ucr_benchmark_results.md) for detailed validation study.
-
----
-
-## Configuration
-
-### Number of Compute Units
-
-Edit [config.cfg](tcl_template/config.cfg):
-```ini
-[connectivity]
-nk=krnl_top:4  # Change to 1, 2, 4, or 8 CUs
-```
-
-Rebuild required after changing configuration.
-
-### Time Series Length & Classes
-
-Edit [src/krnl.hpp](tcl_template/src/krnl.hpp):
-```cpp
-#define MAX_TIME_SERIES_LENGTH 512  // Max input length
-#define MAX_CLASSES 4               // Max output classes
-#define MAX_FEATURES 840            // 84 kernels × 10 features
-#define MAX_DILATIONS 8             // Max dilation values
-```
-
-Rebuild HLS and bitstream after changes.
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**1. Kernel Interface Mismatch Errors**
-```
-[XRT] ERROR: Invalid kernel offset in xclbin
-```
-**Solution**: Rebuild both HLS IP and bitstream after source changes.
-
-**2. Low Performance / Only 1 CU Active**
-```
-[XRT] WARNING: compute unit cannot be used with this argument
-```
-**Cause**: Memory bank connectivity issue in 1:1 reference version
-**Solution**: Use optimized version for multi-CU performance
-
-**3. Build Failures**
-```
-bash: [[: not found
-```
-**Solution**: Add `SHELL := /bin/bash` to top of Makefile
-
-**4. Accuracy Below 90%**
-```
-Accuracy: 25/300 (8.33%)
-```
-**Cause**: Bitstream/host code mismatch or FPGA not computing correctly
-**Solution**: Rebuild bitstream and verify host code matches kernel signature
-
----
-
-## Known Limitations
-
-1. **Time Series Length**: Currently limited to 512 samples (configurable)
-2. **Number of Classes**: Maximum 4 classes (configurable)
-3. **Number of Features**: Fixed at 840 (84 kernels × 10 features)
-4. **Platform**: Tested only on Xilinx Alveo U280
-5. **1:1 Reference Multi-CU**: Memory bank connectivity limits to 1 active CU
-
-**Workarounds**: Modify constants in source code and rebuild for different limits.
-
----
-
-## Contributing
-
-Contributions are welcome! Areas for contribution:
-
-- Support for additional FPGA platforms (U50, U250, U55C, etc.)
-- Alternative optimization strategies
-- Precision tuning experiments (ap_fixed bit widths)
-- Additional UCR dataset benchmarks
-- Power measurement scripts
-- Training pipeline improvements
-
-Please open an issue or pull request on GitHub.
+| Doc | Covers |
+|---|---|
+| [docs/RESULTS.md](docs/RESULTS.md) | Host-dispatched results tables: MiniRocket variants, HYDRA, GPU comparison, power |
+| [docs/NETWORK_RESULTS.md](docs/NETWORK_RESULTS.md) | FPGA-to-FPGA network saturation — the decisive FCCM result |
+| [docs/ALGORITHM.md](docs/ALGORITHM.md) | MiniRocket algorithm and FPGA-specific optimizations |
+| [docs/FPGA_IMPLEMENTATION.md](docs/FPGA_IMPLEMENTATION.md) | HLS pragmas, HBM banking, timing closure |
+| `saturation_harness/FCCM_network_result_SUMMARY.md` | Chronological network-result session log (superseded by NETWORK_RESULTS.md as the current synthesis) |
+| `multirocket_optimized/README.md` | MultiRocket retraction banner and what went wrong |
 
 ---
 
 ## Citation
-
-If you use this work in your research, please cite:
 
 ```bibtex
 @inproceedings{dempster2021minirocket,
@@ -385,38 +164,10 @@ If you use this work in your research, please cite:
   pages={248--257},
   year={2021}
 }
-
-@misc{minirockethls2025,
-  title={MiniRocket FPGA Accelerator: High-Performance Time Series Classification},
-  author={Dave, Rohan},
-  year={2025},
-  publisher={GitHub},
-  url={https://github.com/YOUR_USERNAME/MiniRocketHLS}
-}
 ```
 
----
+FCCM paper source: `PaperTexFiles/fccm.tex`.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-
----
-
-## Acknowledgments
-
-- **Original MiniRocket**: Angus Dempster, Daniel F. Schmidt, Geoffrey I. Webb (Monash University)
-- **UCR Time Series Archive**: Eamonn Keogh et al. (UC Riverside)
-- **Xilinx**: For Vitis HLS tools and Alveo platform support
-
----
-
-## Contact & Support
-
-- **Issues**: GitHub Issues
-- **Questions**: Create a discussion on GitHub
-- **Documentation**: See [ALGORITHM.md](ALGORITHM.md), [FPGA_IMPLEMENTATION.md](FPGA_IMPLEMENTATION.md), [RESULTS.md](RESULTS.md)
-
----
-
-**Last Updated**: December 23, 2025
+Apache License 2.0 — see `LICENSE`.
