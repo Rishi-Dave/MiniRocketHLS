@@ -1,0 +1,190 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{BakeOff,BakeOffRedux,BakeOffReduxCorrection}
+\citation{UCRTimeSeries,UEATimeSeries,MONSTER}
+\citation{Hydra}
+\citation{ImageNet}
+\citation{MiniRocket}
+\citation{MiniRocket}
+\citation{Hydra}
+\citation{Jarrett2009,Pinto2009,Cox2011,Saxe2011,Yosinski2014}
+\citation{Cui2016,Wang2017,Fawaz2019a,Fawaz2019b,Zimmerman2019,InceptionTime,Fawaz2020b}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:Introduction}{{I}{1}{Introduction}{section.1}{}}
+\newlabel{fig:cpu-network}{{1a}{1}{CPU network interface via NIC and host memory}{figure.caption.1}{}}
+\newlabel{sub@fig:cpu-network}{{a}{1}{CPU network interface via NIC and host memory}{figure.caption.1}{}}
+\newlabel{fig:fpga-network}{{1b}{1}{FPGA configured as a SmartNIC with onboard accelerator}{figure.caption.1}{}}
+\newlabel{sub@fig:fpga-network}{{b}{1}{FPGA configured as a SmartNIC with onboard accelerator}{figure.caption.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces A time series datapoint received by a traditional networked CPU (a) vs.\ an FPGA SmartNIC (b). The CPU path requires NIC$\to $PCIe$\to $kernel$\to $user-space copies; the FPGA transmits directly from network to accelerator.}}{1}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:cpuvsfpga}{{1}{1}{A time series datapoint received by a traditional networked CPU (a) vs.\ an FPGA SmartNIC (b). The CPU path requires NIC$\to $PCIe$\to $kernel$\to $user-space copies; the FPGA transmits directly from network to accelerator}{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Background: Time Series Classification using Untrained Convolutional Kernels}{1}{section.2}\protected@file@percent }
+\newlabel{sec:Background}{{II}{1}{Background: Time Series Classification using Untrained Convolutional Kernels}{section.2}{}}
+\citation{Yu2015,Bai2018}
+\citation{Rocket}
+\citation{Hydra}
+\citation{Rocket}
+\newlabel{fig:conv_d1}{{2a}{2}{Dilation $d = 1$}{figure.caption.2}{}}
+\newlabel{sub@fig:conv_d1}{{a}{2}{Dilation $d = 1$}{figure.caption.2}{}}
+\newlabel{fig:conv_d2}{{2b}{2}{Dilation $d = 2$}{figure.caption.2}{}}
+\newlabel{sub@fig:conv_d2}{{b}{2}{Dilation $d = 2$}{figure.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Convolutions with dilations (a) $d = 1$ and (b) $d = 2$.}}{2}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:convolutions}{{2}{2}{Convolutions with dilations (a) $d = 1$ and (b) $d = 2$}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Classifier Overview}{2}{subsection.2.1}\protected@file@percent }
+\newlabel{sec:Overview}{{\mbox  {II-A}}{2}{Classifier Overview}{subsection.2.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Dilations}{2}{subsection.2.2}\protected@file@percent }
+\newlabel{sec:Dilations}{{\mbox  {II-B}}{2}{Dilations}{subsection.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Reduction Function}{2}{subsection.2.3}\protected@file@percent }
+\newlabel{sec:Reductions}{{\mbox  {II-C}}{2}{Reduction Function}{subsection.2.3}{}}
+\newlabel{eq:pv}{{1}{2}{Reduction Function}{equation.1}{}}
+\newlabel{eq:ppv}{{2}{2}{Reduction Function}{equation.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Convolutional Kernel-based Feature Generators}{2}{subsection.2.4}\protected@file@percent }
+\newlabel{sec:Classifiers}{{\mbox  {II-D}}{2}{Convolutional Kernel-based Feature Generators}{subsection.2.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-D}1}\textbf  {MiniRocket}}{2}{subsubsection.2.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {II-D}2}\textbf  {Hydra}}{2}{subsubsection.2.4.2}\protected@file@percent }
+\newlabel{eq:Rmax}{{3}{2}{\textbf {Hydra}}{equation.3}{}}
+\newlabel{eq:Imax}{{4}{2}{\textbf {Hydra}}{equation.4}{}}
+\newlabel{eq:Hmin}{{5}{2}{\textbf {Hydra}}{equation.5}{}}
+\newlabel{eq:Smax}{{6}{2}{\textbf {Hydra}}{equation.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Regression Classifier}{2}{subsection.2.5}\protected@file@percent }
+\newlabel{sec:regression}{{\mbox  {II-E}}{2}{Regression Classifier}{subsection.2.5}{}}
+\newlabel{eq:predicted_class}{{7}{3}{Regression Classifier}{equation.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {III}FPGA Accelerator Architectures}{3}{section.3}\protected@file@percent }
+\newlabel{sec:accelerators}{{III}{3}{FPGA Accelerator Architectures}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Convolution Engine Design}{3}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:conv_engine}{{\mbox  {III-A}}{3}{Convolution Engine Design}{subsection.3.1}{}}
+\newlabel{eq:streaming_conv_reuse}{{8}{3}{Convolution Engine Design}{equation.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}MiniRocket Floating-point Multiplication}{3}{subsection.3.2}\protected@file@percent }
+\newlabel{sec:fp_mult}{{\mbox  {III-B}}{3}{MiniRocket Floating-point Multiplication}{subsection.3.2}{}}
+\citation{aeon-arxiv,aeon-pkdd}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces FPGA accelerator for MiniRocket. Blue-shaded components support additional pooling operators for future work.}}{4}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:MiniMultiRocket_arch}{{3}{4}{FPGA accelerator for MiniRocket. Blue-shaded components support additional pooling operators for future work}{figure.caption.3}{}}
+\newlabel{eq:bFP}{{9}{4}{MiniRocket Floating-point Multiplication}{equation.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Pooling and Classification Pipeline}{4}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:classification}{{\mbox  {III-C}}{4}{Pooling and Classification Pipeline}{subsection.3.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Setup}{4}{section.4}\protected@file@percent }
+\newlabel{sec:ExpSetup}{{IV}{4}{Experimental Setup}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}FPGA Implementation Details}{4}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:FPGA_Implementation}{{\mbox  {IV-A}}{4}{FPGA Implementation Details}{subsection.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Software Baseline and Datasets}{4}{subsection.4.2}\protected@file@percent }
+\newlabel{sec:sw_baseline_and_datasets}{{\mbox  {IV-B}}{4}{Software Baseline and Datasets}{subsection.4.2}{}}
+\citation{UCRTimeSeries}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces FPGA accelerator for Hydra. Network streaming (CMAC/UDP) was evaluated for MiniRocket only (Section \ref {sec:streaming_results}); Hydra results use the single-node configuration.}}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:Hydra_arch}{{4}{5}{FPGA accelerator for Hydra. Network streaming (CMAC/UDP) was evaluated for MiniRocket only (Section \ref {sec:streaming_results}); Hydra results use the single-node configuration}{figure.caption.4}{}}
+\newlabel{fig:conv_eng_1}{{5a}{5}{$0^4T_{1..23} *_1 \omega $}{figure.caption.5}{}}
+\newlabel{sub@fig:conv_eng_1}{{a}{5}{$0^4T_{1..23} *_1 \omega $}{figure.caption.5}{}}
+\newlabel{fig:conv_eng_2}{{5b}{5}{$0^4T_{0..22} *_1 \omega $}{figure.caption.5}{}}
+\newlabel{sub@fig:conv_eng_2}{{b}{5}{$0^4T_{0..22} *_1 \omega $}{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Example of a convolution (dilation $d=1$) with dot-product reuse applied to a front-padded streaming time series $0^4T_{0..23}$ before (a) and after (b) a new datapoint is added to the window.}}{5}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:convolution_engine}{{5}{5}{Example of a convolution (dilation $d=1$) with dot-product reuse applied to a front-padded streaming time series $0^4T_{0..23}$ before (a) and after (b) a new datapoint is added to the window}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Single-Node Experiments}{5}{subsection.4.3}\protected@file@percent }
+\newlabel{sec:single_node_experiments}{{\mbox  {IV-C}}{5}{Single-Node Experiments}{subsection.4.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Time series datasets used in our experiments.}}{5}{table.caption.6}\protected@file@percent }
+\newlabel{tab:datasets}{{I}{5}{Time series datasets used in our experiments}{table.caption.6}{}}
+\citation{oct,networkfpga}
+\citation{CloudLabs}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Post place-and-route resource utilization on Alveo U280.}}{6}{table.caption.7}\protected@file@percent }
+\newlabel{tab:resource_annotated}{{II}{6}{Post place-and-route resource utilization on Alveo U280}{table.caption.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Throughput (inferences/sec) and classification accuracy (\%). Baseline = single-threaded C++ \texttt  {-O3 -march=native} on the same kernel source compiled natively (HLS pragmas no-op); Speedup = FPGA 3CU / C++ baseline.}}{6}{table.caption.8}\protected@file@percent }
+\newlabel{tab:throughput}{{III}{6}{Throughput (inferences/sec) and classification accuracy (\%). Baseline = single-threaded C++ \texttt {-O3 -march=native} on the same kernel source compiled natively (HLS pragmas no-op); Speedup = FPGA 3CU / C++ baseline}{table.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Streaming Experiment}{6}{subsection.4.4}\protected@file@percent }
+\newlabel{sec:streaming_experiments}{{\mbox  {IV-D}}{6}{Streaming Experiment}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Experimental Results}{6}{section.5}\protected@file@percent }
+\newlabel{sec:ExpResults}{{V}{6}{Experimental Results}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Resource Utilization}{6}{subsection.5.1}\protected@file@percent }
+\newlabel{sec:resource_utilization}{{\mbox  {V-A}}{6}{Resource Utilization}{subsection.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Throughput, Latency, and Accuracy}{6}{subsection.5.2}\protected@file@percent }
+\newlabel{sec:single_node_results}{{\mbox  {V-B}}{6}{Throughput, Latency, and Accuracy}{subsection.5.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Impact of fused CONV+PPV kernel on MiniRocket (1 CU, 300 MHz).}}{6}{table.caption.9}\protected@file@percent }
+\newlabel{tab:fused}{{IV}{6}{Impact of fused CONV+PPV kernel on MiniRocket (1 CU, 300 MHz)}{table.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces MiniRocket CU scaling (fused kernel, inferences/sec).}}{6}{table.caption.10}\protected@file@percent }
+\newlabel{tab:cu_scaling}{{V}{6}{MiniRocket CU scaling (fused kernel, inferences/sec)}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Design Space Exploration}{6}{subsection.5.3}\protected@file@percent }
+\newlabel{sec:design_space}{{\mbox  {V-C}}{6}{Design Space Exploration}{subsection.5.3}{}}
+\citation{UCRTimeSeries,UEATimeSeries,MONSTER}
+\citation{sktime,pyts,tslearn,aeon-arxiv,aeon-pkdd}
+\citation{BakeOff,BakeOffRedux,BakeOffReduxCorrection}
+\citation{Rocket}
+\citation{MiniRocket}
+\citation{MultiRocket}
+\citation{Hydra}
+\citation{HIVE-COTE2.0}
+\citation{ChiosaAMNES}
+\citation{CostaShapelet,LiuShapelet}
+\citation{SartDTW,WangDTW}
+\citation{RomeroMP,KalantarLAMP}
+\citation{SpectralAnomalyDetection}
+\citation{Eciton}
+\citation{InceptionTime,H-InceptionTime,LiteTime}
+\citation{H-InceptionTime}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces HYDRA FPGA design comparison: monolithic kernel vs.\ 3-kernel dataflow pipeline (on-chip AXI-Stream). Both use ap\_fixed$\langle $32,16$\rangle $, UNROLL=16, 1\,CU on Alveo U280.}}{7}{table.caption.11}\protected@file@percent }
+\newlabel{tab:hydra_comparison}{{VI}{7}{HYDRA FPGA design comparison: monolithic kernel vs.\ 3-kernel dataflow pipeline (on-chip AXI-Stream). Both use ap\_fixed$\langle $32,16$\rangle $, UNROLL=16, 1\,CU on Alveo U280}{table.caption.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces GPU (Tesla T4) vs.\ FPGA (Alveo U280) throughput (inferences/sec). FPGA columns use per-sample OpenCL dispatch (effective batch=1); GPU columns report both batch=256 (offline upper bound) and batch=1 (streaming).}}{7}{table.caption.12}\protected@file@percent }
+\newlabel{tab:gpu_comparison}{{VII}{7}{GPU (Tesla T4) vs.\ FPGA (Alveo U280) throughput (inferences/sec). FPGA columns use per-sample OpenCL dispatch (effective batch=1); GPU columns report both batch=256 (offline upper bound) and batch=1 (streaming)}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}GPU Comparison}{7}{subsection.5.4}\protected@file@percent }
+\newlabel{sec:gpu_comparison}{{\mbox  {V-D}}{7}{GPU Comparison}{subsection.5.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces MiniRocket GPU/FPGA throughput ratio vs.\ time series length. GPU: Tesla T4, batch=256 and batch=1. FPGA: Alveo U280, fused 1-CU, 300\,MHz.}}{7}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:gpu_scalability}{{6}{7}{MiniRocket GPU/FPGA throughput ratio vs.\ time series length. GPU: Tesla T4, batch=256 and batch=1. FPGA: Alveo U280, fused 1-CU, 300\,MHz}{figure.caption.13}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Energy efficiency: MiniRocket inference. FPGA 25.7\,W (static-dominated at $<$5\% utilization); GPU via nvidia-smi; CPU via RAPL.}}{7}{table.caption.14}\protected@file@percent }
+\newlabel{tab:power}{{VIII}{7}{Energy efficiency: MiniRocket inference. FPGA 25.7\,W (static-dominated at $<$5\% utilization); GPU via nvidia-smi; CPU via RAPL}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Network Streaming Results}{7}{subsection.5.5}\protected@file@percent }
+\newlabel{sec:streaming_results}{{\mbox  {V-E}}{7}{Network Streaming Results}{subsection.5.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Related Work}{7}{section.6}\protected@file@percent }
+\newlabel{sec:Related}{{VI}{7}{Related Work}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Time Series Classification}{7}{subsection.6.1}\protected@file@percent }
+\newlabel{sec:TSC}{{\mbox  {VI-A}}{7}{Time Series Classification}{subsection.6.1}{}}
+\bibstyle{IEEEtran}
+\bibdata{bibfile}
+\bibcite{BakeOff}{1}
+\bibcite{BakeOffRedux}{2}
+\bibcite{BakeOffReduxCorrection}{3}
+\bibcite{UCRTimeSeries}{4}
+\bibcite{UEATimeSeries}{5}
+\bibcite{MONSTER}{6}
+\bibcite{Hydra}{7}
+\bibcite{ImageNet}{8}
+\bibcite{MiniRocket}{9}
+\bibcite{Jarrett2009}{10}
+\bibcite{Pinto2009}{11}
+\bibcite{Cox2011}{12}
+\bibcite{Saxe2011}{13}
+\bibcite{Yosinski2014}{14}
+\bibcite{Cui2016}{15}
+\bibcite{Wang2017}{16}
+\bibcite{Fawaz2019a}{17}
+\bibcite{Fawaz2019b}{18}
+\bibcite{Zimmerman2019}{19}
+\bibcite{InceptionTime}{20}
+\bibcite{Fawaz2020b}{21}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}FPGA-accelerated Time Series Computation}{8}{subsection.6.2}\protected@file@percent }
+\newlabel{sec:fpga_time_series}{{\mbox  {VI-B}}{8}{FPGA-accelerated Time Series Computation}{subsection.6.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{8}{section.7}\protected@file@percent }
+\newlabel{sec:conclusion}{{VII}{8}{Conclusion}{section.7}{}}
+\@writefile{toc}{\contentsline {section}{References}{8}{section*.15}\protected@file@percent }
+\bibcite{Yu2015}{22}
+\bibcite{Bai2018}{23}
+\bibcite{Rocket}{24}
+\bibcite{aeon-arxiv}{25}
+\bibcite{aeon-pkdd}{26}
+\bibcite{oct}{27}
+\bibcite{networkfpga}{28}
+\bibcite{CloudLabs}{29}
+\bibcite{sktime}{30}
+\bibcite{pyts}{31}
+\bibcite{tslearn}{32}
+\bibcite{MultiRocket}{33}
+\bibcite{HIVE-COTE2.0}{34}
+\bibcite{ChiosaAMNES}{35}
+\bibcite{CostaShapelet}{36}
+\bibcite{LiuShapelet}{37}
+\bibcite{SartDTW}{38}
+\bibcite{WangDTW}{39}
+\bibcite{RomeroMP}{40}
+\bibcite{KalantarLAMP}{41}
+\bibcite{SpectralAnomalyDetection}{42}
+\bibcite{Eciton}{43}
+\bibcite{H-InceptionTime}{44}
+\bibcite{LiteTime}{45}
+\gdef \@abspage@last{9}

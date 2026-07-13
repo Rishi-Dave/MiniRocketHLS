@@ -1,0 +1,19 @@
+\begin{table}[t]
+\centering
+\caption{Post place-and-route resource utilization on Alveo U280.}
+\label{tab:resource_annotated}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{l l r r r r r}
+\toprule
+Algorithm & Config & FF & LUTs & DSPs & BRAMs & Freq \\
+\midrule
+MiniRocket & Fused 1CU & 94,283 & 57,090 & 0 & 185 & 300 MHz \\
+MiniRocket & Fused 2CU & 188,566 & 114,180 & 0 & 370 & 300 MHz \\
+MiniRocket & Fused 3CU & 159,086 & 92,703 & 1,264 & 428 & 269 MHz \\
+MiniRocket & DP-Reuse 1CU & 153,327 & 135,634 & 2 & 1,320 & 300 MHz \\
+\addlinespace
+HYDRA & v2\_fixed 1CU & 58,537 & 41,746 & 1,355 & 86 & 300 MHz \\
+HYDRA & Dataflow 1CU & 20,823 & 15,866 & 55 & 115 & 405 MHz \\
+\bottomrule
+\end{tabular}}
+\end{table}

@@ -1,0 +1,61 @@
+\section{Experimental Results}
+\label{sec:ExpResults}
+
+\subsection{Resource Utilization}
+\label{sec:resource_utilization}
+
+\input{resource_annotated}
+
+Table \ref{tab:resource_annotated} reports post place-and-route resource utilization on the Alveo U280. All single-node designs achieve 300\,MHz; the 3-CU MiniRocket variant is auto-throttled to 269\,MHz due to SLR crossing penalties.
+
+MiniRocket's fused CONV+PPV kernel achieves zero DSP utilization by exploiting the ternary weight structure ($\{-1, +2\}$) through the bFP multiplier (Eq. \ref{eq:bFP}). Hydra's v2\_fixed variant uses 1,355 DSPs because its learned random kernels require standard floating-point multiplication, implemented via ap\_fixed$\langle$32,16$\rangle$ arithmetic.
+
+\subsection{Throughput, Latency, and Accuracy}
+\label{sec:single_node_results}
+
+\input{throughput_table}
+
+Table \ref{tab:throughput} reports throughput and classification accuracy. Both MiniRocket and Hydra are compared against an optimized single-threaded C++ baseline (\texttt{-O3 -march=native}). For Hydra, no third-party optimized C++ implementation exists; we therefore compile the Hydra HLS kernel sources directly as native C++ (HLS pragmas are no-ops outside Vitis HLS), which yields a fair single-core CPU reference. Reference accuracy on a 1000-sample subset matches the FPGA full-set accuracy within statistical noise.
+
+The fused MiniRocket kernel achieves 742--1,967 inferences/sec (1 CU), corresponding to 8.5--58.7$\times$ speedup over C++ with 3 CUs. Hydra achieves 1,507--6,326 inferences/sec (1 CU), scaling to 2,972--10,573 with 3 CUs (7.7--12.1$\times$ over the same C++ baseline). Hydra's narrower speedup ratio reflects that its monolithic kernel maps more efficiently onto a CPU than MiniRocket's heavily unrolled 84-kernel pipeline. Single-CU P50 latency ranges from 0.62\,ms to 1.49\,ms for MiniRocket and 0.16\,ms to 0.66\,ms for Hydra.
+
+\subsection{Design Space Exploration}
+\label{sec:design_space}
+
+\input{fused_comparison}
+
+Table \ref{tab:fused} quantifies the impact of fusing convolution and PPV pooling into a single-pass kernel. Fusion eliminates the intermediate \texttt{convolutions[16][8192]} array, reducing BRAM by 68\% and DSP to zero, while achieving 6.6--10.9$\times$ throughput improvement.
+
+\input{cu_scaling}
+
+Table \ref{tab:cu_scaling} reports throughput scaling from 1 to 3 compute units. The 2-CU design meets timing at 300\,MHz with 1.51--1.62$\times$ scaling; the 3-CU design uses a higher unroll factor (28 vs.\ 16) to compensate for SLR crossing latency, which introduces 1,264 DSPs per CU (Table \ref{tab:resource_annotated}), and achieves 2.55--3.01$\times$ scaling despite being auto-throttled to 269\,MHz due to timing closure failure (WNS=$-$0.38\,ns).
+
+\input{hydra_comparison_table}
+
+Table \ref{tab:hydra_comparison} compares the monolithic Hydra kernel against a 3-kernel on-chip dataflow decomposition connected by AXI-Stream interfaces (\texttt{load} $\to$ \texttt{hydra\_inference} $\to$ \texttt{store}). This on-chip partitioning (distinct from the network streaming experiment in Section \ref{sec:streaming_results}) synthesizes at 404.86\,MHz and matches the Python reference exactly on all three datasets, confirming that the architecture is amenable to modular partitioning. However, end-to-end throughput is limited by per-sample OpenCL dispatch; for batch inference the monolithic variant remains preferable.
+
+\subsection{GPU Comparison}
+\label{sec:gpu_comparison}
+
+\input{gpu_comparison}
+
+Table \ref{tab:gpu_comparison} reports throughput at two batch sizes that bracket the GPU's operating envelope. Batch size 256 is the GPU's best case for offline/bulk inference, where many samples are available simultaneously. Batch size 1 is the per-sample regime targeted by this work: streaming sensor classification (Section \ref{sec:streaming_results}) and any latency-bound deployment in which samples arrive sequentially over a network or sensor interface, since batching $b$ samples adds at minimum $(b{-}1) \cdot \Delta t$ of queueing delay relative to immediate dispatch. We report both endpoints rather than a single operating point. At batch=256, the GPU achieves 1.5--6.1$\times$ higher throughput than the 3-CU FPGA for MiniRocket (advantage largest for short series, where GPU parallelism dominates) and 1.3--1.5$\times$ for Hydra. At batch=1, the FPGA 3-CU configuration exceeds GPU throughput on all datasets for both algorithms.
+
+\begin{figure}[tp]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/fig4_scaling.pdf}
+    \caption{MiniRocket GPU/FPGA throughput ratio vs.\ time series length. GPU: Tesla T4, batch=256 and batch=1. FPGA: Alveo U280, fused 1-CU, 300\,MHz.}
+    \label{fig:gpu_scalability}
+\end{figure}
+
+Fig. \ref{fig:gpu_scalability} shows how the GPU/FPGA throughput ratio varies with time series length. The GPU advantage at batch=256 drops from 65$\times$ at length 64 to 3.8$\times$ at length 8,192. At batch=1, the FPGA matches the GPU at length $\sim$4,096 (single CU) and $\sim$2,048 (3-CU).
+
+Table~\ref{tab:power} compares energy efficiency across platforms. The FPGA consumes 25.7\,W (measured via \texttt{xbutil examine}); the GPU consumes 54--68\,W under sustained inference; CPU power is measured via Intel RAPL at 40--53\,W under single-threaded inference. For long time series (MosquitoSound), the FPGA 3-CU configuration achieves 92$\times$ better energy efficiency than the CPU baseline and 1.4$\times$ better than the GPU at batch=256. For short series (InsectSound), the GPU's higher batched throughput yields 2.3$\times$ better energy efficiency; the FPGA advantage re-emerges at batch=1. Hydra exhibits similar trends: at 25.7\,W, the 3-CU FPGA consumes 2.4--8.6\,mJ/inf across datasets.
+
+\input{power_table}
+
+\subsection{Network Streaming Results}
+\label{sec:streaming_results}
+
+In the MiniRocket SmartNIC experiment (ArrowHead dataset), the FPGA achieves 4.12\,ms average RTT (1.25\,ms computation + 2.87\,ms communication) vs.\ 11.0\,ms for CPU with Python sockets (2.65$\times$). With DPDK kernel bypass, CPU RTT drops to 5.66\,ms (2.31\,ms computation + 3.35\,ms communication); the FPGA retains a 1.37$\times$ advantage, with gains in both computation (1.85$\times$) and communication (1.17$\times$).
+

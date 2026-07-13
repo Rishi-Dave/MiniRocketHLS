@@ -1,0 +1,79 @@
+
+
+
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\hyphenation{op-tical net-works semi-conduc-tor}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{tablefootnote}
+\usepackage{subcaption}
+\usepackage{ifthen}
+\usepackage[noadjust]{cite}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+
+\newcommand{\eg}{\emph{e.g.,} }
+\newcommand{\ie}{\emph{i.e.,} }
+
+\newcommand{\pb}[1]{\textcolor{blue}{[PB:~#1]}}
+\newcommand{\py}[1]{\textcolor{orange}{[PY:~#1]}}
+\newcommand{\todo}[1]{\textcolor{purple}{[Todo:~#1]}}
+
+
+
+\title{FPGA Acceleration of Convolution-based Classification Algorithms for Streaming Time Series}
+
+%Set 1 = 1 for authors, 0 = 1 for anonymous
+\ifthenelse{\equal{0}{1}}{
+    \author{
+        \and
+        \IEEEauthorblockN{Rishi Dave}
+        \IEEEauthorblockA{
+            University of California, Riverside \\
+            rdave009@cs.ucr.edu
+        }
+        \and
+        \IEEEauthorblockN{Prithviraj Yuvaraj}
+        \IEEEauthorblockA{
+            University of California, Riverside \\
+            pyuva001@ucr.edu
+        }
+        \and
+        \IEEEauthorblockN{Philip Brisk}
+        \IEEEauthorblockA{
+            University of California, Riverside \\
+            philip@cs.ucr.edu
+        }
+    }
+}{
+    \author{\IEEEauthorblockN{Anonymous Authors}}
+}
+
+% make the title area
+\maketitle
+
+\begin{abstract}
+This paper presents a set of FPGA accelerator architectures for three time series classification algorithms, MiniRocket, MultiRocket, and Hydra, all of which employ convolutional kernels to generate features for downstream classifiers. Prior work has established that a combined MultiRocket+Hydra classifier is competitive with the state-of the art in this domain. The accelerators introduced in this paper process streaming time series that are sampled and transmitted over the network for real-time classification. Performing classification on a network-attached FPGA eliminates the latency required to copy data from a NIC to a CPU or GPU via host memory; on the other hand, the FPGA's may or may not retain an advantage if the time series is originally stored in host or onboard memory. These results demonstrate how and when FPGAs may retain an advantage over more traditional computing architecture for processing streaming time series data in real-time, using the aforementioned convolution-based classifiers as representative examples of the processing that might be done. 
+\end{abstract}
+
+
+\input{01_introduction}
+\input{02_background}
+\input{03_architecture}
+\input{04_experiments}
+\input{05_related_work}
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibfile}
+
+
+\end{document}
+
+
