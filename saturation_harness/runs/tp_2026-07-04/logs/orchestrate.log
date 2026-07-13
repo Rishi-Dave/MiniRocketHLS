@@ -1,0 +1,92 @@
+[2026-07-04 13:23:27] === dpr_sweep_orchestrate.sh (Wolverine-driven) starting; rates: 500 1000 2000 5000 10000 25000 50000 100000 250000 500000 1000000 2000000 5000000 ===
+[2026-07-04 13:23:27] === rate step: 500 pps ===
+[2026-07-04 13:23:28]   counters BEFORE: eth_in=1247 app_in=1001 udp_out=2002
+[2026-07-04 13:23:35]   counters AFTER:  eth_in=2752 app_in=2502 udp_out=5004
+[2026-07-04 13:23:35]   row: sent=1501 eth_d=1505 app_d=1501 udp_d=3002 pps=500.333 loss=0.000% bw=256.170kbps
+[2026-07-04 13:23:35]   (rate < 2000, no recovery)
+[2026-07-04 13:23:35] === rate step: 1000 pps ===
+[2026-07-04 13:23:36]   counters BEFORE: eth_in=2753 app_in=2502 udp_out=5004
+[2026-07-04 13:23:43]   counters AFTER:  eth_in=5757 app_in=5503 udp_out=9918
+[2026-07-04 13:23:43]   row: sent=3001 eth_d=3004 app_d=3001 udp_d=4914 pps=1000.333 loss=0.000% bw=512.170kbps
+[2026-07-04 13:23:43]   (rate < 2000, no recovery)
+[2026-07-04 13:23:43] === rate step: 2000 pps ===
+[2026-07-04 13:23:44]   counters BEFORE: eth_in=5758 app_in=5503 udp_out=11006
+[2026-07-04 13:23:50]   counters AFTER:  eth_in=8472 app_in=8206 udp_out=15918
+[2026-07-04 13:23:50]   row: sent=6001 eth_d=2714 app_d=2703 udp_d=4912 pps=901.000 loss=54.958% bw=461.312kbps
+[2026-07-04 13:23:50] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:24:25]   recovery ok
+[2026-07-04 13:24:25] === rate step: 5000 pps ===
+[2026-07-04 13:24:27]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:24:33]   counters AFTER:  eth_in=2320 app_in=2296 udp_out=4592
+[2026-07-04 13:24:33]   row: sent=15001 eth_d=2309 app_d=2296 udp_d=4592 pps=765.333 loss=84.694% bw=391.850kbps
+[2026-07-04 13:24:33] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:25:07]   recovery ok
+[2026-07-04 13:25:07] === rate step: 10000 pps ===
+[2026-07-04 13:25:09]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:25:15]   counters AFTER:  eth_in=2207 app_in=2184 udp_out=4368
+[2026-07-04 13:25:15]   row: sent=30001 eth_d=2196 app_d=2184 udp_d=4368 pps=728.000 loss=92.720% bw=372.736kbps
+[2026-07-04 13:25:15] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:25:50]   recovery ok
+[2026-07-04 13:25:50] === rate step: 25000 pps ===
+[2026-07-04 13:25:51]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:25:58]   counters AFTER:  eth_in=2141 app_in=2118 udp_out=4236
+[2026-07-04 13:25:58]   row: sent=75001 eth_d=2130 app_d=2118 udp_d=4236 pps=706.000 loss=97.176% bw=361.472kbps
+[2026-07-04 13:25:58] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:26:32]   recovery ok
+[2026-07-04 13:26:32] === rate step: 50000 pps ===
+[2026-07-04 13:26:34]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:26:40]   counters AFTER:  eth_in=2122 app_in=2099 udp_out=4198
+[2026-07-04 13:26:40]   row: sent=150001 eth_d=2111 app_d=2099 udp_d=4198 pps=699.667 loss=98.601% bw=358.230kbps
+[2026-07-04 13:26:40] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:27:14]   recovery ok
+[2026-07-04 13:27:15] === rate step: 100000 pps ===
+[2026-07-04 13:27:16]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:27:23]   counters AFTER:  eth_in=2113 app_in=2089 udp_out=4178
+[2026-07-04 13:27:23]   row: sent=300001 eth_d=2102 app_d=2089 udp_d=4178 pps=696.333 loss=99.304% bw=356.522kbps
+[2026-07-04 13:27:23] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:27:57]   recovery ok
+[2026-07-04 13:27:57] === rate step: 250000 pps ===
+[2026-07-04 13:27:58]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:28:05]   counters AFTER:  eth_in=2106 app_in=2083 udp_out=4166
+[2026-07-04 13:28:05]   row: sent=749999 eth_d=2095 app_d=2083 udp_d=4166 pps=694.333 loss=99.722% bw=355.498kbps
+[2026-07-04 13:28:05] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:28:39]   recovery ok
+[2026-07-04 13:28:39] === rate step: 500000 pps ===
+[2026-07-04 13:28:41]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:28:47]   counters AFTER:  eth_in=2106 app_in=2083 udp_out=4166
+[2026-07-04 13:28:47]   row: sent=932209 eth_d=2095 app_d=2083 udp_d=4166 pps=694.333 loss=99.777% bw=355.498kbps
+[2026-07-04 13:28:47] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:29:22]   recovery ok
+[2026-07-04 13:29:23] === rate step: 1000000 pps ===
+[2026-07-04 13:29:24]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:29:31]   counters AFTER:  eth_in=2107 app_in=2083 udp_out=4166
+[2026-07-04 13:29:31]   row: sent=960439 eth_d=2096 app_d=2083 udp_d=4166 pps=694.333 loss=99.783% bw=355.498kbps
+[2026-07-04 13:29:31] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:30:04]   recovery ok
+[2026-07-04 13:30:04] === rate step: 2000000 pps ===
+[2026-07-04 13:30:06]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:30:12]   counters AFTER:  eth_in=2106 app_in=2083 udp_out=4166
+[2026-07-04 13:30:12]   row: sent=912665 eth_d=2095 app_d=2083 udp_d=4166 pps=694.333 loss=99.772% bw=355.498kbps
+[2026-07-04 13:30:12] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:30:47]   recovery ok
+[2026-07-04 13:30:47] === rate step: 5000000 pps ===
+[2026-07-04 13:30:48]   counters BEFORE: eth_in=11 app_in=0 udp_out=0
+[2026-07-04 13:30:55]   counters AFTER:  eth_in=2107 app_in=2083 udp_out=4166
+[2026-07-04 13:30:55]   row: sent=935357 eth_d=2096 app_d=2083 udp_d=4166 pps=694.333 loss=99.777% bw=355.498kbps
+[2026-07-04 13:30:55] RECOVERY: ssh pc160 'bash ~/deploy_v3dpr_pc160.sh'
+[2026-07-04 13:31:30]   recovery ok
+[2026-07-04 13:31:30] === sweep complete. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-04/dpr_sweep.csv ===
+variant,dataset,configured_pps,sent,duration_s,eth_in_delta,app_in_delta,udp_out_delta,processed_pps,loss_pct,bandwidth_kbps
+v3-dpr,len150-binary,500,1501,3,1505,1501,3002,500.333,0.000,256.170
+v3-dpr,len150-binary,1000,3001,3,3004,3001,4914,1000.333,0.000,512.170
+v3-dpr,len150-binary,2000,6001,3,2714,2703,4912,901.000,54.958,461.312
+v3-dpr,len150-binary,5000,15001,3,2309,2296,4592,765.333,84.694,391.850
+v3-dpr,len150-binary,10000,30001,3,2196,2184,4368,728.000,92.720,372.736
+v3-dpr,len150-binary,25000,75001,3,2130,2118,4236,706.000,97.176,361.472
+v3-dpr,len150-binary,50000,150001,3,2111,2099,4198,699.667,98.601,358.230
+v3-dpr,len150-binary,100000,300001,3,2102,2089,4178,696.333,99.304,356.522
+v3-dpr,len150-binary,250000,749999,3,2095,2083,4166,694.333,99.722,355.498
+v3-dpr,len150-binary,500000,932209,3,2095,2083,4166,694.333,99.777,355.498
+v3-dpr,len150-binary,1000000,960439,3,2096,2083,4166,694.333,99.783,355.498
+v3-dpr,len150-binary,2000000,912665,3,2095,2083,4166,694.333,99.772,355.498
+v3-dpr,len150-binary,5000000,935357,3,2096,2083,4166,694.333,99.777,355.498

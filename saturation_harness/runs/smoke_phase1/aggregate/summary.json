@@ -1,0 +1,15 @@
+[
+  {
+    "run_dir": "/home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/smoke_phase1/cpu_InsectSound_v2",
+    "platform": "cpu-minirocket",
+    "dataset": "InsectSound",
+    "n_points": 3,
+    "n_errors": 0,
+    "max_achieved_inf_per_s": 25.498917711187207,
+    "saturation_rate_pps": null,
+    "saturation_throughput_inf_per_s": null,
+    "saturation_reason": "unsaturated",
+    "throughput_fraction_threshold": 0.95,
+    "drop_threshold": 0.01
+  }
+]

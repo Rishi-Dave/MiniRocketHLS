@@ -1,0 +1,36 @@
+[setup] SKIP_DEPLOY=1 — using already-deployed pc160 DUT
+[19:48:26] div=13300 offered=4803 processed=4688 loss=2.41% bw=2400.0kbps (udp_out_d=15)
+[19:48:41] div=6650 offered=9598 processed=9688 loss=-0.93% bw=4960.0kbps (udp_out_d=31)
+[19:48:56] div=2660 offered=23991 processed=24062 loss=-0.30% bw=12320.0kbps (udp_out_d=77)
+[19:49:12] div=1330 offered=47967 processed=48125 loss=-0.33% bw=24640.0kbps (udp_out_d=154)
+[19:49:27] div=665 offered=96564 processed=96562 loss=0.00% bw=49440.0kbps (udp_out_d=309)
+[19:49:35] div=500 offered=135453 processed=135938 loss=-0.36% bw=69600.0kbps (udp_out_d=145)
+[19:49:42] div=200 offered=339306 processed=339375 loss=-0.02% bw=173760.0kbps (udp_out_d=362)
+[19:49:49] div=100 offered=671592 processed=671250 loss=0.05% bw=343680.0kbps (udp_out_d=716)
+[19:49:57] div=65 offered=1027186 processed=1026562 loss=0.06% bw=525600.0kbps (udp_out_d=1095)
+[19:50:04] div=45 offered=1475825 processed=1475625 loss=0.01% bw=755520.0kbps (udp_out_d=1574)
+[19:50:11] div=30 offered=2188112 processed=2188125 loss=-0.00% bw=1120320.0kbps (udp_out_d=2334)
+[19:50:19] div=22 offered=2943538 processed=2943750 loss=-0.01% bw=1507200.0kbps (udp_out_d=3140)
+[19:50:26] div=15 offered=4241280 processed=4241250 loss=0.00% bw=2171520.0kbps (udp_out_d=4524)
+[19:50:33] div=10 offered=6174688 processed=6174375 loss=0.01% bw=3161280.0kbps (udp_out_d=6586)
+[19:50:40] div=6 offered=9696014 processed=7885312 loss=18.67% bw=4037280.0kbps (udp_out_d=8411)
+[19:50:48] div=3 offered=16935349 processed=7870312 loss=53.53% bw=4029600.0kbps (udp_out_d=8395)
+[done] generator quiesced (div=1000000000)
+=== KNEE SWEEP DONE: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-09_f2f_knee/hydra_dropfull_knee_MosquitoSound.csv ===
+rate_divider  offered_pps  processed_pps  loss_pct  bandwidth_kbps  udp_out_delta  app_in_delta
+13300         4803         4688           2.41      2400.0          15             57638
+6650          9598         9688           -0.93     4960.0          31             115175
+2660          23991        24062          -0.30     12320.0         77             287889
+1330          47967        48125          -0.33     24640.0         154            575602
+665           96564        96562          0.00      49440.0         309            1158766
+500           135453       135938         -0.36     69600.0         145            541811
+200           339306       339375         -0.02     173760.0        362            1357224
+100           671592       671250         0.05      343680.0        716            2686366
+65            1027186      1026562        0.06      525600.0        1095           4108745
+45            1475825      1475625        0.01      755520.0        1574           5903299
+30            2188112      2188125        -0.00     1120320.0       2334           8752447
+22            2943538      2943750        -0.01     1507200.0       3140           11774154
+15            4241280      4241250        0.00      2171520.0       4524           16965120
+10            6174688      6174375        0.01      3161280.0       6586           24698751
+6             9696014      7885312        18.67     4037280.0       8411           38784057
+3             16935349     7870312        53.53     4029600.0       8395           67741395

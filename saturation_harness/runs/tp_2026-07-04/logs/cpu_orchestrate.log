@@ -1,0 +1,93 @@
+[2026-07-04 13:50:54] === cpu_sweep_orchestrate.sh (Wolverine-driven) starting; rates: 500 1000 2000 5000 10000 25000 50000 100000 250000 500000 ===
+[2026-07-04 13:50:54] *** FPGA on pc160 is left untouched -- no xbutil, no program, no reset. ***
+[2026-07-04 13:50:54] starting minirocket responder on pc160 192.168.40.30:51000 (model=models/minirocket_model.json)
+[2026-07-04 13:51:08]   responder pid(s) on pc160: 18041
+[2026-07-04 13:51:08] === [minirocket] rate step: 500 pps ===
+[2026-07-04 13:51:09]   packets_received BEFORE: 0
+[2026-07-04 13:51:16]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-04 13:51:16] === [minirocket] rate step: 1000 pps ===
+[2026-07-04 13:51:17]   packets_received BEFORE: 1501
+[2026-07-04 13:51:24]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-04 13:51:24] === [minirocket] rate step: 2000 pps ===
+[2026-07-04 13:51:25]   packets_received BEFORE: 4502
+[2026-07-04 13:51:32]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-04 13:51:32] === [minirocket] rate step: 5000 pps ===
+[2026-07-04 13:51:33]   packets_received BEFORE: 10503
+[2026-07-04 13:51:40]   row: sent=15001 before=10503 after=25504 processed=15001 processed_pps=5000.3
+[2026-07-04 13:51:40] === [minirocket] rate step: 10000 pps ===
+[2026-07-04 13:51:41]   packets_received BEFORE: 25504
+[2026-07-04 13:51:47]   row: sent=30001 before=25504 after=55171 processed=29667 processed_pps=9889.0
+[2026-07-04 13:51:47] === [minirocket] rate step: 25000 pps ===
+[2026-07-04 13:51:49]   packets_received BEFORE: 55171
+[2026-07-04 13:51:56]   row: sent=75001 before=55171 after=96123 processed=40952 processed_pps=13650.7
+[2026-07-04 13:51:56] === [minirocket] rate step: 50000 pps ===
+[2026-07-04 13:51:57]   packets_received BEFORE: 96123
+[2026-07-04 13:52:03]   row: sent=150001 before=96123 after=137415 processed=41292 processed_pps=13764.0
+[2026-07-04 13:52:03] === [minirocket] rate step: 100000 pps ===
+[2026-07-04 13:52:05]   packets_received BEFORE: 137415
+[2026-07-04 13:52:11]   row: sent=300001 before=137415 after=179431 processed=42016 processed_pps=14005.3
+[2026-07-04 13:52:11] === [minirocket] rate step: 250000 pps ===
+[2026-07-04 13:52:12]   packets_received BEFORE: 179431
+[2026-07-04 13:52:19]   row: sent=750000 before=179431 after=221567 processed=42136 processed_pps=14045.3
+[2026-07-04 13:52:19] === [minirocket] rate step: 500000 pps ===
+[2026-07-04 13:52:20]   packets_received BEFORE: 221567
+[2026-07-04 13:52:27]   row: sent=937894 before=221567 after=263550 processed=41983 processed_pps=13994.3
+[2026-07-04 13:52:27] stopping minirocket responder on pc160
+[2026-07-04 13:52:29] === minirocket sweep complete. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-04/cpu_minirocket_sweep.csv ===
+variant,dataset,configured_pps,sent,duration_s,processed_pkts,processed_pps,loss_pct,bandwidth_kbps
+cpu-minirocket,len150-binary,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-minirocket,len150-binary,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-minirocket,len150-binary,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-minirocket,len150-binary,5000.0,15001,3.0,15001,5000.333333333333,0.0,2560.1706666666664
+cpu-minirocket,len150-binary,10000.0,30001,3.0,29667,9889.0,1.1132962234592148,5063.168
+cpu-minirocket,len150-binary,25000.0,75001,3.0,40952,13650.666666666666,45.398061359181874,6989.141333333333
+cpu-minirocket,len150-binary,50000.0,150001,3.0,41292,13764.0,72.47218351877653,7047.168
+cpu-minirocket,len150-binary,100000.0,300001,3.0,42016,14005.333333333334,85.9947133509555,7170.730666666667
+cpu-minirocket,len150-binary,250000.0,750000,3.0,42136,14045.333333333334,94.38186666666667,7191.210666666667
+cpu-minirocket,len150-binary,500000.0,937894,3.0,41983,13994.333333333334,95.52369457529316,7165.098666666667
+[2026-07-04 13:52:29] starting hydra responder on pc160 192.168.40.30:51001 (model=models/hydra_insectsound_model.json)
+[2026-07-04 13:52:42]   responder pid(s) on pc160: 18632
+[2026-07-04 13:52:42] === [hydra] rate step: 500 pps ===
+[2026-07-04 13:52:43]   packets_received BEFORE: 0
+[2026-07-04 13:52:50]   row: sent=1501 before=0 after=1501 processed=1501 processed_pps=500.3
+[2026-07-04 13:52:50] === [hydra] rate step: 1000 pps ===
+[2026-07-04 13:52:51]   packets_received BEFORE: 1501
+[2026-07-04 13:52:58]   row: sent=3001 before=1501 after=4502 processed=3001 processed_pps=1000.3
+[2026-07-04 13:52:58] === [hydra] rate step: 2000 pps ===
+[2026-07-04 13:52:59]   packets_received BEFORE: 4502
+[2026-07-04 13:53:06]   row: sent=6001 before=4502 after=10503 processed=6001 processed_pps=2000.3
+[2026-07-04 13:53:06] === [hydra] rate step: 5000 pps ===
+[2026-07-04 13:53:07]   packets_received BEFORE: 10503
+[2026-07-04 13:53:14]   row: sent=15001 before=10503 after=25504 processed=15001 processed_pps=5000.3
+[2026-07-04 13:53:14] === [hydra] rate step: 10000 pps ===
+[2026-07-04 13:53:15]   packets_received BEFORE: 25504
+[2026-07-04 13:53:22]   row: sent=30001 before=25504 after=55505 processed=30001 processed_pps=10000.3
+[2026-07-04 13:53:22] === [hydra] rate step: 25000 pps ===
+[2026-07-04 13:53:23]   packets_received BEFORE: 55505
+[2026-07-04 13:53:30]   row: sent=75001 before=55505 after=124889 processed=69384 processed_pps=23128.0
+[2026-07-04 13:53:30] === [hydra] rate step: 50000 pps ===
+[2026-07-04 13:53:31]   packets_received BEFORE: 124889
+[2026-07-04 13:53:38]   row: sent=150001 before=124889 after=244985 processed=120096 processed_pps=40032.0
+[2026-07-04 13:53:38] === [hydra] rate step: 100000 pps ===
+[2026-07-04 13:53:39]   packets_received BEFORE: 244985
+[2026-07-04 13:53:46]   row: sent=300001 before=244985 after=455224 processed=210239 processed_pps=70079.7
+[2026-07-04 13:53:46] === [hydra] rate step: 250000 pps ===
+[2026-07-04 13:53:47]   packets_received BEFORE: 455224
+[2026-07-04 13:53:53]   row: sent=749999 before=455224 after=771702 processed=316478 processed_pps=105492.7
+[2026-07-04 13:53:54] === [hydra] rate step: 500000 pps ===
+[2026-07-04 13:53:55]   packets_received BEFORE: 771702
+[2026-07-04 13:54:02]   row: sent=916007 before=771702 after=1104175 processed=332473 processed_pps=110824.3
+[2026-07-04 13:54:02] stopping hydra responder on pc160
+[2026-07-04 13:54:03] === hydra sweep complete. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-04/cpu_hydra_sweep.csv ===
+variant,dataset,configured_pps,sent,duration_s,processed_pkts,processed_pps,loss_pct,bandwidth_kbps
+cpu-hydra,InsectSound,500.0,1501,3.0,1501,500.3333333333333,0.0,256.17066666666665
+cpu-hydra,InsectSound,1000.0,3001,3.0,3001,1000.3333333333334,0.0,512.1706666666666
+cpu-hydra,InsectSound,2000.0,6001,3.0,6001,2000.3333333333333,0.0,1024.1706666666666
+cpu-hydra,InsectSound,5000.0,15001,3.0,15001,5000.333333333333,0.0,2560.1706666666664
+cpu-hydra,InsectSound,10000.0,30001,3.0,30001,10000.333333333334,0.0,5120.170666666667
+cpu-hydra,InsectSound,25000.0,75001,3.0,69384,23128.0,7.4892334768869695,11841.536
+cpu-hydra,InsectSound,50000.0,150001,3.0,120096,40032.0,19.93653375644162,20496.384
+cpu-hydra,InsectSound,100000.0,300001,3.0,210239,70079.66666666667,29.92056693144356,35880.789333333334
+cpu-hydra,InsectSound,250000.0,749999,3.0,316478,105492.66666666667,57.80287707050276,54012.24533333333
+cpu-hydra,InsectSound,500000.0,916007,3.0,332473,110824.33333333333,63.70409833112629,56742.058666666664
+[2026-07-04 13:54:03] === all CPU baseline sweeps complete ===

@@ -1,0 +1,364 @@
+=== ENV ===
+XILINXD_LICENSE_FILE=/home/rdave009/.Xilinx/Xilinx.lic:/opt/Xilinx.lic
+/home/Xilinx/Vitis/2023.2/bin/v++
+/home/Xilinx/Vitis_HLS/2023.2/bin/vitis_hls
+
+****** v++ v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+=== license features available ===
+/home/rdave009/.Xilinx/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+/opt/Xilinx.lic:INCREMENT xilinxd
+-rw------- 1 rdave009 rdave009 2390746 May 22 20:59 /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo
+=== make build Sun May 24 06:56:34 PM PDT 2026 ===
+mkdir -p ./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1
+v++ -t hw --platform xilinx_u280_gen3x16_xdma_1_202211_1 --save-temps -I./src --config config.cfg -l  --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/100G-fpga-network-stack-core/synthesis_results_HBM --user_ip_repo_paths ./iprepo --temp_dir _x.xilinx_u280_gen3x16_xdma_1_202211_1 -o'./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin' build/iprepo/minirocket_inference.xo NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo
+Option Map File Used: '/home/Xilinx/Vitis/2023.2/data/vitis/vpp/optMap.xml'
+
+****** v++ v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: [v++ 60-1306] Additional information associated with this v++ link can be found at:
+	Reports: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link
+	Log files: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link
+Running Dispatch Server on port: 45107
+INFO: [v++ 60-1548] Creating build summary session with primary output /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.link_summary, at Sun May 24 18:56:39 2026
+INFO: [v++ 60-1315] Creating rulecheck session with output '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/v++_link_krnl_guidance.html', at Sun May 24 18:56:39 2026
+INFO: [v++ 60-895]   Target platform: /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm
+INFO: [v++ 60-1578]   This platform contains Xilinx Shell Archive '/opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/hw/hw.xsa'
+INFO: [v++ 74-78] Compiler Version string: 2023.2
+INFO: [v++ 60-629] Linking for hardware target
+INFO: [v++ 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [v++ 60-1332] Run 'run_link' status: Not started
+INFO: [v++ 60-1443] [18:56:47] Run run_link: Step system_link: Started
+INFO: [v++ 60-1453] Command Line: system_link --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo --xo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo -keep --config /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/syslinkConfig.ini --xpfm /opt/xilinx/platforms/xilinx_u280_gen3x16_xdma_1_202211_1/xilinx_u280_gen3x16_xdma_1_202211_1.xpfm --target hw --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build/iprepo/minirocket_inference.xo
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/_x.xilinx_u280_gen3x16_xdma_1_202211_1/networklayer.xo
+INFO: [SYSTEM_LINK 82-70] Extracting xo v3 file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/Ethernet/_x.xilinx_u280_gen3x16_xdma_1_202211_1/cmac_0.xo
+INFO: [SYSTEM_LINK 82-53] Creating IP database /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-38] [18:56:50] build_xd_ip_db started: /home/Xilinx/Vitis/2023.2/bin/build_xd_ip_db -ip_search 0  -sds-pf /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/hw.hpfm -clkid 0 -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_kernel_networklayer_1_0,networklayer -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_hls_minirocket_inference_1_0,minirocket_inference -ip /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/iprepo/xilinx_com_kernel_cmac_0_1_0,cmac_0 -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml
+INFO: [SYSTEM_LINK 82-37] [18:56:58] build_xd_ip_db finished successfully
+Time (s): cpu = 00:00:07 ; elapsed = 00:00:08 . Memory (MB): peak = 462.977 ; gain = 0.000 ; free physical = 2126 ; free virtual = 89550
+INFO: [SYSTEM_LINK 82-51] Create system connectivity graph
+INFO: [SYSTEM_LINK 82-102] Applying explicit connections to the system connectivity graph: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [SYSTEM_LINK 82-38] [18:56:58] cfgen started: /home/Xilinx/Vitis/2023.2/bin/cfgen  -nk minirocket_inference:1:minirocket_inference_1 -nk cmac_0:1:cmac_0_1 -nk networklayer:1:networklayer_1 -sc cmac_0_1.M_AXIS:networklayer_1.S_AXIS_eth2nl -sc networklayer_1.M_AXIS_nl2eth:cmac_0_1.S_AXIS -sc minirocket_inference_1.output_predictions:networklayer_1.S_AXIS_sk2nl -sc networklayer_1.M_AXIS_nl2sk:minirocket_inference_1.input_timeseries -slr cmac_0_1:SLR2 -sp minirocket_inference_1.coefficients:HBM[2] -sp minirocket_inference_1.intercept:HBM[3] -sp minirocket_inference_1.scaler_mean:HBM[4] -sp minirocket_inference_1.scaler_scale:HBM[5] -sp minirocket_inference_1.dilations:HBM[6] -sp minirocket_inference_1.num_features_per_dilation:HBM[7] -sp minirocket_inference_1.biases:HBM[8] -dpa_mem_offload false -dmclkid 0 -r /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml
+INFO: [CFGEN 83-0] Kernel Specs: 
+INFO: [CFGEN 83-0]   kernel: minirocket_inference, num: 1  {minirocket_inference_1}
+INFO: [CFGEN 83-0]   kernel: cmac_0, num: 1  {cmac_0_1}
+INFO: [CFGEN 83-0]   kernel: networklayer, num: 1  {networklayer_1}
+INFO: [CFGEN 83-0] Port Specs: 
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: coefficients, sptag: HBM[2]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: intercept, sptag: HBM[3]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: scaler_mean, sptag: HBM[4]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: scaler_scale, sptag: HBM[5]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: dilations, sptag: HBM[6]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: num_features_per_dilation, sptag: HBM[7]
+INFO: [CFGEN 83-0]   kernel: minirocket_inference_1, k_port: biases, sptag: HBM[8]
+INFO: [CFGEN 83-0] Stream Specs: 
+INFO: [CFGEN 83-0]   cmac_0_1.M_AXIS => networklayer_1.S_AXIS_eth2nl
+INFO: [CFGEN 83-0]   networklayer_1.M_AXIS_nl2eth => cmac_0_1.S_AXIS
+INFO: [CFGEN 83-0]   minirocket_inference_1.output_predictions => networklayer_1.S_AXIS_sk2nl
+INFO: [CFGEN 83-0]   networklayer_1.M_AXIS_nl2sk => minirocket_inference_1.input_timeseries
+INFO: [CFGEN 83-0] SLR Specs: 
+INFO: [CFGEN 83-0]   instance: cmac_0_1, SLR: SLR2
+INFO: [SYSTEM_LINK 82-37] [18:57:11] cfgen finished successfully
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 462.977 ; gain = 0.000 ; free physical = 1250 ; free virtual = 89551
+INFO: [SYSTEM_LINK 82-52] Create top-level block diagram
+INFO: [SYSTEM_LINK 82-38] [18:57:11] cf2bd started: /home/Xilinx/Vitis/2023.2/bin/cf2bd  --linux --trace_buffer 1024 --input_file /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml --ip_db /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml --cf_name dr --working_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.xsd --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --target_bd ulp.bd
+INFO: [CF2BD 82-31] Launching cf2xd: cf2xd -linux -trace-buffer 1024 -i /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/cfgraph/cfgen_cfgraph.xml -r /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.cdb/xd_ip_db.xml -o dr.xml
+INFO: [CF2BD 82-28] cf2xd finished successfully
+INFO: [CF2BD 82-31] Launching cf_xsd: cf_xsd -disable-address-gen -bd ulp.bd -dn dr -dp /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/sys_link/_sysl/.xsd
+INFO: [CF2BD 82-28] cf_xsd finished successfully
+INFO: [SYSTEM_LINK 82-37] [18:57:22] cf2bd finished successfully
+Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 462.977 ; gain = 0.000 ; free physical = 638 ; free virtual = 89578
+INFO: [v++ 60-1441] [18:57:22] Run run_link: Step system_link: Completed
+Time (s): cpu = 00:00:34 ; elapsed = 00:00:35 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 704 ; free virtual = 89644
+INFO: [v++ 60-1443] [18:57:22] Run run_link: Step cf2sw: Started
+INFO: [v++ 60-1453] Command Line: cf2sw -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/sdsl.dat -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/cf2sw.rtd -nofilter /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/cf2sw_full.rtd -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.xml -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.1.xml
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [18:57:44] Run run_link: Step cf2sw: Completed
+Time (s): cpu = 00:00:22 ; elapsed = 00:00:22 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 655 ; free virtual = 89636
+INFO: [v++ 60-1443] [18:57:44] Run run_link: Step rtd2_system_diagram: Started
+INFO: [v++ 60-1453] Command Line: rtd2SystemDiagram
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [18:57:45] Run run_link: Step rtd2_system_diagram: Completed
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.72 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 684 ; free virtual = 89663
+INFO: [v++ 60-1443] [18:57:45] Run run_link: Step vpl: Started
+INFO: [v++ 60-1453] Command Line: vpl -t hw -f xilinx_u280_gen3x16_xdma_1_202211_1 -s --remote_ip_cache /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/.ipcache --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/NetLayers/100G-fpga-network-stack-core/synthesis_results_HBM --user_ip_repo_paths /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./iprepo --output_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int --log_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link --report_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link --config /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/vplConfig.ini -k /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/kernel_info.dat --webtalk_flag Vitis --temp_dir /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link --no-info --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_kernel_cmac_0_1_0 --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_kernel_networklayer_1_0 --iprepo /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xo/ip_repo/xilinx_com_hls_minirocket_inference_1_0 --messageDb /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link/vpl.pb /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/dr.bd.tcl
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+
+****** vpl v2023.2 (64-bit)
+  **** SW Build 4026344 on 2023-10-11-15:42:10
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+
+INFO: [VPL 60-839] Read in kernel information from file '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/kernel_info.dat'.
+INFO: [VPL 74-78] Compiler Version string: 2023.2
+INFO: [VPL 60-423]   Target device: xilinx_u280_gen3x16_xdma_1_202211_1
+INFO: [VPL 60-1032] Extracting hardware platform to /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/vivado/vpl/.local/hw_platform
+[18:58:10] Run vpl: Step create_project: Started
+Creating Vivado project.
+[18:58:21] Run vpl: Step create_project: Completed
+[18:58:21] Run vpl: Step create_bd: Started
+[18:59:12] Run vpl: Step create_bd: Completed
+[18:59:12] Run vpl: Step update_bd: Started
+[18:59:12] Run vpl: Step update_bd: Completed
+[18:59:12] Run vpl: Step generate_target: Started
+[19:00:28] Run vpl: Step generate_target: RUNNING...
+[19:01:43] Run vpl: Step generate_target: RUNNING...
+[19:02:18] Run vpl: Step generate_target: Completed
+[19:02:18] Run vpl: Step config_hw_runs: Started
+[19:02:46] Run vpl: Step config_hw_runs: Completed
+[19:02:46] Run vpl: Step synth: Started
+[19:03:48] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:04:18] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:04:48] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:05:18] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:05:49] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:06:19] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:06:49] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:07:19] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:07:49] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:08:20] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:08:50] Block-level synthesis in progress, 0 of 3 jobs complete, 2 jobs running.
+[19:09:20] Block-level synthesis in progress, 1 of 3 jobs complete, 1 job running.
+[19:09:50] Block-level synthesis in progress, 1 of 3 jobs complete, 1 job running.
+[19:10:20] Block-level synthesis in progress, 2 of 3 jobs complete, 0 jobs running.
+[19:10:50] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[19:11:21] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[19:11:51] Block-level synthesis in progress, 2 of 3 jobs complete, 1 job running.
+[19:11:53] Run vpl: Step synth: Completed
+[19:11:53] Run vpl: Step impl: Started
+[19:30:02] Finished 2nd of 6 tasks (FPGA linking synthesized kernels to platform). Elapsed time: 00h 32m 14s 
+
+[19:30:02] Starting logic optimization..
+[19:30:32] Phase 1 Initialization
+[19:30:32] Phase 1.1 Core Generation And Design Setup
+[19:31:02] Phase 1.2 Setup Constraints And Sort Netlist
+[19:31:32] Phase 2 Timer Update And Timing Data Collection
+[19:31:32] Phase 2.1 Timer Update
+[19:32:03] Phase 2.2 Timing Data Collection
+[19:32:03] Phase 3 Retarget
+[19:33:03] Phase 4 Constant propagation
+[19:33:33] Phase 5 Sweep
+[19:36:35] Phase 6 BUFG optimization
+[19:37:05] Phase 7 Shift Register Optimization
+[19:37:35] Phase 8 Post Processing Netlist
+[19:37:35] Phase 9 Finalization
+[19:38:05] Phase 9.1 Finalizing Design Cores and Updating Shapes
+[19:38:05] Phase 9.2 Verifying Netlist Connectivity
+[19:39:06] Finished 3rd of 6 tasks (FPGA logic optimization). Elapsed time: 00h 09m 04s 
+
+[19:39:06] Starting logic placement..
+[19:39:36] Phase 1 Placer Initialization
+[19:39:36] Phase 1.1 Placer Initialization Netlist Sorting
+[19:43:38] Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
+[19:44:38] Phase 1.3 Build Placer Netlist Model
+[19:48:10] Phase 1.4 Constrain Clocks/Macros
+[19:48:40] Phase 2 Global Placement
+[19:48:40] Phase 2.1 Floorplanning
+[19:50:11] Phase 2.1.1 Partition Driven Placement
+[19:50:11] Phase 2.1.1.1 PBP: Partition Driven Placement
+[19:51:42] Phase 2.1.1.2 PBP: Clock Region Placement
+[19:53:13] Phase 2.1.1.3 PBP: Discrete Incremental
+[19:53:44] Phase 2.1.1.4 PBP: Compute Congestion
+[19:54:14] Phase 2.1.1.5 PBP: Macro Placement
+[19:54:14] Phase 2.1.1.6 PBP: UpdateTiming
+[19:55:15] Phase 2.1.1.7 PBP: Add part constraints
+[19:55:46] Phase 2.2 Physical Synthesis After Floorplan
+[19:56:16] Phase 2.3 Update Timing before SLR Path Opt
+[19:56:47] Phase 2.4 Post-Processing in Floorplanning
+[19:56:47] Phase 2.5 Global Placement Core
+[20:23:10] Phase 2.5.1 UpdateTiming Before Physical Synthesis
+[20:23:41] Phase 2.5.2 Physical Synthesis In Placer
+[20:29:47] Phase 3 Detail Placement
+[20:29:47] Phase 3.1 Commit Multi Column Macros
+[20:30:17] Phase 3.2 Commit Most Macros & LUTRAMs
+[20:33:20] Phase 3.3 Small Shape DP
+[20:33:20] Phase 3.3.1 Small Shape Clustering
+[20:33:50] Phase 3.3.2 Slice Area Swap
+[20:34:21] Phase 3.3.2.1 Slice Area Swap Initial
+[20:36:53] Phase 3.4 Place Remaining
+[20:37:54] Phase 3.5 Re-assign LUT pins
+[20:38:55] Phase 3.6 Pipeline Register Optimization
+[20:38:55] Phase 3.7 Fast Optimization
+[20:41:27] Phase 4 Post Placement Optimization and Clean-Up
+[20:41:27] Phase 4.1 Post Commit Optimization
+[20:43:59] Phase 4.1.1 Post Placement Optimization
+[20:43:59] Phase 4.1.1.1 BUFG Insertion
+[20:43:59] Phase 1 Physical Synthesis Initialization
+[20:45:00] Phase 4.1.1.2 BUFG Replication
+[20:45:30] Phase 4.1.1.3 Post Placement Timing Optimization
+[20:56:39] Phase 4.1.1.4 Replication
+[20:59:41] Phase 4.2 Post Placement Cleanup
+[20:59:42] Phase 4.3 Placer Reporting
+[20:59:42] Phase 4.3.1 Print Estimated Congestion
+[21:00:12] Phase 4.4 Final Placement Cleanup
+[21:19:58] Finished 4th of 6 tasks (FPGA logic placement). Elapsed time: 01h 40m 52s 
+
+[21:19:58] Starting logic routing..
+[21:20:59] Phase 1 Build RT Design
+[21:23:01] Phase 2 Router Initialization
+[21:23:01] Phase 2.1 Fix Topology Constraints
+[21:23:01] Phase 2.2 Pre Route Cleanup
+[21:23:01] Phase 2.3 Global Clock Net Routing
+[21:24:02] Phase 2.4 Update Timing
+[21:27:04] Phase 2.5 Update Timing for Bus Skew
+[21:27:04] Phase 2.5.1 Update Timing
+[21:28:05] Phase 3 Initial Routing
+[21:28:05] Phase 3.1 Global Routing
+[21:28:05] Phase 3.2 Initial Net Routing
+[21:29:06] Phase 4 Rip-up And Reroute
+[21:29:06] Phase 4.1 Global Iteration 0
+[21:50:24] Phase 4.2 Global Iteration 1
+[21:53:26] Phase 4.3 Global Iteration 2
+[21:55:28] Phase 4.4 Global Iteration 3
+[22:02:03] Phase 4.5 Global Iteration 4
+[22:03:04] Phase 5 Delay and Skew Optimization
+[22:03:04] Phase 5.1 Delay CleanUp
+[22:03:04] Phase 5.1.1 Update Timing
+[22:03:34] Phase 5.1.2 Update Timing
+[22:04:35] Phase 5.1.3 Update Timing
+[22:05:05] Phase 5.2 Clock Skew Optimization
+[22:05:36] Phase 6 Post Hold Fix
+[22:05:36] Phase 6.1 Hold Fix Iter
+[22:05:36] Phase 6.1.1 Update Timing
+[22:06:06] Phase 6.2 Non Free Resource Hold Fix Iter
+[22:06:36] Phase 7 Route finalize
+[22:06:36] Phase 8 Verifying routed nets
+[22:06:36] Phase 9 Depositing Routes
+[22:07:37] Phase 10 Leaf Clock Prog Delay Opt
+[22:08:08] Phase 10.1 Optimize Skews
+[22:08:08] Phase 10.1.1 Leaf ClockOpt Init
+[22:09:09] Phase 10.2 Post SkewOpt Delay Cleanup
+[22:09:09] Phase 10.2.1 Delay CleanUp
+[22:09:39] Phase 10.2.1.1 Update Timing
+[22:10:09] Phase 10.2.1.2 Update Timing
+[22:11:10] Phase 10.3 Post SkewOpt Hold Fix
+[22:11:10] Phase 10.3.1 Hold Fix Iter
+[22:11:10] Phase 10.3.1.1 Update Timing
+[22:13:42] Phase 11 Depositing Routes
+[22:14:13] Phase 12 Resolve XTalk
+[22:14:13] Phase 13 Post Router Timing
+[22:16:14] Phase 14 Physical Synthesis in Router
+[22:16:14] Phase 14.1 Physical Synthesis Initialization
+[22:19:17] Phase 14.2 Critical Path Optimization
+[22:25:52] Phase 15 Route finalize
+[22:25:52] Finished 5th of 6 tasks (FPGA routing). Elapsed time: 01h 05m 53s 
+
+[22:25:52] Starting bitstream generation..
+[22:26:22] Phase 16 Post-Route Event Processing
+[22:41:04] Creating bitmap...
+[22:48:41] Writing bitstream ./level0_i_ulp_my_rm_partial.bit...
+[22:48:41] Finished 6th of 6 tasks (FPGA bitstream generation). Elapsed time: 00h 22m 49s 
+Check VPL, containing 12 checks, has run: 0 errors, 1 warning violation, 1 advisory violation
+WARNING: [AUTO-FREQ-SCALING-04] One or more timing paths failed timing requirements. The kernel clock ulp_ucs/aclk_kernel_00 has an original frequency equal to 300.000000 MHz. The frequency has been automatically changed to 299.7 MHz to enable proper functionality. The clock Id is 0.
+ADVISORY: [AUTO-FREQ-SCALING-08] For clock hbm_aclk, the auto scaled frequency 466.4 MHz exceeds the original specified frequency. The compiler will select the original specified frequency of 450.0 MHz.
+[22:50:09] Run vpl: Step impl: Completed
+[22:50:11] Run vpl: FINISHED. Run Status: impl Complete!
+INFO: [v++ 60-1441] [22:50:14] Run run_link: Step vpl: Completed
+Time (s): cpu = 00:02:33 ; elapsed = 03:52:29 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 20465 ; free virtual = 97672
+INFO: [v++ 60-1443] [22:50:14] Run run_link: Step rtdgen: Started
+INFO: [v++ 60-1453] Command Line: rtdgen
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-991] clock name 'ulp_ucs/aclk_kernel_01' (clock ID '1') is being mapped to clock name 'KERNEL_CLK' in the xclbin
+INFO: [v++ 60-991] clock name 'ulp_ucs/aclk_kernel_00' (clock ID '0') is being mapped to clock name 'DATA_CLK' in the xclbin
+INFO: [v++ 60-991] clock name 'hbm_aclk' (clock ID '') is being mapped to clock name 'hbm_aclk' in the xclbin
+INFO: [v++ 60-1230] The compiler selected the following frequencies for the runtime controllable kernel clock(s) and scalable system clock(s): System (SYSTEM) clock: hbm_aclk = 450, Kernel (KERNEL) clock: ulp_ucs/aclk_kernel_01 = 500, Kernel (DATA) clock: ulp_ucs/aclk_kernel_00 = 299
+INFO: [v++ 60-1453] Command Line: cf2sw -a /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/address_map.xml -sdsl /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/sdsl.dat -xclbin /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/xclbin_orig.xml -rtd /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.rtd -o /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml
+INFO: [v++ 60-1652] Cf2sw returned exit code: 0
+INFO: [v++ 60-1441] [22:50:33] Run run_link: Step rtdgen: Completed
+Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19119 ; free virtual = 97227
+INFO: [v++ 60-1443] [22:50:33] Run run_link: Step xclbinutil: Started
+INFO: [v++ 60-1453] Command Line: xclbinutil --add-section BITSTREAM:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/partial.bit --force --target hw --key-value SYS:dfx_enable:true --add-section :JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.rtd --append-section :JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/appendSection.rtd --add-section CLOCK_FREQ_TOPOLOGY:JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_xml.rtd --add-section BUILD_METADATA:JSON:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_build.rtd --add-section EMBEDDED_METADATA:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml --add-section SYSTEM_METADATA:RAW:/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/systemDiagramModelSlrBaseAddress.json --key-value SYS:PlatformVBNV:xilinx_u280_gen3x16_xdma_1_202211_1 --output /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+XRT Build Version: 2.16.204 (2023.2)
+       Build Date: 2023-10-11 23:45:57
+          Hash ID: fa4c0045003fed0acea4593788dce5ef6d0b66ee
+Creating a default 'in-memory' xclbin image.
+
+Section: 'BITSTREAM'(0) was successfully added.
+Size   : 60782798 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/partial.bit'
+
+Section: 'MEM_TOPOLOGY'(6) was successfully added.
+Format : JSON
+File   : 'mem_topology'
+
+Section: 'IP_LAYOUT'(8) was successfully added.
+Format : JSON
+File   : 'ip_layout'
+
+Section: 'CONNECTIVITY'(7) was successfully added.
+Format : JSON
+File   : 'connectivity'
+
+Section: 'CLOCK_FREQ_TOPOLOGY'(11) was successfully added.
+Size   : 410 bytes
+Format : JSON
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_xml.rtd'
+
+Section: 'BUILD_METADATA'(14) was successfully added.
+Size   : 28505 bytes
+Format : JSON
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl_build.rtd'
+
+Section: 'EMBEDDED_METADATA'(2) was successfully added.
+Size   : 123887 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/krnl.xml'
+
+Section: 'SYSTEM_METADATA'(22) was successfully added.
+Size   : 96596 bytes
+Format : RAW
+File   : '/home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/int/systemDiagramModelSlrBaseAddress.json'
+
+Section: 'PARTITION_METADATA'(20) was successfully appended to.
+Format : JSON
+File   : 'partition_metadata'
+
+Section: 'IP_LAYOUT'(8) was successfully appended to.
+Format : JSON
+File   : 'ip_layout'
+Successfully wrote (61090933 bytes) to the output file: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+Leaving xclbinutil.
+INFO: [v++ 60-1441] [22:50:33] Run run_link: Step xclbinutil: Completed
+Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.26 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 19039 ; free virtual = 97223
+INFO: [v++ 60-1443] [22:50:33] Run run_link: Step xclbinutilinfo: Started
+INFO: [v++ 60-1453] Command Line: xclbinutil --quiet --force --info /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.info --input /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [22:50:34] Run run_link: Step xclbinutilinfo: Completed
+Time (s): cpu = 00:00:00.67 ; elapsed = 00:00:00.72 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 18973 ; free virtual = 97193
+INFO: [v++ 60-1443] [22:50:34] Run run_link: Step generate_sc_driver: Started
+INFO: [v++ 60-1453] Command Line: 
+INFO: [v++ 60-1454] Run Directory: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/link/run_link
+INFO: [v++ 60-1441] [22:50:34] Run run_link: Step generate_sc_driver: Completed
+Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.08 . Memory (MB): peak = 473.402 ; gain = 0.000 ; free physical = 18971 ; free virtual = 97191
+INFO: [v++ 60-2331] SLR2 was specfied for compute unit cmac_0_1, and verified as such in implementation.
+Check POST-VPL, containing 1 checks, has run: 0 errors
+INFO: [v++ 60-244] Generating system estimate report...
+INFO: [v++ 60-1092] Generated system estimate report: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/system_estimate_krnl.xtxt
+INFO: [v++ 60-586] Created /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.ltx
+INFO: [v++ 60-586] Created ./build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin
+INFO: [v++ 60-1307] Run completed. Additional information can be found in:
+	Guidance: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/v++_link_krnl_guidance.html
+	Timing Report: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/reports/link/imp/impl_1_hw_bb_locked_timing_summary_routed.rpt
+	Vivado Log: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link/vivado.log
+	Steps Log File: /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/_x.xilinx_u280_gen3x16_xdma_1_202211_1/logs/link/link.steps.log
+
+INFO: [v++ 60-2343] Use the vitis_analyzer tool to visualize and navigate the relevant reports. Run the following command. 
+    vitis_analyzer /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin.link_summary 
+INFO: [v++ 60-791] Total elapsed time: 3h 53m 58s
+INFO: [v++ 60-1653] Closing dispatch client.
+=== FINISHED Sun May 24 10:50:36 PM PDT 2026 RC=0 elapsed=14042s ===
+-rw------- 1 rdave009 rdave009 61090933 May 24 22:50 /home/rdave009/minirocket-hls/MiniRocketHLS/fpga-network/build_dir.hw.xilinx_u280_gen3x16_xdma_1_202211_1/krnl.xclbin

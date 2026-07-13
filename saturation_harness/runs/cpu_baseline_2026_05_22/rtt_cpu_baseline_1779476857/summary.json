@@ -1,0 +1,17 @@
+{
+  "fpga_ip": "192.168.40.31",
+  "fpga_port": 62177,
+  "listen_port": 62178,
+  "packets": 1000,
+  "received": 1000,
+  "drop_count": 0,
+  "drop_pct": 0.0,
+  "rtt_us_min": 38.02,
+  "rtt_us_p50": 50.09,
+  "rtt_us_p95": 61.007,
+  "rtt_us_p99": 138.229,
+  "rtt_us_max": 162.787,
+  "packet_bytes": 64,
+  "warmup_discarded": 50,
+  "ts_unix": 1779476857.6099195
+}

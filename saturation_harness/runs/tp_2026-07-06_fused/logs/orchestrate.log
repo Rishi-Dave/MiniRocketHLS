@@ -1,0 +1,113 @@
+[08:44:43] === DATASET InsectSound (model=/users/rdave009/InsectSound_minirocket_model.json ts_len=600) ===
+[08:44:44]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:45:14]   --- InsectSound @ 500 pps ---
+[08:45:22]     sent=1501 eth_d=1505 app_d=1501 udp_d=2 pps=500.333 loss=0.000% bw=256.170kbps
+[08:45:22]   --- InsectSound @ 1000 pps ---
+[08:45:30]     sent=3001 eth_d=3004 app_d=3001 udp_d=5 pps=1000.333 loss=0.000% bw=512.170kbps
+[08:45:30]   --- InsectSound @ 2000 pps ---
+[08:45:38]     sent=6001 eth_d=6005 app_d=6001 udp_d=10 pps=2000.333 loss=0.000% bw=1024.170kbps
+[08:45:38]   --- InsectSound @ 5000 pps ---
+[08:45:46]     sent=15001 eth_d=15004 app_d=15001 udp_d=25 pps=5000.333 loss=0.000% bw=2560.170kbps
+[08:45:46]   --- InsectSound @ 10000 pps ---
+[08:45:54]     sent=30001 eth_d=30004 app_d=30001 udp_d=50 pps=10000.333 loss=0.000% bw=5120.170kbps
+[08:45:54]   --- InsectSound @ 25000 pps ---
+[08:46:02]     sent=75001 eth_d=75004 app_d=75001 udp_d=125 pps=25000.333 loss=0.000% bw=12800.170kbps
+[08:46:02]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:46:32]   --- InsectSound @ 50000 pps ---
+[08:46:41]     sent=150001 eth_d=5507 app_d=5495 udp_d=9 pps=1831.667 loss=96.337% bw=937.814kbps
+[08:46:41]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:47:10]   --- InsectSound @ 100000 pps ---
+[08:47:18]     sent=300001 eth_d=3034 app_d=3023 udp_d=5 pps=1007.667 loss=98.992% bw=515.926kbps
+[08:47:18]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:47:47]   --- InsectSound @ 250000 pps ---
+[08:47:55]     sent=749999 eth_d=2385 app_d=2374 udp_d=3 pps=791.333 loss=99.683% bw=405.162kbps
+[08:47:55]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:48:25]   --- InsectSound @ 500000 pps ---
+[08:48:33]     sent=943945 eth_d=2379 app_d=2369 udp_d=3 pps=789.667 loss=99.749% bw=404.310kbps
+[08:48:33]   DEPLOY/RECOVER fused (model=/users/rdave009/InsectSound_minirocket_model.json)
+[08:49:02] === DATASET FruitFlies (model=/users/rdave009/FruitFlies_minirocket_model.json ts_len=5000) ===
+[08:49:02]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:49:34]   --- FruitFlies @ 500 pps ---
+[08:49:42]     sent=1501 eth_d=1504 app_d=1501 udp_d=0 pps=500.333 loss=0.000% bw=256.170kbps
+[08:49:42]   --- FruitFlies @ 1000 pps ---
+[08:49:50]     sent=3001 eth_d=3004 app_d=3001 udp_d=0 pps=1000.333 loss=0.000% bw=512.170kbps
+[08:49:50]   --- FruitFlies @ 2000 pps ---
+[08:49:58]     sent=6001 eth_d=6006 app_d=6001 udp_d=2 pps=2000.333 loss=0.000% bw=1024.170kbps
+[08:49:58]   --- FruitFlies @ 5000 pps ---
+[08:50:06]     sent=15001 eth_d=15004 app_d=15001 udp_d=3 pps=5000.333 loss=0.000% bw=2560.170kbps
+[08:50:06]   --- FruitFlies @ 10000 pps ---
+[08:50:14]     sent=30001 eth_d=30004 app_d=30001 udp_d=6 pps=10000.333 loss=0.000% bw=5120.170kbps
+[08:50:14]   --- FruitFlies @ 25000 pps ---
+[08:50:22]     sent=75001 eth_d=75004 app_d=75001 udp_d=15 pps=25000.333 loss=0.000% bw=12800.170kbps
+[08:50:22]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:50:52]   --- FruitFlies @ 50000 pps ---
+[08:51:00]     sent=150001 eth_d=8196 app_d=8185 udp_d=1 pps=2728.333 loss=94.543% bw=1396.906kbps
+[08:51:00]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:51:30]   --- FruitFlies @ 100000 pps ---
+[08:51:38]     sent=300001 eth_d=3332 app_d=3321 udp_d=0 pps=1107.000 loss=98.893% bw=566.784kbps
+[08:51:38]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:52:07]   --- FruitFlies @ 250000 pps ---
+[08:52:15]     sent=750000 eth_d=2387 app_d=2377 udp_d=0 pps=792.333 loss=99.683% bw=405.674kbps
+[08:52:15]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:52:44]   --- FruitFlies @ 500000 pps ---
+[08:52:52]     sent=945292 eth_d=2330 app_d=2319 udp_d=0 pps=773.000 loss=99.755% bw=395.776kbps
+[08:52:52]   DEPLOY/RECOVER fused (model=/users/rdave009/FruitFlies_minirocket_model.json)
+[08:53:22] === DATASET MosquitoSound (model=/users/rdave009/MosquitoSound_minirocket_model.json ts_len=3750) ===
+[08:53:22]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:53:54]   --- MosquitoSound @ 500 pps ---
+[08:54:02]     sent=1501 eth_d=1504 app_d=1501 udp_d=0 pps=500.333 loss=0.000% bw=256.170kbps
+[08:54:02]   --- MosquitoSound @ 1000 pps ---
+[08:54:11]     sent=3001 eth_d=3005 app_d=3001 udp_d=1 pps=1000.333 loss=0.000% bw=512.170kbps
+[08:54:11]   --- MosquitoSound @ 2000 pps ---
+[08:54:19]     sent=6001 eth_d=6005 app_d=6001 udp_d=1 pps=2000.333 loss=0.000% bw=1024.170kbps
+[08:54:19]   --- MosquitoSound @ 5000 pps ---
+[08:54:27]     sent=15001 eth_d=15004 app_d=15001 udp_d=4 pps=5000.333 loss=0.000% bw=2560.170kbps
+[08:54:27]   --- MosquitoSound @ 10000 pps ---
+[08:54:35]     sent=30001 eth_d=30004 app_d=30001 udp_d=8 pps=10000.333 loss=0.000% bw=5120.170kbps
+[08:54:35]   --- MosquitoSound @ 25000 pps ---
+[08:54:43]     sent=75001 eth_d=75004 app_d=75001 udp_d=20 pps=25000.333 loss=0.000% bw=12800.170kbps
+[08:54:43]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:55:12]   --- MosquitoSound @ 50000 pps ---
+[08:55:21]     sent=150001 eth_d=8213 app_d=8201 udp_d=2 pps=2733.667 loss=94.533% bw=1399.638kbps
+[08:55:21]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:55:50]   --- MosquitoSound @ 100000 pps ---
+[08:55:58]     sent=300001 eth_d=3864 app_d=3853 udp_d=1 pps=1284.333 loss=98.716% bw=657.578kbps
+[08:55:58]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:56:28]   --- MosquitoSound @ 250000 pps ---
+[08:56:36]     sent=749998 eth_d=2408 app_d=2398 udp_d=0 pps=799.333 loss=99.680% bw=409.258kbps
+[08:56:36]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:57:04]   --- MosquitoSound @ 500000 pps ---
+[08:57:13]     sent=941768 eth_d=2439 app_d=2429 udp_d=0 pps=809.667 loss=99.742% bw=414.550kbps
+[08:57:13]   DEPLOY/RECOVER fused (model=/users/rdave009/MosquitoSound_minirocket_model.json)
+[08:57:42] === SWEEP COMPLETE. CSV: /home/rdave009/minirocket-hls/MiniRocketHLS/saturation_harness/runs/tp_2026-07-06_fused/fused_sweep.csv ===
+variant,dataset,configured_pps,sent,duration_s,eth_in_delta,app_in_delta,udp_out_delta,processed_pps,loss_pct,bandwidth_kbps
+fused,InsectSound,500,1501,3,1505,1501,2,500.333,0.000,256.170
+fused,InsectSound,1000,3001,3,3004,3001,5,1000.333,0.000,512.170
+fused,InsectSound,2000,6001,3,6005,6001,10,2000.333,0.000,1024.170
+fused,InsectSound,5000,15001,3,15004,15001,25,5000.333,0.000,2560.170
+fused,InsectSound,10000,30001,3,30004,30001,50,10000.333,0.000,5120.170
+fused,InsectSound,25000,75001,3,75004,75001,125,25000.333,0.000,12800.170
+fused,InsectSound,50000,150001,3,5507,5495,9,1831.667,96.337,937.814
+fused,InsectSound,100000,300001,3,3034,3023,5,1007.667,98.992,515.926
+fused,InsectSound,250000,749999,3,2385,2374,3,791.333,99.683,405.162
+fused,InsectSound,500000,943945,3,2379,2369,3,789.667,99.749,404.310
+fused,FruitFlies,500,1501,3,1504,1501,0,500.333,0.000,256.170
+fused,FruitFlies,1000,3001,3,3004,3001,0,1000.333,0.000,512.170
+fused,FruitFlies,2000,6001,3,6006,6001,2,2000.333,0.000,1024.170
+fused,FruitFlies,5000,15001,3,15004,15001,3,5000.333,0.000,2560.170
+fused,FruitFlies,10000,30001,3,30004,30001,6,10000.333,0.000,5120.170
+fused,FruitFlies,25000,75001,3,75004,75001,15,25000.333,0.000,12800.170
+fused,FruitFlies,50000,150001,3,8196,8185,1,2728.333,94.543,1396.906
+fused,FruitFlies,100000,300001,3,3332,3321,0,1107.000,98.893,566.784
+fused,FruitFlies,250000,750000,3,2387,2377,0,792.333,99.683,405.674
+fused,FruitFlies,500000,945292,3,2330,2319,0,773.000,99.755,395.776
+fused,MosquitoSound,500,1501,3,1504,1501,0,500.333,0.000,256.170
+fused,MosquitoSound,1000,3001,3,3005,3001,1,1000.333,0.000,512.170
+fused,MosquitoSound,2000,6001,3,6005,6001,1,2000.333,0.000,1024.170
+fused,MosquitoSound,5000,15001,3,15004,15001,4,5000.333,0.000,2560.170
+fused,MosquitoSound,10000,30001,3,30004,30001,8,10000.333,0.000,5120.170
+fused,MosquitoSound,25000,75001,3,75004,75001,20,25000.333,0.000,12800.170
+fused,MosquitoSound,50000,150001,3,8213,8201,2,2733.667,94.533,1399.638
+fused,MosquitoSound,100000,300001,3,3864,3853,1,1284.333,98.716,657.578
+fused,MosquitoSound,250000,749998,3,2408,2398,0,799.333,99.680,409.258
+fused,MosquitoSound,500000,941768,3,2439,2429,0,809.667,99.742,414.550
