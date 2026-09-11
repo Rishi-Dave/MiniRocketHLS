@@ -1,12 +1,33 @@
-// MiniRocket CPU Baseline Inference (C++) — Single-threaded, with timing
-// Same algorithm/logic as the original minirocket_cpu_inference.cpp.
-// Adds internal wall-clock timing for each phase (model load, test data
-// load, inference loop, CSV write) plus a total, so a log file captures
-// the full breakdown on its own — without needing to wrap the binary in
-// the shell's `time` command separately.
+// MiniRocket CPU Baseline Inference (C++) — Multithreaded (v2)
+// Adds OpenMP-based multithreading, to make CPU throughput comparisons
+// against the paper's baseline meaningful: the paper's own CPU baseline
+// is multi-threaded Python (aeon, parallelized via Python's
+// `multiprocessing` across convolutions/pooling) — the original
+// single-threaded minirocket_cpu_inference.cpp is NOT directly
+// comparable to that on throughput, only on correctness/accuracy.
 //
-// Compile: g++ -O3 -march=native -std=c++17 -o minirocket_cpu minirocket_cpu_inference_timed.cpp
-// Usage:   ./minirocket_cpu <model.json> <test_data.json> [output.csv]
+// Design:
+//   - Per-sample LATENCY benchmark stays single-threaded and sequential,
+//     exactly like the original file. Running this multithreaded would
+//     add scheduling/contention noise to the P50/P95/P99 numbers,
+//     making single-sample latency comparisons (vs GPU/FPGA) less
+//     meaningful. Latency is inherently a single-thread-doing-one-thing
+//     measurement.
+//   - A NEW batched THROUGHPUT benchmark parallelizes across samples
+//     using OpenMP (`#pragma omp parallel for`), each thread processing
+//     a different sample. This is the number to compare against the
+//     paper's multi-threaded Python execution times/throughput.
+//
+// Compile (note the added -fopenmp):
+//   g++ -O3 -march=native -std=c++17 -fopenmp -o minirocket_cpu_mt minirocket_cpu_inference_v2.cpp
+//
+// Usage:
+//   ./minirocket_cpu_mt <model.json> <test_data.json> [output.csv] [num_threads]
+//
+//   num_threads (optional): defaults to all logical cores available
+//   (omp_get_max_threads()). Pass a smaller number to see how throughput
+//   scales with thread count, e.g. to compare against the paper's
+//   reported core count.
 
 #include <iostream>
 #include <fstream>
@@ -19,34 +40,10 @@
 #include <numeric>
 #include <cassert>
 #include <iomanip>
-#include <ctime>
+#include <omp.h>
 
 // ============================================================
-// Small timing helper — wraps std::chrono so each phase can be
-// timed and printed with one line, instead of repeating the
-// now()/now()/duration boilerplate at every phase boundary.
-// ============================================================
-class Stopwatch {
-    std::chrono::high_resolution_clock::time_point t0;
-public:
-    Stopwatch() : t0(std::chrono::high_resolution_clock::now()) {}
-    void reset() { t0 = std::chrono::high_resolution_clock::now(); }
-    double elapsed_ms() const {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration<double, std::milli>(t1 - t0).count();
-    }
-};
-
-std::string current_timestamp() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    char buf[32];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now_c));
-    return std::string(buf);
-}
-
-// ============================================================
-// Minimal JSON parser (unchanged from the original CPU file)
+// Minimal JSON parser (identical to the original CPU file)
 // ============================================================
 
 struct JsonValue {
@@ -203,7 +200,7 @@ JsonValue load_json(const std::string& path) {
 }
 
 // ============================================================
-// MiniRocket Model (unchanged)
+// MiniRocket Model (identical to the original CPU file)
 // ============================================================
 
 struct MiniRocketModel {
@@ -259,7 +256,13 @@ struct MiniRocketModel {
 };
 
 // ============================================================
-// MiniRocket Feature Extraction (unchanged algorithm)
+// MiniRocket Feature Extraction (identical algorithm/logic to
+// the original CPU file — this is a pure function of its inputs and
+// writes only to the `features` vector passed in by the caller, so
+// it is already safe to call concurrently from multiple threads as
+// long as each thread passes its OWN `features` vector, never a
+// shared one. That's exactly how the OpenMP throughput benchmark
+// below uses it.)
 // ============================================================
 
 static const double WEIGHT_NEG = -1.0;
@@ -366,25 +369,22 @@ int classify(const MiniRocketModel& model, const std::vector<double>& features) 
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <model.json> <test_data.json> [output.csv]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <model.json> <test_data.json> [output.csv] [num_threads]" << std::endl;
         return 1;
     }
 
     std::string model_path = argv[1];
     std::string test_path = argv[2];
     std::string csv_path = (argc > 3) ? argv[3] : "";
+    int num_threads = (argc > 4) ? std::stoi(argv[4]) : omp_get_max_threads();
 
-    std::cout << "Run started: " << current_timestamp() << std::endl;
-    Stopwatch total_timer;
+    omp_set_num_threads(num_threads);
+    std::cout << "OpenMP threads: " << num_threads
+              << " (max available: " << omp_get_max_threads() << ")" << std::endl;
 
-    // ---- Phase 1: model load ----
-    Stopwatch phase_timer;
     MiniRocketModel model;
     model.load(model_path);
-    double model_load_ms = phase_timer.elapsed_ms();
 
-    // ---- Phase 2: test data load ----
-    phase_timer.reset();
     std::cout << "Loading test data from: " << test_path << std::endl;
     auto test_json = load_json(test_path);
 
@@ -409,7 +409,6 @@ int main(int argc, char** argv) {
     if (!has_labels) {
         y_test.assign(num_samples, -1);
     }
-    double data_load_ms = phase_timer.elapsed_ms();
 
     std::cout << "Dataset: " << dataset_name << std::endl;
     std::cout << "  Samples: " << num_samples << std::endl;
@@ -418,9 +417,12 @@ int main(int argc, char** argv) {
     assert(series_length == model.time_series_length);
     assert((int)X_test_2d.size() == num_samples);
 
-    // ---- Phase 3: warmup + per-sample inference loop ----
-    phase_timer.reset();
-    std::cout << "\nRunning per-sample inference..." << std::endl;
+    // ------------------------------------------------------------
+    // PART 1: Single-threaded per-sample LATENCY benchmark
+    // (identical to the original file — kept sequential deliberately,
+    // see the file-level comment at the top for why)
+    // ------------------------------------------------------------
+    std::cout << "\n[1/2] Running SINGLE-THREADED per-sample latency benchmark..." << std::endl;
     std::vector<double> latencies_ms(num_samples);
     std::vector<int> predictions(num_samples);
     std::vector<double> features;
@@ -431,9 +433,7 @@ int main(int argc, char** argv) {
         apply_scaler(model, features);
         classify(model, features);
     }
-    double warmup_ms = phase_timer.elapsed_ms();
 
-    phase_timer.reset();
     for (int i = 0; i < num_samples; i++) {
         auto t0 = std::chrono::high_resolution_clock::now();
         extract_features(model, X_test_2d[i], features);
@@ -450,7 +450,6 @@ int main(int argc, char** argv) {
             std::cout << "  Sample " << (i + 1) << "/" << num_samples << "..." << std::endl;
         }
     }
-    double inference_loop_ms = phase_timer.elapsed_ms();
 
     double accuracy = has_labels ? ((double)correct / num_samples) : 0.0;
 
@@ -469,7 +468,7 @@ int main(int argc, char** argv) {
         return sorted_lat[lo] * (1 - frac) + sorted_lat[hi] * frac;
     };
 
-    std::cout << "\n========== RESULTS ==========" << std::endl;
+    std::cout << "\n========== SINGLE-THREADED LATENCY RESULTS ==========" << std::endl;
     std::cout << "Dataset:     " << dataset_name << std::endl;
     if (has_labels) {
         std::cout << "Accuracy:    " << std::fixed << std::setprecision(4) << (accuracy * 100)
@@ -478,7 +477,7 @@ int main(int argc, char** argv) {
         std::cout << "Accuracy:    N/A (no ground truth y_test labels in JSON)" << std::endl;
     }
     std::cout << "Throughput:  " << std::fixed << std::setprecision(1) << (1000.0 / mean)
-              << " inferences/sec" << std::endl;
+              << " inferences/sec (single-threaded)" << std::endl;
     std::cout << "\nLatency distribution (ms):" << std::endl;
     std::cout << "  Mean:  " << std::fixed << std::setprecision(3) << mean << std::endl;
     std::cout << "  P50:   " << percentile(50) << std::endl;
@@ -487,12 +486,64 @@ int main(int argc, char** argv) {
     std::cout << "  Min:   " << sorted_lat.front() << std::endl;
     std::cout << "  Max:   " << sorted_lat.back() << std::endl;
     std::cout << "  Std:   " << std_dev << std::endl;
-    std::cout << "=============================" << std::endl;
+    std::cout << "======================================================" << std::endl;
 
-    // ---- Phase 4: CSV write ----
-    phase_timer.reset();
+    // ------------------------------------------------------------
+    // PART 2: Multithreaded batched THROUGHPUT benchmark
+    // This is the number comparable to the paper's multi-threaded
+    // Python (aeon) execution times — it parallelizes across samples,
+    // the same way aeon's `multiprocessing`-based parallelism does,
+    // just using OpenMP threads instead of Python processes.
+    // ------------------------------------------------------------
+    std::cout << "\n[2/2] Running MULTITHREADED batched throughput benchmark ("
+              << num_threads << " threads)..." << std::endl;
+
+    std::vector<int> mt_predictions(num_samples);
+    int mt_correct = 0;
+
+    auto mt_t0 = std::chrono::high_resolution_clock::now();
+
+    #pragma omp parallel
+    {
+        // Each thread gets its OWN features buffer — this is what makes
+        // calling extract_features/apply_scaler/classify safe here even
+        // though they're being called concurrently from many threads.
+        std::vector<double> thread_features;
+        #pragma omp for schedule(static) reduction(+:mt_correct)
+        for (int i = 0; i < num_samples; i++) {
+            extract_features(model, X_test_2d[i], thread_features);
+            apply_scaler(model, thread_features);
+            int pred = classify(model, thread_features);
+            mt_predictions[i] = pred;
+            if (has_labels && pred == y_test[i]) mt_correct++;
+        }
+    }
+
+    auto mt_t1 = std::chrono::high_resolution_clock::now();
+    double mt_total_ms = std::chrono::duration<double, std::milli>(mt_t1 - mt_t0).count();
+    double mt_throughput = num_samples / (mt_total_ms / 1000.0);
+    double mt_accuracy = has_labels ? ((double)mt_correct / num_samples) : 0.0;
+
+    std::cout << "\n========== MULTITHREADED THROUGHPUT RESULTS ==========" << std::endl;
+    std::cout << "Threads:     " << num_threads << std::endl;
+    std::cout << "Total time:  " << std::fixed << std::setprecision(1) << mt_total_ms << " ms" << std::endl;
+    std::cout << "Throughput:  " << std::fixed << std::setprecision(1) << mt_throughput
+              << " inferences/sec (multithreaded)" << std::endl;
+    if (has_labels) {
+        std::cout << "Accuracy:    " << std::fixed << std::setprecision(4) << (mt_accuracy * 100)
+                  << "% (" << mt_correct << "/" << num_samples
+                  << ") — should match single-threaded accuracy above" << std::endl;
+    }
+    std::cout << "Speedup vs. single-threaded: "
+              << std::fixed << std::setprecision(2) << (mt_throughput / (1000.0 / mean)) << "x" << std::endl;
+    std::cout << "=======================================================" << std::endl;
+
+    // ------------------------------------------------------------
+    // CSV output — from the single-threaded latency run, same format
+    // as the original CPU file and the CUDA file, for consistency.
+    // ------------------------------------------------------------
     if (csv_path.empty()) {
-        csv_path = "../results/MiniRocket_CPU_cpp_" + dataset_name + "_per_sample.csv";
+        csv_path = "../results/MiniRocket_CPU_cpp_mt_" + dataset_name + "_per_sample.csv";
     }
     std::ofstream csv(csv_path);
     if (csv.is_open()) {
@@ -507,23 +558,6 @@ int main(int argc, char** argv) {
     } else {
         std::cerr << "WARNING: Could not open " << csv_path << " for writing" << std::endl;
     }
-    double csv_write_ms = phase_timer.elapsed_ms();
-
-    double total_ms = total_timer.elapsed_ms();
-
-    // ---- Timing summary — printed last so it's easy to grep out of a log file ----
-    std::cout << "\n========== TIMING BREAKDOWN ==========" << std::endl;
-    std::cout << "Model load:       " << std::fixed << std::setprecision(1) << model_load_ms << " ms" << std::endl;
-    std::cout << "Test data load:   " << data_load_ms << " ms" << std::endl;
-    std::cout << "Warmup (3 samp.): " << warmup_ms << " ms" << std::endl;
-    std::cout << "Inference loop:   " << inference_loop_ms << " ms  ("
-              << num_samples << " samples)" << std::endl;
-    std::cout << "CSV write:        " << csv_write_ms << " ms" << std::endl;
-    std::cout << "----------------------------------------" << std::endl;
-    std::cout << "TOTAL (program):  " << total_ms << " ms  ("
-              << (total_ms / 1000.0) << " s)" << std::endl;
-    std::cout << "=======================================" << std::endl;
-    std::cout << "Run finished: " << current_timestamp() << std::endl;
 
     return 0;
 }

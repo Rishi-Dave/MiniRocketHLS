@@ -1,11 +1,8 @@
-// MiniRocket CPU Baseline Inference (C++) — Single-threaded, with timing
-// Same algorithm/logic as the original minirocket_cpu_inference.cpp.
-// Adds internal wall-clock timing for each phase (model load, test data
-// load, inference loop, CSV write) plus a total, so a log file captures
-// the full breakdown on its own — without needing to wrap the binary in
-// the shell's `time` command separately.
+// MiniRocket CPU Baseline Inference (C++)
+// Implements the same MiniRocket feature extraction + Ridge classifier
+// as the Python aeon library, for fair CPU baseline comparison.
 //
-// Compile: g++ -O3 -march=native -std=c++17 -o minirocket_cpu minirocket_cpu_inference_timed.cpp
+// Compile: g++ -O3 -march=native -o minirocket_cpu minirocket_cpu_inference.cpp
 // Usage:   ./minirocket_cpu <model.json> <test_data.json> [output.csv]
 
 #include <iostream>
@@ -19,34 +16,10 @@
 #include <numeric>
 #include <cassert>
 #include <iomanip>
-#include <ctime>
 
 // ============================================================
-// Small timing helper — wraps std::chrono so each phase can be
-// timed and printed with one line, instead of repeating the
-// now()/now()/duration boilerplate at every phase boundary.
-// ============================================================
-class Stopwatch {
-    std::chrono::high_resolution_clock::time_point t0;
-public:
-    Stopwatch() : t0(std::chrono::high_resolution_clock::now()) {}
-    void reset() { t0 = std::chrono::high_resolution_clock::now(); }
-    double elapsed_ms() const {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration<double, std::milli>(t1 - t0).count();
-    }
-};
-
-std::string current_timestamp() {
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    char buf[32];
-    std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now_c));
-    return std::string(buf);
-}
-
-// ============================================================
-// Minimal JSON parser (unchanged from the original CPU file)
+// Minimal JSON parser (no external dependencies)
+// Handles the specific model/test_data JSON format
 // ============================================================
 
 struct JsonValue {
@@ -203,26 +176,28 @@ JsonValue load_json(const std::string& path) {
 }
 
 // ============================================================
-// MiniRocket Model (unchanged)
+// MiniRocket Model
 // ============================================================
 
 struct MiniRocketModel {
-    int num_kernels;
-    int num_dilations;
-    int num_features;
+    int num_kernels;       // 84
+    int num_dilations;     // 9
+    int num_features;      // 840
     int num_classes;
     int time_series_length;
 
-    std::vector<std::vector<int>> kernel_indices;
-    std::vector<int> dilations;
-    std::vector<int> num_features_per_dilation;
-    std::vector<double> biases;
+    std::vector<std::vector<int>> kernel_indices; // [84][3]
+    std::vector<int> dilations;                   // [num_dilations]
+    std::vector<int> num_features_per_dilation;   // [num_dilations]
+    std::vector<double> biases;                   // [num_features]
 
-    std::vector<double> scaler_mean;
-    std::vector<double> scaler_scale;
+    // Scaler
+    std::vector<double> scaler_mean;  // [num_features]
+    std::vector<double> scaler_scale; // [num_features]
 
-    std::vector<std::vector<double>> classifier_coef;
-    std::vector<double> classifier_intercept;
+    // Ridge classifier
+    std::vector<std::vector<double>> classifier_coef; // [num_classes][num_features]
+    std::vector<double> classifier_intercept;          // [num_classes]
     std::vector<int> classes;
 
     void load(const std::string& path) {
@@ -241,10 +216,12 @@ struct MiniRocketModel {
         biases = j["biases"].as_double_array();
         scaler_mean = j["scaler_mean"].as_double_array();
         scaler_scale = j["scaler_scale"].as_double_array();
+        // Handle binary vs multi-class: binary has coef as 1D [num_features]
         auto& coef_val = j["classifier_coef"];
         if (coef_val.arr.size() > 0 && coef_val.arr[0].type == JsonValue::ARRAY) {
             classifier_coef = coef_val.as_2d_double_array();
         } else {
+            // Binary: single coefficient vector, wrap in 2D
             classifier_coef.push_back(coef_val.as_double_array());
         }
         classifier_intercept = j["classifier_intercept"].as_double_array();
@@ -259,9 +236,20 @@ struct MiniRocketModel {
 };
 
 // ============================================================
-// MiniRocket Feature Extraction (unchanged algorithm)
+// MiniRocket Feature Extraction
+//
+// For each dilation d:
+//   For each kernel k (84 kernels, each with 3 indices from {0..8}):
+//     weights[9] = {-1,-1,-1,-1,-1,-1,-1,-1,-1} initially
+//     then set weights[indices[0]] += 3, weights[indices[1]] += 3, weights[indices[2]] += 3
+//     => weights at selected indices become +2, rest remain -1
+//     Convolve time_series with these 9 weights at stride=dilation
+//     For each bias in this kernel's bias set:
+//       feature = PPV (proportion of conv output > bias)
 // ============================================================
 
+// The 9 fixed weights: -1 everywhere, +2 at the 3 selected indices
+// This matches the MiniRocket paper: W = {-1, +2} with 3 positive positions
 static const double WEIGHT_NEG = -1.0;
 static const double WEIGHT_POS = 2.0;
 
@@ -273,13 +261,21 @@ void extract_features(const MiniRocketModel& model,
 
     int feature_idx = 0;
 
+    // Aeon's MiniRocket centers kernels at position 4 and alternates
+    // between padded (full output) and unpadded (valid-only) per kernel.
+    // _padding0 = dilation_index % 2
+    // _padding1 = (_padding0 + kernel_index) % 2
+    // When _padding1 == 0: padded output (length = L, zero-pad boundaries)
+    // When _padding1 == 1: unpadded output (length = L - 8*dilation)
+
     for (int d = 0; d < model.num_dilations; d++) {
         int dilation = model.dilations[d];
         int n_feat_this_dil = model.num_features_per_dilation[d];
         int padding0 = d % 2;
-        int half_pad = 4 * dilation;
+        int half_pad = 4 * dilation; // padding on each side
 
         for (int k = 0; k < 84; k++) {
+            // Build weights: -1 everywhere, +2 at selected indices
             double weights[9];
             for (int i = 0; i < 9; i++) weights[i] = WEIGHT_NEG;
             weights[model.kernel_indices[k][0]] = WEIGHT_POS;
@@ -288,12 +284,15 @@ void extract_features(const MiniRocketModel& model,
 
             int padding1 = (padding0 + k) % 2;
 
+            // Determine convolution range
             int t_start, t_end, conv_length;
             if (padding1 == 0) {
+                // Padded: full output, kernel centered at position 4
                 t_start = 0;
                 t_end = L;
                 conv_length = L;
             } else {
+                // Unpadded: valid only, skip boundary positions
                 t_start = half_pad;
                 t_end = L - half_pad;
                 conv_length = t_end - t_start;
@@ -313,10 +312,12 @@ void extract_features(const MiniRocketModel& model,
                 for (int t = t_start; t < t_end; t++) {
                     double conv_val = 0.0;
                     for (int w = 0; w < 9; w++) {
+                        // Kernel centered at position 4: offset = (w - 4) * dilation
                         int idx = t + (w - 4) * dilation;
                         if (idx >= 0 && idx < L) {
                             conv_val += weights[w] * time_series[idx];
                         }
+                        // else: zero-padding (contributes 0)
                     }
                     if (conv_val > bias) {
                         count_positive++;
@@ -338,6 +339,7 @@ void apply_scaler(const MiniRocketModel& model, std::vector<double>& features) {
 
 int classify(const MiniRocketModel& model, const std::vector<double>& features) {
     if (model.classifier_coef.size() == 1) {
+        // Binary classification: sign(coef @ features + intercept)
         double score = model.classifier_intercept[0];
         for (int f = 0; f < model.num_features; f++) {
             score += model.classifier_coef[0][f] * features[f];
@@ -345,8 +347,10 @@ int classify(const MiniRocketModel& model, const std::vector<double>& features) 
         return model.classes[score > 0 ? 1 : 0];
     }
 
+    // Multi-class: argmax(coef @ features + intercept)
     int best_class = 0;
     double best_score = -1e30;
+
     for (int c = 0; c < model.num_classes; c++) {
         double score = model.classifier_intercept[c];
         for (int f = 0; f < model.num_features; f++) {
@@ -357,6 +361,7 @@ int classify(const MiniRocketModel& model, const std::vector<double>& features) 
             best_class = c;
         }
     }
+
     return model.classes[best_class];
 }
 
@@ -374,22 +379,20 @@ int main(int argc, char** argv) {
     std::string test_path = argv[2];
     std::string csv_path = (argc > 3) ? argv[3] : "";
 
-    std::cout << "Run started: " << current_timestamp() << std::endl;
-    Stopwatch total_timer;
-
-    // ---- Phase 1: model load ----
-    Stopwatch phase_timer;
+    // Load model
     MiniRocketModel model;
     model.load(model_path);
-    double model_load_ms = phase_timer.elapsed_ms();
 
-    // ---- Phase 2: test data load ----
-    phase_timer.reset();
+    // Load test data
     std::cout << "Loading test data from: " << test_path << std::endl;
     auto test_json = load_json(test_path);
 
-    std::string dataset_name = (test_json["dataset_name"].type != JsonValue::NONE)
-        ? test_json["dataset_name"].as_string() : "unknown";
+    // Handle varying field names across test data JSONs
+    std::string dataset_name;
+    if (test_json["dataset_name"].type != JsonValue::NONE)
+        dataset_name = test_json["dataset_name"].as_string();
+    else
+        dataset_name = "unknown";
 
     int num_samples = 0;
     if (test_json["num_samples"].type != JsonValue::NONE)
@@ -397,11 +400,13 @@ int main(int argc, char** argv) {
     else
         num_samples = (int)test_json["X_test"].arr.size();
 
-    int series_length = (test_json["series_length"].type != JsonValue::NONE)
-        ? (int)test_json["series_length"].as_number()
-        : (test_json["time_series_length"].type != JsonValue::NONE)
-            ? (int)test_json["time_series_length"].as_number()
-            : (int)test_json["X_test"].arr[0].arr.size();
+    int series_length = 0;
+    if (test_json["series_length"].type != JsonValue::NONE)
+        series_length = (int)test_json["series_length"].as_number();
+    else if (test_json["time_series_length"].type != JsonValue::NONE)
+        series_length = (int)test_json["time_series_length"].as_number();
+    else
+        series_length = (int)test_json["X_test"].arr[0].arr.size();
 
     auto X_test_2d = test_json["X_test"].as_2d_double_array();
     auto y_test = test_json["y_test"].as_int_array();
@@ -409,7 +414,6 @@ int main(int argc, char** argv) {
     if (!has_labels) {
         y_test.assign(num_samples, -1);
     }
-    double data_load_ms = phase_timer.elapsed_ms();
 
     std::cout << "Dataset: " << dataset_name << std::endl;
     std::cout << "  Samples: " << num_samples << std::endl;
@@ -418,22 +422,20 @@ int main(int argc, char** argv) {
     assert(series_length == model.time_series_length);
     assert((int)X_test_2d.size() == num_samples);
 
-    // ---- Phase 3: warmup + per-sample inference loop ----
-    phase_timer.reset();
+    // Per-sample inference with timing
     std::cout << "\nRunning per-sample inference..." << std::endl;
     std::vector<double> latencies_ms(num_samples);
     std::vector<int> predictions(num_samples);
     std::vector<double> features;
     int correct = 0;
 
+    // Warmup (3 samples)
     for (int i = 0; i < std::min(3, num_samples); i++) {
         extract_features(model, X_test_2d[i], features);
         apply_scaler(model, features);
         classify(model, features);
     }
-    double warmup_ms = phase_timer.elapsed_ms();
 
-    phase_timer.reset();
     for (int i = 0; i < num_samples; i++) {
         auto t0 = std::chrono::high_resolution_clock::now();
         extract_features(model, X_test_2d[i], features);
@@ -444,18 +446,20 @@ int main(int argc, char** argv) {
         double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
         latencies_ms[i] = ms;
         predictions[i] = pred;
+
         if (has_labels && pred == y_test[i]) correct++;
 
         if ((i + 1) % 5000 == 0 || i == num_samples - 1) {
             std::cout << "  Sample " << (i + 1) << "/" << num_samples << "..." << std::endl;
         }
     }
-    double inference_loop_ms = phase_timer.elapsed_ms();
 
+    // Compute statistics
     double accuracy = has_labels ? ((double)correct / num_samples) : 0.0;
 
     std::vector<double> sorted_lat(latencies_ms);
     std::sort(sorted_lat.begin(), sorted_lat.end());
+
     double sum = 0, sum2 = 0;
     for (double v : latencies_ms) { sum += v; sum2 += v * v; }
     double mean = sum / num_samples;
@@ -469,6 +473,10 @@ int main(int argc, char** argv) {
         return sorted_lat[lo] * (1 - frac) + sorted_lat[hi] * frac;
     };
 
+    double p50 = percentile(50);
+    double p95 = percentile(95);
+    double p99 = percentile(99);
+
     std::cout << "\n========== RESULTS ==========" << std::endl;
     std::cout << "Dataset:     " << dataset_name << std::endl;
     if (has_labels) {
@@ -481,16 +489,15 @@ int main(int argc, char** argv) {
               << " inferences/sec" << std::endl;
     std::cout << "\nLatency distribution (ms):" << std::endl;
     std::cout << "  Mean:  " << std::fixed << std::setprecision(3) << mean << std::endl;
-    std::cout << "  P50:   " << percentile(50) << std::endl;
-    std::cout << "  P95:   " << percentile(95) << std::endl;
-    std::cout << "  P99:   " << percentile(99) << std::endl;
+    std::cout << "  P50:   " << p50 << std::endl;
+    std::cout << "  P95:   " << p95 << std::endl;
+    std::cout << "  P99:   " << p99 << std::endl;
     std::cout << "  Min:   " << sorted_lat.front() << std::endl;
     std::cout << "  Max:   " << sorted_lat.back() << std::endl;
     std::cout << "  Std:   " << std_dev << std::endl;
     std::cout << "=============================" << std::endl;
 
-    // ---- Phase 4: CSV write ----
-    phase_timer.reset();
+    // Write CSV
     if (csv_path.empty()) {
         csv_path = "../results/MiniRocket_CPU_cpp_" + dataset_name + "_per_sample.csv";
     }
@@ -507,23 +514,6 @@ int main(int argc, char** argv) {
     } else {
         std::cerr << "WARNING: Could not open " << csv_path << " for writing" << std::endl;
     }
-    double csv_write_ms = phase_timer.elapsed_ms();
-
-    double total_ms = total_timer.elapsed_ms();
-
-    // ---- Timing summary — printed last so it's easy to grep out of a log file ----
-    std::cout << "\n========== TIMING BREAKDOWN ==========" << std::endl;
-    std::cout << "Model load:       " << std::fixed << std::setprecision(1) << model_load_ms << " ms" << std::endl;
-    std::cout << "Test data load:   " << data_load_ms << " ms" << std::endl;
-    std::cout << "Warmup (3 samp.): " << warmup_ms << " ms" << std::endl;
-    std::cout << "Inference loop:   " << inference_loop_ms << " ms  ("
-              << num_samples << " samples)" << std::endl;
-    std::cout << "CSV write:        " << csv_write_ms << " ms" << std::endl;
-    std::cout << "----------------------------------------" << std::endl;
-    std::cout << "TOTAL (program):  " << total_ms << " ms  ("
-              << (total_ms / 1000.0) << " s)" << std::endl;
-    std::cout << "=======================================" << std::endl;
-    std::cout << "Run finished: " << current_timestamp() << std::endl;
 
     return 0;
 }
