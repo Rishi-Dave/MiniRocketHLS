@@ -5,43 +5,62 @@ NVCC = nvcc
 CUDA_ARCH ?= sm_75
 NVCCFLAGS = -O3 -std=c++17 -arch=$(CUDA_ARCH)
 
-TARGET = minirocket_cpu
 GPU_UDP_SERVER = minirocket_gpu_udp_server
-UDP_CLIENT = minirocket_udp_client
+CPU_UDP_SERVER = minirocket_cpu_udp_server
+UDP_CLIENT     = minirocket_udp_client
+UDP_BENCH      = minirocket_udp_bench
+UDP_RATE_SWEEP = minirocket_udp_rate_sweep
 
+# Legacy / offline targets (optional; sources may live elsewhere in full repo)
+TARGET = minirocket_cpu
 MODELS_DIR ?= ../fpga-network/minirocket_fused
 RESULTS_DIR = ../results
 
 .PHONY: all clean gpu-stream stream-server stream-client \
+        stream-bench stream-rate stream-cpu-server \
         minirocket_gpu minirocket_gpu_streams minirocket_cpu_mt \
         run-insectsound run-fruitflies run-mosquitosound run-all
 
-all: $(TARGET)
+all: gpu-stream
 
+# Naive streaming UDP suite — NAIVE full-recompute, no DP-Reuse
+# Builds: GPU server + CPU server + client + full bench + rate sweep
+gpu-stream: $(GPU_UDP_SERVER) $(CPU_UDP_SERVER) $(UDP_CLIENT) \
+            $(UDP_BENCH) $(UDP_RATE_SWEEP)
+
+stream-server: $(GPU_UDP_SERVER)
+stream-cpu-server: $(CPU_UDP_SERVER)
+stream-client: $(UDP_CLIENT)
+stream-bench: $(UDP_BENCH)
+stream-rate: $(UDP_RATE_SWEEP)
+
+$(GPU_UDP_SERVER): minirocket_gpu_udp_server.cu
+	$(NVCC) $(NVCCFLAGS) -o $@ $<
+
+$(CPU_UDP_SERVER): minirocket_cpu_udp_server.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+$(UDP_CLIENT): minirocket_udp_client.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+$(UDP_BENCH): minirocket_udp_bench.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+$(UDP_RATE_SWEEP): minirocket_udp_rate_sweep.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+# Optional offline baselines (present in full MiniRocketHLS cpu/ tree)
 $(TARGET): minirocket_cpu_inference.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-# OpenMP multithreaded CPU
 minirocket_cpu_mt: minirocket_cpu_inference_mt.cpp
 	$(CXX) $(CXXFLAGS) -fopenmp -o $@ $<
 
-# Existing single-node GPU binaries
 minirocket_gpu: minirocket_gpu_inference.cu
 	$(NVCC) $(NVCCFLAGS) -o $@ $<
 
 minirocket_gpu_streams: minirocket_gpu_inference_streams.cu
 	$(NVCC) $(NVCCFLAGS) -o $@ $<
-
-# Naive streaming UDP (phase a) — NAIVE full-recompute, no DP-Reuse
-stream-server: $(GPU_UDP_SERVER)
-stream-client: $(UDP_CLIENT)
-gpu-stream: stream-server stream-client
-
-$(GPU_UDP_SERVER): minirocket_gpu_udp_server.cu
-	$(NVCC) $(NVCCFLAGS) -o $@ $<
-
-$(UDP_CLIENT): minirocket_udp_client.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $<
 
 run-insectsound: $(TARGET)
 	./$(TARGET) $(MODELS_DIR)/InsectSound_minirocket_model.json \
@@ -62,4 +81,5 @@ run-all: run-insectsound run-fruitflies run-mosquitosound
 
 clean:
 	rm -f $(TARGET) minirocket_cpu_mt minirocket_gpu minirocket_gpu_streams \
-	      $(GPU_UDP_SERVER) $(UDP_CLIENT)
+	      $(GPU_UDP_SERVER) $(CPU_UDP_SERVER) $(UDP_CLIENT) \
+	      $(UDP_BENCH) $(UDP_RATE_SWEEP)

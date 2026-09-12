@@ -1,38 +1,27 @@
-// MiniRocket GPU UDP Streaming Server — NAIVE full-recompute (NO DP-Reuse)
+// MiniRocket CPU UDP Streaming Server — NAIVE full-recompute (NO DP-Reuse)
 //==============================================================================
-// Phase (a) correctness / rate-sweep baseline for streaming MiniRocket on GPU.
+// Fair GPU-vs-CPU streaming curve baseline: same UDP protocol + RESET as
+// minirocket_gpu_udp_server.cu, but feature extract runs on the host (single
+// thread). OpenMP / MT can be added later — clarity first.
 //
-// On EVERY new sample: shift the sliding window left by 1, append the sample,
-// then run a FULL MiniRocket feature extract over the entire window of length
-// L = time_series_length. This is intentionally the naive approach — DP-Reuse
-// (incremental convolution / PPV updates) is future work.
-//
-// Algorithm / structure reused from the validated cpu/minirocket_gpu_inference.cu
-// (JSON parser, MiniRocketModel, extract_features_kernel, host scaler+Ridge,
-// g_d_biases in global memory — NOT __constant__).
+// Algorithm matches the non-CUDA path / GPU kernel logic:
+//   for each dilation d, for each of 84 kernels:
+//     build weights (-1, +2 at three kernel_indices),
+//     convolve over window with dilation, count PPV vs biases,
+//   then scaler + Ridge classify.
 //
 // Protocol (IPv4 UDP SOCK_DGRAM), little-endian explicit memcpy:
+//   len==4: float32 sample → infer → reply int32 class
+//   len==8: control  magic=0x4D525354 ('MRST') + cmd
+//           cmd=1 RESET → zero window, reply int32 0 ACK
+//           unknown cmd → reply int32 -1
 //
-//   len == 4: float32 sample (unchanged path)
-//     Client → server: 4 bytes LE float32 sample.
-//     Server → client: 4 bytes LE int32 predicted class (= model.classes[argmax]).
-//     Sliding window of length L: memmove left by 1, append sample; NAIVE full
-//     recompute; scaler+classify; reply.
-//
-//   len == 8: control packet
-//     Layout: uint32_t magic LE + uint32_t cmd LE
-//     magic = 0x4D525354 ('MRST')
-//     cmd = 1: RESET — zero the sliding window. Reply int32 0 as ACK (client
-//              can wait). Required between independent series for correctness
-//              benches / rate sweeps.
-//     unknown cmd: reply int32 -1 (or ignore if magic mismatch — drop)
-//
-// Compile (sm_75 = RTX 2080 Ti on cerebro):
-//   nvcc -O3 -arch=sm_75 -std=c++17 -o minirocket_gpu_udp_server \
-//        minirocket_gpu_udp_server.cu
+// Compile:
+//   g++ -O3 -march=native -std=c++17 -o minirocket_cpu_udp_server \
+//       minirocket_cpu_udp_server.cpp
 //
 // Usage:
-//   ./minirocket_gpu_udp_server <model.json> [bind_host] [bind_port]
+//   ./minirocket_cpu_udp_server <model.json> [bind_host] [bind_port]
 //   defaults: 127.0.0.1 9000
 //==============================================================================
 
@@ -49,25 +38,11 @@
 #include <csignal>
 #include <atomic>
 #include <cstdint>
-#include <cuda_runtime.h>
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
-// ============================================================
-// CUDA error-checking helper
-// ============================================================
-#define CUDA_CHECK(call)                                                     \
-    do {                                                                     \
-        cudaError_t err = (call);                                           \
-        if (err != cudaSuccess) {                                            \
-            std::cerr << "CUDA error at " << __FILE__ << ":" << __LINE__     \
-                      << " -> " << cudaGetErrorString(err) << std::endl;      \
-            exit(1);                                                         \
-        }                                                                    \
-    } while (0)
 
 static constexpr uint32_t kCtrlMagic = 0x4D525354u;  // 'MRST'
 static constexpr uint32_t kCmdReset  = 1u;
@@ -79,7 +54,7 @@ static void on_signal(int) {
 }
 
 // ============================================================
-// Minimal JSON parser (identical to existing GPU files)
+// Minimal JSON parser (same style as GPU / client files)
 // ============================================================
 
 struct JsonValue {
@@ -236,30 +211,25 @@ JsonValue load_json(const std::string& path) {
 }
 
 // ============================================================
-// MiniRocket Model
+// MiniRocket Model + host feature extract (NAIVE, single-thread)
 // ============================================================
 
-#define MAX_DILATIONS 32
-
 struct MiniRocketModel {
-    int num_kernels;
-    int num_dilations;
-    int num_features;
-    int num_classes;
-    int time_series_length;
+    int num_kernels = 0;
+    int num_dilations = 0;
+    int num_features = 0;
+    int num_classes = 0;
+    int time_series_length = 0;
 
     std::vector<std::vector<int>> kernel_indices;
     std::vector<int> dilations;
     std::vector<int> num_features_per_dilation;
     std::vector<double> biases;
-
     std::vector<double> scaler_mean;
     std::vector<double> scaler_scale;
-
     std::vector<std::vector<double>> classifier_coef;
     std::vector<double> classifier_intercept;
     std::vector<int> classes;
-
     std::vector<int> dilation_feature_offset;
 
     void load(const std::string& path) {
@@ -288,14 +258,7 @@ struct MiniRocketModel {
         classifier_intercept = j["classifier_intercept"].as_double_array();
         classes = j["classes"].as_int_array();
 
-        assert(num_kernels == 84 && "This CUDA port assumes the standard 84 MiniRocket kernels");
-        assert(num_dilations <= MAX_DILATIONS && "Increase MAX_DILATIONS for this model");
-        for (int d = 0; d < num_dilations; d++) {
-            assert(num_features_per_dilation[d] <= 256 &&
-                   "A dilation needs more than 256 features/kernel — bump counts[256] "
-                   "in extract_features_kernel AND this bound together, or predictions "
-                   "will silently corrupt again.");
-        }
+        assert(num_kernels == 84 && "Assumes standard 84 MiniRocket kernels");
 
         dilation_feature_offset.resize(num_dilations);
         int running = 0;
@@ -303,7 +266,7 @@ struct MiniRocketModel {
             dilation_feature_offset[d] = running;
             running += 84 * num_features_per_dilation[d];
         }
-        assert(running == num_features && "Feature count mismatch — check num_features_per_dilation");
+        assert(running == num_features && "Feature count mismatch");
 
         std::cout << "  num_kernels: " << num_kernels << std::endl;
         std::cout << "  num_dilations: " << num_dilations << std::endl;
@@ -313,97 +276,67 @@ struct MiniRocketModel {
     }
 };
 
-// ============================================================
-// Device constant memory (+ biases in global memory)
-// ============================================================
-__constant__ int   d_kernel_indices[84 * 3];
-__constant__ int   d_dilations[MAX_DILATIONS];
-__constant__ int   d_num_features_per_dilation[MAX_DILATIONS];
-__constant__ int   d_dilation_feature_offset[MAX_DILATIONS];
+// Host-side MiniRocket feature extract — port of GPU kernel / CPU inference.
+// NAIVE: full recompute over entire window. Single-thread (MT/OpenMP later).
+void extract_features_cpu(const MiniRocketModel& model,
+                          const std::vector<double>& ts,
+                          std::vector<double>& features_out) {
+    const int L = model.time_series_length;
+    std::fill(features_out.begin(), features_out.end(), 0.0);
 
-// Biases in GLOBAL device memory (g_d_biases), NOT __constant__ —
-// constant mem overflow bug on large feature counts (see existing GPU files).
-static double* g_d_biases = nullptr;
+    for (int d = 0; d < model.num_dilations; d++) {
+        const int dilation = model.dilations[d];
+        const int n_feat_this_dil = model.num_features_per_dilation[d];
+        const int padding0 = d % 2;
+        const int half_pad = 4 * dilation;
+        const int feat_off = model.dilation_feature_offset[d];
 
-// ============================================================
-// GPU feature-extraction kernel (same as batch_size=1 offline GPU)
-// Weights: -1 everywhere except +2 at three kernel_indices positions.
-// NAIVE: full extract over entire window — no DP-Reuse.
-// ============================================================
-__global__ void extract_features_kernel(
-    const double* __restrict__ X,
-    double* __restrict__ features_out,
-    const double* __restrict__ biases,
-    int L,
-    int num_dilations,
-    int batch_size)
-{
-    int sample = blockIdx.x;
-    int d      = blockIdx.y;
-    int k      = threadIdx.x;
+        for (int k = 0; k < 84; k++) {
+            double weights[9];
+            for (int i = 0; i < 9; i++) weights[i] = -1.0;
+            weights[model.kernel_indices[k][0]] = 2.0;
+            weights[model.kernel_indices[k][1]] = 2.0;
+            weights[model.kernel_indices[k][2]] = 2.0;
 
-    if (sample >= batch_size || d >= num_dilations || k >= 84) return;
+            const int padding1 = (padding0 + k) % 2;
+            int t_start, t_end, conv_length;
+            if (padding1 == 0) {
+                t_start = 0;
+                t_end = L;
+                conv_length = L;
+            } else {
+                t_start = half_pad;
+                t_end = L - half_pad;
+                conv_length = t_end - t_start;
+            }
 
-    int dilation        = d_dilations[d];
-    int n_feat_this_dil = d_num_features_per_dilation[d];
-    int padding0        = d % 2;
-    int padding1        = (padding0 + k) % 2;
-    int half_pad        = 4 * dilation;
+            const int feature_base = feat_off + k * n_feat_this_dil;
+            if (conv_length <= 0) {
+                for (int f = 0; f < n_feat_this_dil; f++)
+                    features_out[(size_t)feature_base + f] = 0.0;
+                continue;
+            }
 
-    double weights[9];
-    #pragma unroll
-    for (int i = 0; i < 9; i++) weights[i] = -1.0;
-    weights[d_kernel_indices[k * 3 + 0]] = 2.0;
-    weights[d_kernel_indices[k * 3 + 1]] = 2.0;
-    weights[d_kernel_indices[k * 3 + 2]] = 2.0;
-
-    int t_start, t_end, conv_length;
-    if (padding1 == 0) {
-        t_start = 0;
-        t_end = L;
-        conv_length = L;
-    } else {
-        t_start = half_pad;
-        t_end = L - half_pad;
-        conv_length = t_end - t_start;
-    }
-
-    int feature_base = d_dilation_feature_offset[d] + k * n_feat_this_dil;
-    const double* ts = X + (size_t)sample * L;
-    double* out = features_out + (size_t)sample * (d_dilation_feature_offset[num_dilations - 1]
-                                                      + 84 * d_num_features_per_dilation[num_dilations - 1]);
-
-    if (conv_length <= 0) {
-        for (int f = 0; f < n_feat_this_dil; f++) out[feature_base + f] = 0.0;
-        return;
-    }
-
-    // counts[256] — asserted in MiniRocketModel::load via num_features_per_dilation
-    int counts[256] = {0};
-
-    for (int t = t_start; t < t_end; t++) {
-        double conv_val = 0.0;
-        #pragma unroll
-        for (int w = 0; w < 9; w++) {
-            int idx = t + (w - 4) * dilation;
-            if (idx >= 0 && idx < L) {
-                conv_val += weights[w] * ts[idx];
+            std::vector<int> counts((size_t)n_feat_this_dil, 0);
+            for (int t = t_start; t < t_end; t++) {
+                double conv_val = 0.0;
+                for (int w = 0; w < 9; w++) {
+                    int idx = t + (w - 4) * dilation;
+                    if (idx >= 0 && idx < L)
+                        conv_val += weights[w] * ts[(size_t)idx];
+                }
+                for (int f = 0; f < n_feat_this_dil; f++) {
+                    if (conv_val > model.biases[(size_t)feature_base + f])
+                        counts[(size_t)f]++;
+                }
+            }
+            for (int f = 0; f < n_feat_this_dil; f++) {
+                features_out[(size_t)feature_base + f] =
+                    (double)counts[(size_t)f] / (double)conv_length;
             }
         }
-        for (int f = 0; f < n_feat_this_dil; f++) {
-            double bias = biases[feature_base + f];
-            if (conv_val > bias) counts[f]++;
-        }
-    }
-
-    for (int f = 0; f < n_feat_this_dil; f++) {
-        out[feature_base + f] = (double)counts[f] / (double)conv_length;
     }
 }
-
-// ============================================================
-// Host apply_scaler + classify (Ridge) — matching existing GPU files
-// ============================================================
 
 void apply_scaler(const MiniRocketModel& model, std::vector<double>& features) {
     for (int i = 0; i < model.num_features; i++) {
@@ -429,27 +362,7 @@ int classify(const MiniRocketModel& model, const std::vector<double>& features) 
     return model.classes[best_class];
 }
 
-void upload_model_to_gpu(const MiniRocketModel& model) {
-    std::vector<int> flat_kernel_indices(84 * 3);
-    for (int k = 0; k < 84; k++)
-        for (int i = 0; i < 3; i++)
-            flat_kernel_indices[k * 3 + i] = model.kernel_indices[k][i];
-
-    CUDA_CHECK(cudaMemcpyToSymbol(d_kernel_indices, flat_kernel_indices.data(),
-                                   84 * 3 * sizeof(int)));
-    CUDA_CHECK(cudaMemcpyToSymbol(d_dilations, model.dilations.data(),
-                                   model.num_dilations * sizeof(int)));
-    CUDA_CHECK(cudaMemcpyToSymbol(d_num_features_per_dilation, model.num_features_per_dilation.data(),
-                                   model.num_dilations * sizeof(int)));
-    CUDA_CHECK(cudaMemcpyToSymbol(d_dilation_feature_offset, model.dilation_feature_offset.data(),
-                                   model.num_dilations * sizeof(int)));
-
-    CUDA_CHECK(cudaMalloc(&g_d_biases, model.num_features * sizeof(double)));
-    CUDA_CHECK(cudaMemcpy(g_d_biases, model.biases.data(),
-                          model.num_features * sizeof(double), cudaMemcpyHostToDevice));
-}
-
-static double percentile_sorted(std::vector<double>& v, double p) {
+static double percentile_sorted(std::vector<double> v, double p) {
     if (v.empty()) return 0.0;
     std::sort(v.begin(), v.end());
     double idx = p * (double)(v.size() - 1);
@@ -463,17 +376,11 @@ static double percentile_sorted(std::vector<double>& v, double p) {
 static void send_i32_reply(int sock, const sockaddr_in& client, socklen_t client_len,
                            int32_t value) {
     uint8_t out_buf[4];
-    std::memcpy(out_buf, &value, 4);  // LE on x86/ARM LE hosts
+    std::memcpy(out_buf, &value, 4);
     ssize_t sn = sendto(sock, out_buf, 4, 0,
                         reinterpret_cast<const sockaddr*>(&client), client_len);
-    if (sn != 4) {
-        perror("sendto");
-    }
+    if (sn != 4) perror("sendto");
 }
-
-// ============================================================
-// Main — UDP server, NAIVE full-recompute per sample packet
-// ============================================================
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -490,37 +397,17 @@ int main(int argc, char** argv) {
     std::signal(SIGINT, on_signal);
     std::signal(SIGTERM, on_signal);
 
-    int device_count = 0;
-    CUDA_CHECK(cudaGetDeviceCount(&device_count));
-    if (device_count == 0) {
-        std::cerr << "ERROR: No CUDA-capable GPU found." << std::endl;
-        return 1;
-    }
-    cudaDeviceProp prop;
-    CUDA_CHECK(cudaGetDeviceProperties(&prop, 0));
-
     MiniRocketModel model;
     model.load(model_path);
-    upload_model_to_gpu(model);
 
     const int L = model.time_series_length;
     const int num_features = model.num_features;
 
-    // Allocate once; reuse across packets (correctness-phase simplicity:
-    // cudaMemcpy H2D/D2H each inference).
-    double *d_X = nullptr, *d_features = nullptr;
-    CUDA_CHECK(cudaMalloc(&d_X, (size_t)L * sizeof(double)));
-    CUDA_CHECK(cudaMalloc(&d_features, (size_t)num_features * sizeof(double)));
-
-    std::vector<double> h_window((size_t)L, 0.0);  // starts as zeros
+    std::vector<double> h_window((size_t)L, 0.0);
     std::vector<double> h_features((size_t)num_features, 0.0);
 
-    // UDP IPv4 SOCK_DGRAM server
     int sock = ::socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) {
-        perror("socket");
-        return 1;
-    }
+    if (sock < 0) { perror("socket"); return 1; }
     int yes = 1;
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 
@@ -536,15 +423,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Startup banner
     std::cout << "========================================" << std::endl;
-    std::cout << "MiniRocket GPU UDP Server" << std::endl;
+    std::cout << "MiniRocket CPU UDP Server" << std::endl;
     std::cout << "  model:         " << model_path << std::endl;
     std::cout << "  L:             " << L << std::endl;
     std::cout << "  num_features:  " << num_features << std::endl;
     std::cout << "  bind:          " << bind_host << ":" << bind_port << std::endl;
-    std::cout << "  GPU:           " << prop.name << std::endl;
     std::cout << "  mode:          NAIVE full-recompute (no DP-Reuse)" << std::endl;
+    std::cout << "  threads:       1 (OpenMP optional later)" << std::endl;
     std::cout << "  protocol:      4B float32 sample | 8B MRST control (RESET=1)" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << "Waiting for packets..." << std::endl;
@@ -557,7 +443,6 @@ int main(int argc, char** argv) {
     std::vector<double> infer_ms_hist;
     infer_ms_hist.reserve(1 << 16);
 
-    // Optional short recv timeout so Ctrl+C is noticed promptly
     timeval tv{};
     tv.tv_sec = 1;
     tv.tv_usec = 0;
@@ -571,42 +456,36 @@ int main(int argc, char** argv) {
                              reinterpret_cast<sockaddr*>(&client), &client_len);
         if (n < 0) {
             if (!g_running) break;
-            continue;  // timeout / EINTR
+            continue;
         }
 
-        // ---- Control packet: 8 bytes magic+cmd ----
         if (n == 8) {
             uint32_t magic = 0, cmd = 0;
             std::memcpy(&magic, buf + 0, 4);
             std::memcpy(&cmd,   buf + 4, 4);
             if (magic != kCtrlMagic) {
-                std::cerr << "WARNING: 8-byte packet with bad magic 0x"
-                          << std::hex << magic << std::dec << " — dropping" << std::endl;
+                std::cerr << "WARNING: 8-byte packet with bad magic — dropping\n";
                 continue;
             }
             if (cmd == kCmdReset) {
-                // RESET sliding window to zeros
                 std::fill(h_window.begin(), h_window.end(), 0.0);
                 n_resets++;
-                send_i32_reply(sock, client, client_len, /*ACK=*/0);
+                send_i32_reply(sock, client, client_len, 0);
             } else {
-                // unknown cmd
-                send_i32_reply(sock, client, client_len, /*err=*/-1);
+                send_i32_reply(sock, client, client_len, -1);
             }
             continue;
         }
 
         if (n != 4) {
-            std::cerr << "WARNING: expected 4-byte float32 or 8-byte control, got "
-                      << n << " bytes" << std::endl;
+            std::cerr << "WARNING: expected 4 or 8 bytes, got " << n << std::endl;
             continue;
         }
 
         float sample_f32;
-        std::memcpy(&sample_f32, buf, 4);  // little-endian on x86/ARM LE hosts
+        std::memcpy(&sample_f32, buf, 4);
         double sample = static_cast<double>(sample_f32);
 
-        // Sliding window: memmove left by 1, append new sample at end
         if (L > 1) {
             std::memmove(h_window.data(), h_window.data() + 1,
                          (size_t)(L - 1) * sizeof(double));
@@ -616,20 +495,7 @@ int main(int argc, char** argv) {
         auto t0 = std::chrono::high_resolution_clock::now();
 
         // NAIVE: FULL MiniRocket feature extract on the whole window (no DP-Reuse)
-        CUDA_CHECK(cudaMemcpy(d_X, h_window.data(), (size_t)L * sizeof(double),
-                              cudaMemcpyHostToDevice));
-
-        dim3 grid(1, model.num_dilations);  // batch_size = 1
-        dim3 block(84);
-        extract_features_kernel<<<grid, block>>>(
-            d_X, d_features, g_d_biases, L, model.num_dilations, /*batch_size=*/1);
-        CUDA_CHECK(cudaGetLastError());
-        CUDA_CHECK(cudaDeviceSynchronize());
-
-        CUDA_CHECK(cudaMemcpy(h_features.data(), d_features,
-                              (size_t)num_features * sizeof(double),
-                              cudaMemcpyDeviceToHost));
-
+        extract_features_cpu(model, h_window, h_features);
         apply_scaler(model, h_features);
         int pred = classify(model, h_features);
 
@@ -639,7 +505,6 @@ int main(int argc, char** argv) {
         n_samples++;
         infer_ms_hist.push_back(last_inf_ms);
 
-        // Reply: little-endian int32 class label
         send_i32_reply(sock, client, client_len, static_cast<int32_t>(pred));
 
         if (progress_every > 0 && (n_samples % (uint64_t)progress_every) == 0) {
@@ -651,19 +516,15 @@ int main(int argc, char** argv) {
         }
     }
 
-    // SIGINT summary: samples + mean/p50/p95 infer ms
     std::cout << "\n========== SERVER STATS (SIGINT) ==========" << std::endl;
     std::cout << "  samples:  " << n_samples << std::endl;
     std::cout << "  resets:   " << n_resets << std::endl;
     if (!infer_ms_hist.empty()) {
-        std::vector<double> sorted = infer_ms_hist;
         double sum = 0.0;
-        for (double x : sorted) sum += x;
-        double mean = sum / (double)sorted.size();
-        double p50 = percentile_sorted(sorted, 0.50);
-        // re-sort already sorted; percentile_sorted sorts in place
-        sorted = infer_ms_hist;
-        double p95 = percentile_sorted(sorted, 0.95);
+        for (double x : infer_ms_hist) sum += x;
+        double mean = sum / (double)infer_ms_hist.size();
+        double p50 = percentile_sorted(infer_ms_hist, 0.50);
+        double p95 = percentile_sorted(infer_ms_hist, 0.95);
         std::cout << std::fixed << std::setprecision(3);
         std::cout << "  infer_ms mean: " << mean << std::endl;
         std::cout << "  infer_ms p50:  " << p50 << std::endl;
@@ -673,11 +534,5 @@ int main(int argc, char** argv) {
 
     std::cout << "Shutting down after " << n_samples << " samples." << std::endl;
     ::close(sock);
-    CUDA_CHECK(cudaFree(d_X));
-    CUDA_CHECK(cudaFree(d_features));
-    if (g_d_biases) {
-        CUDA_CHECK(cudaFree(g_d_biases));
-        g_d_biases = nullptr;
-    }
     return 0;
 }
